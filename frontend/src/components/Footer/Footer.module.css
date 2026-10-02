@@ -1,0 +1,139 @@
+.footer {
+  background-color: #0b1a38;
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+  margin-top: 64px;
+}
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 64px 16px 24px 16px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  gap: 48px;
+  margin-bottom: 48px;
+}
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.logoPlaceholder {
+  width: 48px;
+  height: 48px;
+  background-color: white;
+  border-radius: 50%;
+}
+.brandName {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.brandSub {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.description {
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 300px;
+}
+.heading {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.linkList a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+.linkList a:hover {
+  color: white;
+}
+.contactList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.contactList li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+.contactIcon {
+  color: #94a3b8;
+}
+.socialIcons {
+  display: flex;
+  gap: 12px;
+}
+.socialBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.socialBtn:hover {
+  background-color: #1e293b;
+}
+.customIcon {
+  font-family: serif;
+  font-weight: bold;
+}
+.bottomBar {
+  border-top: 1px solid #1e293b;
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #64748b;
+  font-size: 13px;
+}
+.bottomBar p {
+  margin: 0;
+}
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .bottomBar {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+}
