@@ -1,56 +1,433 @@
 .hero {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 45% 55%;
+  background: #f7faff;
+}
+
+/* =========================
+   CONTENT / LEFT SIDE
+========================= */
+
+.content {
+  position: relative;
+  z-index: 5;
+  display: flex;
   align-items: center;
-  gap: 32px;
-  max-width: var(--container-max);
-  margin: 0 auto;
-  padding: 48px 24px;
+  min-width: 0;
+  padding: 64px 40px 64px max(24px, calc((100vw - var(--container-max)) / 2));
+  background: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #f8fbff 75%,
+    rgba(247, 250, 255, 0.8) 100%
+  );
+}
+
+.text {
+  width: 100%;
+  max-width: 590px;
 }
 
 .badge {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-  font-size: 0.85rem;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #dceaff;
+  color: #1761b8;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .title {
-  margin: 16px 0 4px;
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  line-height: 1.1;
-  color: var(--color-primary-dark);
+  margin: 18px 0 0;
+  color: #09204d;
+  font-size: clamp(4rem, 6vw, 6.2rem);
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: -0.045em;
 }
 
 .subtitle {
-  margin: 0 0 16px;
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 600;
-  color: var(--color-primary-dark);
+  margin: 10px 0 0;
+  color: #102b5b;
+  font-size: clamp(1.65rem, 2.4vw, 2.35rem);
+  line-height: 1.15;
+  font-weight: 750;
+  letter-spacing: -0.025em;
 }
 
 .description {
-  max-width: 440px;
-  margin: 0 0 24px;
-  color: var(--color-text-muted);
+  max-width: 560px;
+  margin: 28px 0 0;
+  color: #506789;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  line-height: 1.7;
 }
 
 .actions {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 26px;
+}
+
+.actions a {
+  min-height: 64px;
+  padding: 0 28px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.buttonIcon {
+  margin-right: 9px;
+  font-size: 1rem;
+}
+
+.arrow {
+  margin-left: 20px;
+  font-size: 1.35rem;
+}
+
+/* =========================
+   IMAGE / RIGHT SIDE
+========================= */
+
+.media {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #dceaff;
+}
+
+.media > img,
+.media > div:first-child {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.media img {
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Fade putih dari kiri agar transisi teks dan foto mulus */
+.media::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    rgba(247, 250, 255, 1) 0%,
+    rgba(247, 250, 255, 0.4) 15%,
+    rgba(247, 250, 255, 0) 35%
+  );
+  pointer-events: none;
+}
+
+/* =========================
+   BLUE DIAGONAL (DIPERAPI AGAR TIDAK MENUTUPI FOTO)
+========================= */
+
+.blueShape {
+  position: absolute;
+  z-index: 3;
+  width: 35%;
+  height: 35%;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 50%, rgba(23, 97, 184, 0.85) 50%);
+  pointer-events: none;
+}
+
+.blueShape::after {
+  display: none; /* Nonaktifkan shape tambahan */
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.logo {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  width: clamp(180px, 23vw, 330px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 12px 25px rgba(8, 35, 77, 0.18));
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* =========================
+   DECORATIVE LINES
+========================= */
+
+.lines {
+  position: absolute;
+  z-index: 6;
+  bottom: 58px;
+  left: -100px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.lines span {
+  display: block;
+  width: 135px;
+  height: 4px;
+  border-radius: 999px;
+  background: #c7d9ef;
+}
+
+/* =========================
+   CAROUSEL NAVIGATION
+========================= */
+
+.navigation {
+  position: absolute;
+  z-index: 10;
+  right: 38px;
+  bottom: 22px;
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
 
-.media { height: 340px; }
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #145db2;
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.navButton:hover {
+  transform: scale(1.05);
+  background: #ffffff;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.activeDot {
+  width: 28px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: 48% 52%;
+  }
+
+  .content {
+    padding-right: 24px;
+  }
+
+  .title {
+    font-size: clamp(3.5rem, 7vw, 5rem);
+  }
+
+  .subtitle {
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .logo {
+    width: 240px;
+  }
+
+  .blueShape {
+    right: -65%;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 768px) {
   .hero {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .content {
+    order: 1;
+    padding: 42px 20px 38px;
+  }
+
+  .text {
+    max-width: 100%;
+  }
+
+  .badge {
+    font-size: 0.8rem;
+  }
+
+  .title {
+    margin-top: 15px;
+    font-size: clamp(3.2rem, 16vw, 5rem);
+  }
+
+  .subtitle {
+    font-size: clamp(1.35rem, 6vw, 1.8rem);
+  }
+
+  .description {
+    margin-top: 18px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .actions {
+    gap: 12px;
+  }
+
+  .actions a {
+    min-height: 54px;
+    padding: 0 20px;
+  }
+
+  .media {
+    order: 2;
+    min-height: 360px;
+    height: 360px;
+  }
+
+  .media::before {
+    background: linear-gradient(
+      180deg,
+      rgba(247, 250, 255, 0.95) 0%,
+      rgba(247, 250, 255, 0) 30%
+    );
+  }
+
+  .blueShape {
+    width: 140%;
+    height: 100%;
+    right: -60%;
+    bottom: -60%;
+  }
+
+  .logo {
+    width: 155px;
+  }
+
+  .lines {
+    bottom: 45px;
+    left: 20px;
+  }
+
+  .lines span {
+    width: 85px;
+    height: 3px;
+  }
+
+  .navigation {
+    right: 18px;
+    bottom: 18px;
+  }
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 480px) {
+  .content {
     padding: 32px 16px;
   }
 
-  .media { height: 220px; }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .media {
+    min-height: 300px;
+    height: 300px;
+  }
+
+  .logo {
+    width: 125px;
+  }
+
+  .navigation {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .navButton {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .navButton,
+  .dot {
+    transition: none;
+  }
 }
