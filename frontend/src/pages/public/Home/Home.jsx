@@ -3,7 +3,7 @@ import HeroSection from './components/HeroSection/HeroSection'
 import KegiatanTerbaru from './components/KegiatanTerbaru/KegiatanTerbaru' 
 import InformasiBerita from './components/InformasiBerita/InformasiBerita'
 import Footer from '../../../components/Footer/Footer'
-
+  
 function Home() {
   return (
     <main>

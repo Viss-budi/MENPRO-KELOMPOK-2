@@ -2,11 +2,17 @@ import React from 'react';
 import { Calendar, MapPin, ArrowRight, TrendingUp, Briefcase, Users } from 'lucide-react';
 import styles from './KegiatanTerbaru.module.css';
 
+// Import aset gambar dari folder src/assets/images/
+import stadiumImg from '../../../../../assets/images/kegiatan-stadium-general.webp';
+import seminarImg from '../../../../../assets/images/kegiatan-seminar-moderasi.webp';
+import informaticsImg from '../../../../../assets/images/kegiatan-informatics-fair.webp';
+import volunteerImg from '../../../../../assets/images/volunteer-tim.webp'; // Gambar untuk CTA Section
+
 const KegiatanTerbaru = () => {
   const activities = [
     {
       id: 1,
-      image: '/path-to-image-1.jpg',
+      image: stadiumImg,
       tag: 'Seminar',
       title: 'Stadium General',
       date: '19 Agustus 2026',
@@ -14,7 +20,7 @@ const KegiatanTerbaru = () => {
     },
     {
       id: 2,
-      image: '/path-to-image-2.jpg',
+      image: seminarImg,
       tag: 'Seminar',
       title: 'Seminar Moderasi Beragama',
       date: '26 Februari 2026',
@@ -22,7 +28,7 @@ const KegiatanTerbaru = () => {
     },
     {
       id: 3,
-      image: '/path-to-image-3.jpg',
+      image: informaticsImg,
       tag: 'Event',
       title: 'Informatics Fair 2026',
       date: '12 Oktober 2026',
@@ -111,7 +117,8 @@ const KegiatanTerbaru = () => {
       {/* CTA SECTION */}
       <div className={styles.ctaContainer}>
         <div className={styles.ctaImageWrapper}>
-          <img src="/path-to-group-photo.jpg" alt="Pengurus HIMAFOR" className={styles.ctaImage} />
+          {/* Menggunakan variabel import volunteerImg */}
+          <img src={volunteerImg} alt="Pengurus HIMAFOR" className={styles.ctaImage} />
         </div>
 
         <div className={styles.ctaContent}>

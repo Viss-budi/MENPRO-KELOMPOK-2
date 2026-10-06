@@ -2,25 +2,29 @@ import React from 'react';
 import { Calendar, ArrowRight, Users, CalendarCheck, Trophy, UserCheck } from 'lucide-react';
 import styles from './InformasiBerita.module.css';
 
+import berita_lsp from '../../../../../assets/images/berita-lsp.webp';
+import wedity from '../../../../../assets/images/berita-wedity.webp';
+import oprek from '../../../../../assets/images/berita-open-recruitment.webp';
+
 const InformasiBerita = () => {
   const news = [
     {
       id: 1,
-      image: '/path-to-news-1.jpg',
+      image: berita_lsp,
       tag: 'Berita',
       title: 'Lisensi Lembaga Sertifikasi Profesi berdasarkan Keputusan Ketua BNSP Nomor KEP 2390/BNSP/VII/2026.',
       date: '22 September 2026'
     },
     {
       id: 2,
-      image: '/path-to-news-2.jpg',
+      image: wedity,
       tag: 'Kegiatan',
       title: 'WEDITY HIMAFOR',
       date: '10 September 2026'
     },
     {
       id: 3,
-      image: '/path-to-news-3.jpg',
+      image: oprek,
       tag: 'Kegiatan',
       title: 'Open Recruitmen Volunteer Informatics Fair 2026 Resmi Dibuka!',
       date: '03 September 2026'
