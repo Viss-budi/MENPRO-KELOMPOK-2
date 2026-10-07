@@ -1,0 +1,320 @@
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 16px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Header */
+.header {
+  margin-bottom: 32px;
+}
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a2b4c;
+  margin: 0 0 4px 0;
+}
+.subtitle {
+  color: #6b7280;
+  margin: 0;
+  font-size: 15px;
+}
+
+/* Main Grid */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 24px;
+}
+
+/* Activities List */
+.activitiesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.card {
+  background-color: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.cardImageWrapper {
+  height: 160px;
+  background-color: #e5e7eb;
+}
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cardContent {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.tag {
+  background-color: #2563eb;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  width: max-content;
+  margin-bottom: 12px;
+}
+.cardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a2b4c;
+  margin: 0 0 16px 0;
+}
+.cardMeta {
+  margin-top: auto;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.metaItem {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+.metaIcon {
+  margin-right: 8px;
+}
+.detailLink {
+  display: flex;
+  align-items: center;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  gap: 4px;
+}
+.detailLink:hover {
+  color: #1d4ed8;
+}
+
+/* Calendar Widget */
+.calendarWidget {
+  background-color: #f4f7fc;
+  border: 1px solid #eff6ff;
+  border-radius: 16px;
+  padding: 20px;
+  height: max-content;
+}
+.calendarTitle {
+  font-weight: 700;
+  color: #1a2b4c;
+  font-size: 18px;
+  margin: 0 0 16px 0;
+}
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.navBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.navBtn:hover {
+  background-color: #e5e7eb;
+}
+.monthYear {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a2b4c;
+}
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+.datesGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 24px;
+  gap: 4px;
+}
+.dateItem {
+  padding: 6px;
+  color: #374151;
+  border-radius: 9999px;
+}
+.activeDate {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 700;
+}
+.agendaTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a2b4c;
+  margin: 0 0 12px 0;
+}
+.agendaCard {
+  background-color: white;
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.agendaInfo {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.agendaDot {
+  width: 8px;
+  height: 8px;
+  background-color: #2563eb;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+.agendaName {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a2b4c;
+}
+.agendaTime {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+.agendaArrow {
+  color: #9ca3af;
+}
+
+/* CTA Section */
+.ctaContainer {
+  margin-top: 48px;
+  background-color: #f4f7fc;
+  border: 1px solid #eff6ff;
+  border-radius: 24px;
+  display: flex;
+  overflow: hidden;
+}
+.ctaImageWrapper {
+  flex: 1;
+  min-height: 250px;
+}
+.ctaImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ctaContent {
+  flex: 1;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.ctaTag {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  width: max-content;
+  margin-bottom: 16px;
+}
+.ctaTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a2b4c;
+  margin: 0 0 12px 0;
+}
+.ctaDesc {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+.ctaButton {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  width: max-content;
+}
+.ctaButton:hover {
+  background-color: #1d4ed8;
+}
+.ctaBenefits {
+  flex: 1;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.benefitItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5563;
+}
+.benefitIcon {
+  background-color: white;
+  padding: 12px;
+  border-radius: 50%;
+  color: #2563eb;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+  .activitiesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ctaContainer {
+    flex-direction: column;
+  }
+}
+@media (max-width: 768px) {
+  .activitiesGrid {
+    grid-template-columns: 1fr;
+  }
+}
