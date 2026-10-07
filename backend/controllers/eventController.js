@@ -22,7 +22,7 @@ const getEvents = async (req, res) => {
   const where = ['is_published = 1'];
   const params = [];
   if (date) { where.push('DATE(start_at) = ?'); params.push(date); }
-
+  if (req.query.featured === '1') where.push('is_featured = 1');
   const [rows] = await db.query(
     `SELECT id, title, slug, category, thumbnail_url, location, start_at, end_at
      FROM events WHERE ${where.join(' AND ')}
