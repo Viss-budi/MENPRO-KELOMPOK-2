@@ -32,7 +32,7 @@ const InformasiBerita = () => {
       <div className={styles.mainGrid}>
         {/* KIRI: Daftar Berita (3 Kolom) */}
         {loading && <p className={styles.statusText}>Memuat berita...</p>}
-        {error && <p className={styles.statusText}>Gagal memuat berita: {error.message}</p>}
+        {error && <p className={styles.statusText}>Gagal memuat berita</p>}
         {!loading && !error && news?.length === 0 && (
           <p className={styles.statusText}>Belum ada berita.</p>
         )}

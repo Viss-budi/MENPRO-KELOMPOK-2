@@ -111,7 +111,7 @@ const KegiatanTerbaru = () => {
         {/* KIRI: Daftar Kegiatan */}
         <div className={styles.activitiesGrid}>
           {loading && <p className={styles.statusText}>Memuat kegiatan...</p>}
-          {error && <p className={styles.statusText}>Gagal memuat kegiatan: {error.message}</p>}
+          {error && <p className={styles.statusText}>Gagal memuat kegiatan </p>}
           {!loading && !error && activities?.length === 0 && (
             <p className={styles.statusText}>Belum ada kegiatan.</p>
           )}
