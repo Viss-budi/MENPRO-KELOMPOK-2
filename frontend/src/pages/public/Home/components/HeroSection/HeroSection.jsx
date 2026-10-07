@@ -95,26 +95,28 @@ function HeroSection() {
           <p className={styles.description}>{current.description}</p>
 
           <div className={styles.actions}>
-            <Button href={current.primaryRoute}>
-              <span className={styles.buttonIcon}>▣</span>
+            <Button href={current.primaryRoute} className={styles.primaryBtn}>
+              <span className={styles.buttonIcon}>📅</span>
               {current.primaryButton}
               <span className={styles.arrow}>→</span>
             </Button>
 
-            <Button href={current.secondaryRoute} variant="outline">
+            <Button href={current.secondaryRoute} variant="outline" className={styles.secondaryBtn}>
               {current.secondaryButton}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Media kanan */}
+      {/* Media kanan dengan ukuran tetap & konsisten */}
       <div className={styles.media}>
-        <ImageWithFallback
-          key={current.id}
-          src={current.image}
-          alt={current.imageAlt}
-        />
+        <div className={styles.imageContainer}>
+          <ImageWithFallback
+            key={current.id}
+            src={current.image}
+            alt={current.imageAlt}
+          />
+        </div>
 
         {/* Shape biru diagonal */}
         <div className={styles.blueShape} />

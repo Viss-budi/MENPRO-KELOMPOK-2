@@ -1,6 +1,7 @@
 import React from 'react';
 // Kita ganti ikon brand dengan MessageCircle, Video, dan Link agar tidak error
 import { Mail, Phone, MapPin, MessageCircle, Video, Link } from 'lucide-react';
+import logo from '../../assets/images/logo-himafor.webp'
 import styles from './Footer.module.css';
 
 const Footer = () => {
@@ -11,7 +12,11 @@ const Footer = () => {
           {/* Kolom 1: Profil */}
           <div className={styles.colProfile}>
             <div className={styles.logoWrapper}>
-              <div className={styles.logoPlaceholder}></div>
+              <img
+                  src={logo}
+                  alt="Logo HIMAFOR"
+                  className={styles.logo}
+                />
               <div>
                 <h3 className={styles.brandName}>HIMAFOR</h3>
                 <p className={styles.brandSub}>Himpunan Mahasiswa Informatika</p>
