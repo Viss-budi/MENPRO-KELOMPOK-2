@@ -1,5 +1,6 @@
 .hero {
   position: relative;
+  height: 560px;
   min-height: 560px;
   overflow: hidden;
   display: grid;
@@ -77,48 +78,82 @@
   margin-top: 26px;
 }
 
-.actions a {
-  min-height: 64px;
-  padding: 0 28px;
+.primaryBtn {
+  background-color: #1761b8 !important;
+  color: #ffffff !important;
+  min-height: 52px;
+  height: 52px;
+  padding: 0 24px;
   border-radius: 999px;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 4px 12px rgba(23, 97, 184, 0.25);
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.primaryBtn:hover {
+  background-color: #134e94 !important;
+}
+
+/* Tombol Kedua (Tentang HIMAFOR) - Outline */
+.secondaryBtn {
+  background-color: transparent !important;
+  color: #102b5b !important;
+  border: 1.5px solid #b0c7e8 !important;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.secondaryBtn:hover {
+  border-color: #1761b8 !important;
+  background-color: rgba(23, 97, 184, 0.03) !important;
 }
 
 .buttonIcon {
-  margin-right: 9px;
+  margin-right: 8px;
   font-size: 1rem;
 }
 
 .arrow {
-  margin-left: 20px;
-  font-size: 1.35rem;
+  margin-left: 14px;
+  font-size: 1.2rem;
 }
 
 /* =========================
-   IMAGE / RIGHT SIDE
+   IMAGE / RIGHT SIDE (UKURAN TETAP)
 ========================= */
 
 .media {
   position: relative;
+  height: 560px;
   min-height: 560px;
   overflow: hidden;
   isolation: isolate;
   background: #dceaff;
 }
 
-.media > img,
-.media > div:first-child {
+/* Kontainer pembungkus gambar dengan ukuran absolut yang konsisten */
+.imageContainer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.media img {
-  display: block;
+.imageContainer img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center;
+  display: block;
 }
 
 /* Fade putih dari kiri agar transisi teks dan foto mulus */
@@ -137,7 +172,7 @@
 }
 
 /* =========================
-   BLUE DIAGONAL (DIPERAPI AGAR TIDAK MENUTUPI FOTO)
+   BLUE DIAGONAL
 ========================= */
 
 .blueShape {
@@ -149,10 +184,6 @@
   bottom: 0;
   background: linear-gradient(135deg, transparent 50%, rgba(23, 97, 184, 0.85) 50%);
   pointer-events: none;
-}
-
-.blueShape::after {
-  display: none; /* Nonaktifkan shape tambahan */
 }
 
 /* =========================
@@ -260,47 +291,14 @@
 }
 
 /* =========================
-   TABLET
-========================= */
-
-@media (max-width: 1100px) {
-  .hero {
-    grid-template-columns: 48% 52%;
-  }
-
-  .content {
-    padding-right: 24px;
-  }
-
-  .title {
-    font-size: clamp(3.5rem, 7vw, 5rem);
-  }
-
-  .subtitle {
-    font-size: clamp(1.4rem, 2.5vw, 2rem);
-  }
-
-  .description {
-    font-size: 1rem;
-  }
-
-  .logo {
-    width: 240px;
-  }
-
-  .blueShape {
-    right: -65%;
-  }
-}
-
-/* =========================
-   MOBILE
+   RESPonsive MOBILE / TABLET
 ========================= */
 
 @media (max-width: 768px) {
   .hero {
     display: flex;
     flex-direction: column;
+    height: auto;
     min-height: auto;
   }
 
@@ -309,125 +307,9 @@
     padding: 42px 20px 38px;
   }
 
-  .text {
-    max-width: 100%;
-  }
-
-  .badge {
-    font-size: 0.8rem;
-  }
-
-  .title {
-    margin-top: 15px;
-    font-size: clamp(3.2rem, 16vw, 5rem);
-  }
-
-  .subtitle {
-    font-size: clamp(1.35rem, 6vw, 1.8rem);
-  }
-
-  .description {
-    margin-top: 18px;
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-
-  .actions {
-    gap: 12px;
-  }
-
-  .actions a {
-    min-height: 54px;
-    padding: 0 20px;
-  }
-
   .media {
     order: 2;
-    min-height: 360px;
     height: 360px;
-  }
-
-  .media::before {
-    background: linear-gradient(
-      180deg,
-      rgba(247, 250, 255, 0.95) 0%,
-      rgba(247, 250, 255, 0) 30%
-    );
-  }
-
-  .blueShape {
-    width: 140%;
-    height: 100%;
-    right: -60%;
-    bottom: -60%;
-  }
-
-  .logo {
-    width: 155px;
-  }
-
-  .lines {
-    bottom: 45px;
-    left: 20px;
-  }
-
-  .lines span {
-    width: 85px;
-    height: 3px;
-  }
-
-  .navigation {
-    right: 18px;
-    bottom: 18px;
-  }
-}
-
-/* =========================
-   SMALL MOBILE
-========================= */
-
-@media (max-width: 480px) {
-  .content {
-    padding: 32px 16px;
-  }
-
-  .actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .actions a {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .media {
-    min-height: 300px;
-    height: 300px;
-  }
-
-  .logo {
-    width: 125px;
-  }
-
-  .navigation {
-    right: 12px;
-    bottom: 12px;
-  }
-
-  .navButton {
-    width: 34px;
-    height: 34px;
-  }
-}
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .navButton,
-  .dot {
-    transition: none;
+    min-height: 360px;
   }
 }

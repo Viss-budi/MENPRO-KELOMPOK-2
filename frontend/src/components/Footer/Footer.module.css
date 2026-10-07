@@ -22,11 +22,11 @@
   gap: 12px;
   margin-bottom: 16px;
 }
-.logoPlaceholder {
+.logo {
   width: 48px;
   height: 48px;
-  background-color: white;
-  border-radius: 50%;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 .brandName {
   margin: 0;

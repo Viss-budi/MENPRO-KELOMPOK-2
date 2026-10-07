@@ -1,40 +1,103 @@
-import React from 'react';
+import { useState } from 'react';
 import { Calendar, MapPin, ArrowRight, TrendingUp, Briefcase, Users } from 'lucide-react';
+import { getEvents, getCalendar, getEventsByDate } from '../../../../../services/api';
+import { useApi } from '../../../../../hooks/useApi';
+import { BULAN, formatTanggal, formatJam, dateKey, todayParts } from '../../../../../utils/format';
+import volunteerImg from '../../../../../assets/images/volunteer-tim.webp';
 import styles from './KegiatanTerbaru.module.css';
+import { resolveImage } from '../../../../../utils/image';
+const HARI = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
-// Import aset gambar dari folder src/assets/images/
-import stadiumImg from '../../../../../assets/images/kegiatan-stadium-general.webp';
-import seminarImg from '../../../../../assets/images/kegiatan-seminar-moderasi.webp';
-import informaticsImg from '../../../../../assets/images/kegiatan-informatics-fair.webp';
-import volunteerImg from '../../../../../assets/images/volunteer-tim.webp'; // Gambar untuk CTA Section
+function Kalender() {
+  const today = todayParts();
+  const todayKey = dateKey(today.year, today.month, today.day);
+
+  const [view, setView] = useState({ year: today.year, month: today.month });
+  const [selected, setSelected] = useState(todayKey);
+
+  const { data: marks } = useApi(
+    (signal) => getCalendar(view.year, view.month, signal),
+    `calendar-${view.year}-${view.month}`
+  );
+  const { data: agenda, loading: agendaLoading, error: agendaError } = useApi(
+    (signal) => getEventsByDate(selected, signal),
+    `agenda-${selected}`
+  );
+
+  const markedDays = new Set((marks || []).map((m) => m.event_date));
+  const offset = (new Date(view.year, view.month - 1, 1).getDay() + 6) % 7; // Senin = kolom pertama
+  const daysInMonth = new Date(view.year, view.month, 0).getDate();
+
+  const moveMonth = (delta) =>
+    setView(({ year, month }) => {
+      const d = new Date(year, month - 1 + delta, 1);
+      return { year: d.getFullYear(), month: d.getMonth() + 1 };
+    });
+
+  return (
+    <div className={styles.calendarWidget}>
+      <h3 className={styles.calendarTitle}>Kalender HIMAFOR</h3>
+
+      <div className={styles.calendarHeader}>
+        <button type="button" className={styles.navBtn} onClick={() => moveMonth(-1)} aria-label="Bulan sebelumnya">&lt;</button>
+        <span className={styles.monthYear}>{BULAN[view.month - 1]} {view.year}</span>
+        <button type="button" className={styles.navBtn} onClick={() => moveMonth(1)} aria-label="Bulan berikutnya">&gt;</button>
+      </div>
+
+      <div className={styles.daysGrid}>
+        {HARI.map((h) => <div key={h}>{h}</div>)}
+      </div>
+
+      <div className={styles.datesGrid}>
+        {Array.from({ length: offset }, (_, i) => <div key={`kosong-${i}`} />)}
+        {Array.from({ length: daysInMonth }, (_, i) => {
+          const key = dateKey(view.year, view.month, i + 1);
+          const className = [
+            styles.dateItem,
+            styles.dateButton,
+            key === selected ? styles.activeDate : '',
+            markedDays.has(key) ? styles.hasEvent : '',
+          ].join(' ');
+          return (
+            <button type="button" key={key} className={className} onClick={() => setSelected(key)}>
+              {i + 1}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className={styles.agendaSection}>
+        <h4 className={styles.agendaTitle}>
+          {selected === todayKey ? 'Agenda Hari Ini' : `Agenda ${formatTanggal(selected)}`}
+        </h4>
+
+        {agendaLoading && <p className={styles.agendaTime}>Memuat agenda...</p>}
+        {agendaError && <p className={styles.agendaTime}>Gagal memuat agenda.</p>}
+        {!agendaLoading && !agendaError && agenda?.length === 0 && (
+          <p className={styles.agendaTime}>Tidak ada agenda.</p>
+        )}
+
+        {!agendaError && (agenda || []).map((a) => (
+          <div key={a.id} className={styles.agendaCard}>
+            <div className={styles.agendaInfo}>
+              <div className={styles.agendaDot}></div>
+              <div>
+                <p className={styles.agendaName}>{a.title}</p>
+                <p className={styles.agendaTime}>
+                  {formatJam(a.start_at)}{a.end_at ? ` - ${formatJam(a.end_at)}` : ''}
+                </p>
+              </div>
+            </div>
+            <ArrowRight size={16} className={styles.agendaArrow} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const KegiatanTerbaru = () => {
-  const activities = [
-    {
-      id: 1,
-      image: stadiumImg,
-      tag: 'Seminar',
-      title: 'Stadium General',
-      date: '19 Agustus 2026',
-      location: 'Aula Gedung F, UIN SSC'
-    },
-    {
-      id: 2,
-      image: seminarImg,
-      tag: 'Seminar',
-      title: 'Seminar Moderasi Beragama',
-      date: '26 Februari 2026',
-      location: 'Gedung FITK Lt. 5, UIN SSC'
-    },
-    {
-      id: 3,
-      image: informaticsImg,
-      tag: 'Event',
-      title: 'Informatics Fair 2026',
-      date: '12 Oktober 2026',
-      location: 'Gedung FITK Lt. 5, UIN SSC'
-    }
-  ];
+  const { data: activities, loading, error } = useApi((signal) => getEvents(3, signal), 'events');
 
   return (
     <div className={styles.container}>
@@ -47,19 +110,25 @@ const KegiatanTerbaru = () => {
       <div className={styles.mainGrid}>
         {/* KIRI: Daftar Kegiatan */}
         <div className={styles.activitiesGrid}>
-          {activities.map((item) => (
+          {loading && <p className={styles.statusText}>Memuat kegiatan...</p>}
+          {error && <p className={styles.statusText}>Gagal memuat kegiatan: {error.message}</p>}
+          {!loading && !error && activities?.length === 0 && (
+            <p className={styles.statusText}>Belum ada kegiatan.</p>
+          )}
+
+          {(activities || []).map((item) => (
             <div key={item.id} className={styles.card}>
               <div className={styles.cardImageWrapper}>
-                <img src={item.image} alt={item.title} className={styles.cardImage} />
+                <img src={resolveImage(item.thumbnail_url)} alt={item.title} className={styles.cardImage} />
               </div>
               <div className={styles.cardContent}>
-                <span className={styles.tag}>{item.tag}</span>
+                <span className={styles.tag}>{item.category}</span>
                 <h3 className={styles.cardTitle}>{item.title}</h3>
-                
+
                 <div className={styles.cardMeta}>
                   <div className={styles.metaItem}>
                     <Calendar className={styles.metaIcon} size={16} />
-                    {item.date}
+                    {formatTanggal(item.start_at)}
                   </div>
                   <div className={styles.metaItem}>
                     <MapPin className={styles.metaIcon} size={16} />
@@ -67,6 +136,7 @@ const KegiatanTerbaru = () => {
                   </div>
                 </div>
 
+                {/* TODO: arahkan ke halaman detail (/kegiatan/{item.slug}) setelah routing disepakati */}
                 <a href="#" className={styles.detailLink}>
                   Lihat Detail <ArrowRight size={16} />
                 </a>
@@ -76,48 +146,12 @@ const KegiatanTerbaru = () => {
         </div>
 
         {/* KANAN: Kalender */}
-        <div className={styles.calendarWidget}>
-          <h3 className={styles.calendarTitle}>Kalender HIMAFOR</h3>
-          
-          <div className={styles.calendarHeader}>
-            <button className={styles.navBtn}>&lt;</button>
-            <span className={styles.monthYear}>September 2026</span>
-            <button className={styles.navBtn}>&gt;</button>
-          </div>
-
-          <div className={styles.daysGrid}>
-            <div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div><div>Min</div>
-          </div>
-
-          <div className={styles.datesGrid}>
-            {[...Array(27)].map((_, i) => (
-              <div key={i} className={styles.dateItem}>{i + 1}</div>
-            ))}
-            <div className={`${styles.dateItem} ${styles.activeDate}`}>28</div>
-            <div className={styles.dateItem}>29</div>
-            <div className={styles.dateItem}>30</div>
-          </div>
-
-          <div className={styles.agendaSection}>
-            <h4 className={styles.agendaTitle}>Agenda Hari Ini</h4>
-            <div className={styles.agendaCard}>
-              <div className={styles.agendaInfo}>
-                <div className={styles.agendaDot}></div>
-                <div>
-                  <p className={styles.agendaName}>Seminar Teknologi & Inovasi Digital</p>
-                  <p className={styles.agendaTime}>09.00 - 12.00</p>
-                </div>
-              </div>
-              <ArrowRight size={16} className={styles.agendaArrow} />
-            </div>
-          </div>
-        </div>
+        <Kalender />
       </div>
 
       {/* CTA SECTION */}
       <div className={styles.ctaContainer}>
         <div className={styles.ctaImageWrapper}>
-          {/* Menggunakan variabel import volunteerImg */}
           <img src={volunteerImg} alt="Pengurus HIMAFOR" className={styles.ctaImage} />
         </div>
 

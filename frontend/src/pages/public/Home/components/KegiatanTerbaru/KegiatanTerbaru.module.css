@@ -318,3 +318,40 @@
     grid-template-columns: 1fr;
   }
 }
+/* ---- Kalender dinamis ---- */
+.dateButton {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+.dateButton:hover {
+  background-color: #e5edff;
+}
+.activeDate:hover {
+  background-color: #2563eb;
+}
+.hasEvent {
+  position: relative;
+  font-weight: 700;
+}
+.hasEvent::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 9999px;
+  background-color: #2563eb;
+}
+.activeDate.hasEvent::after {
+  background-color: #ffffff;
+}
+.statusText {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
