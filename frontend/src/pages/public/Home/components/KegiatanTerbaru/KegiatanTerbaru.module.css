@@ -13,11 +13,11 @@
 .title {
   font-size: 24px;
   font-weight: 700;
-  color: #1a2b4c;
+  color: var(--color-heading);
   margin: 0 0 4px 0;
 }
 .subtitle {
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin: 0;
   font-size: 15px;
 }
@@ -37,20 +37,20 @@
 }
 .card {
   background-color: #fff;
-  border: 1px solid #f3f4f6;
+  border: 1px solid var(--color-border);
   border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(var(--color-shadow), 0.05);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   transition: box-shadow 0.2s;
 }
 .card:hover {
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(var(--color-shadow), 0.1);
 }
 .cardImageWrapper {
   height: 160px;
-  background-color: #e5e7eb;
+  background-color: var(--color-border);
 }
 .cardImage {
   width: 100%;
@@ -64,7 +64,7 @@
   flex-grow: 1;
 }
 .tag {
-  background-color: #2563eb;
+  background-color: var(--color-primary);
   color: white;
   font-size: 12px;
   font-weight: 600;
@@ -76,7 +76,7 @@
 .cardTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #1a2b4c;
+  color: var(--color-heading);
   margin: 0 0 16px 0;
 }
 .cardMeta {
@@ -90,7 +90,7 @@
   display: flex;
   align-items: center;
   font-size: 14px;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 .metaIcon {
   margin-right: 8px;
@@ -98,27 +98,27 @@
 .detailLink {
   display: flex;
   align-items: center;
-  color: #2563eb;
+  color: var(--color-primary);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   gap: 4px;
 }
 .detailLink:hover {
-  color: #1d4ed8;
+  color: var(--color-primary-dark);
 }
 
 /* Calendar Widget */
 .calendarWidget {
-  background-color: #f4f7fc;
-  border: 1px solid #eff6ff;
+  background-color: var(--color-surface-panel);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 20px;
   height: max-content;
 }
 .calendarTitle {
   font-weight: 700;
-  color: #1a2b4c;
+  color: var(--color-heading);
   font-size: 18px;
   margin: 0 0 16px 0;
 }
@@ -136,12 +136,12 @@
   border-radius: 4px;
 }
 .navBtn:hover {
-  background-color: #e5e7eb;
+  background-color: var(--color-border);
 }
 .monthYear {
   font-size: 14px;
   font-weight: 600;
-  color: #1a2b4c;
+  color: var(--color-heading);
 }
 .daysGrid {
   display: grid;
@@ -149,7 +149,7 @@
   text-align: center;
   font-size: 12px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-bottom: 8px;
 }
 .datesGrid {
@@ -162,18 +162,19 @@
 }
 .dateItem {
   padding: 6px;
-  color: #374151;
+  color: var(--color-text);
   border-radius: 9999px;
 }
-.activeDate {
-  background-color: #2563eb;
+.activeDate,
+.dateButton.activeDate {
+  background-color: var(--color-primary);
   color: white;
   font-weight: 700;
 }
 .agendaTitle {
   font-size: 14px;
   font-weight: 700;
-  color: #1a2b4c;
+  color: var(--color-heading);
   margin: 0 0 12px 0;
 }
 .agendaCard {
@@ -183,7 +184,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(var(--color-shadow), 0.05);
 }
 .agendaInfo {
   display: flex;
@@ -193,7 +194,7 @@
 .agendaDot {
   width: 8px;
   height: 8px;
-  background-color: #2563eb;
+  background-color: var(--color-primary);
   border-radius: 50%;
   margin-top: 6px;
 }
@@ -201,22 +202,22 @@
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #1a2b4c;
+  color: var(--color-heading);
 }
 .agendaTime {
   margin: 4px 0 0 0;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 .agendaArrow {
-  color: #9ca3af;
+  color: var(--color-text-disabled);
 }
 
 /* CTA Section */
 .ctaContainer {
   margin-top: 48px;
-  background-color: #f4f7fc;
-  border: 1px solid #eff6ff;
+  background-color: var(--color-surface-panel);
+  border: 1px solid var(--color-border);
   border-radius: 24px;
   display: flex;
   overflow: hidden;
@@ -238,8 +239,8 @@
   justify-content: center;
 }
 .ctaTag {
-  background-color: #dbeafe;
-  color: #1d4ed8;
+  background-color: var(--color-surface-badge);
+  color: var(--color-primary);
   font-size: 12px;
   font-weight: 600;
   padding: 4px 12px;
@@ -250,17 +251,17 @@
 .ctaTitle {
   font-size: 24px;
   font-weight: 700;
-  color: #1a2b4c;
+  color: var(--color-heading);
   margin: 0 0 12px 0;
 }
 .ctaDesc {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 14px;
   margin: 0 0 24px 0;
   line-height: 1.5;
 }
 .ctaButton {
-  background-color: #2563eb;
+  background-color: var(--color-primary);
   color: white;
   border: none;
   padding: 10px 24px;
@@ -274,7 +275,7 @@
   width: max-content;
 }
 .ctaButton:hover {
-  background-color: #1d4ed8;
+  background-color: var(--color-primary-dark);
 }
 .ctaBenefits {
   flex: 1;
@@ -290,15 +291,15 @@
   text-align: center;
   font-size: 12px;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--color-text-body);
 }
 .benefitIcon {
   background-color: white;
   padding: 12px;
   border-radius: 50%;
-  color: #2563eb;
+  color: var(--color-primary);
   margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(var(--color-shadow), 0.05);
 }
 
 /* Responsiveness */
@@ -326,10 +327,10 @@
   font: inherit;
 }
 .dateButton:hover {
-  background-color: #e5edff;
+  background-color: var(--color-surface-icon);
 }
 .activeDate:hover {
-  background-color: #2563eb;
+  background-color: var(--color-primary);
 }
 .hasEvent {
   position: relative;
@@ -344,7 +345,7 @@
   height: 4px;
   margin-left: -2px;
   border-radius: 9999px;
-  background-color: #2563eb;
+  background-color: var(--color-primary);
 }
 .activeDate.hasEvent::after {
   background-color: #ffffff;
@@ -352,6 +353,6 @@
 .statusText {
   grid-column: 1 / -1;
   margin: 0;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 14px;
 }

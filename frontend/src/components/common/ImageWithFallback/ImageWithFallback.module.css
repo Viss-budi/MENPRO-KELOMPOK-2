@@ -15,5 +15,5 @@
   text-align: center;
   font-weight: 600;
   color: var(--color-primary-dark);
-  background: linear-gradient(135deg, var(--color-primary-soft), #c9daf5);
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-deco-soft));
 }

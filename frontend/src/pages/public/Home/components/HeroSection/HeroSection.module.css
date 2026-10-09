@@ -5,7 +5,7 @@
   overflow: hidden;
   display: grid;
   grid-template-columns: 45% 55%;
-  background: #f7faff;
+  background: var(--color-surface-hero);
 }
 
 /* =========================
@@ -22,8 +22,8 @@
   background: linear-gradient(
     110deg,
     #ffffff 0%,
-    #f8fbff 75%,
-    rgba(247, 250, 255, 0.8) 100%
+    var(--color-surface-hero) 50%,
+    #e6eef8 100%
   );
 }
 
@@ -38,15 +38,15 @@
   min-height: 38px;
   padding: 8px 18px;
   border-radius: 999px;
-  background: #dceaff;
-  color: #1761b8;
+  background: var(--color-surface-badge);
+  color: var(--color-primary);
   font-size: 0.9rem;
   font-weight: 700;
 }
 
 .title {
   margin: 18px 0 0;
-  color: #09204d;
+  color: var(--color-heading-hero);
   font-size: clamp(4rem, 6vw, 6.2rem);
   line-height: 0.95;
   font-weight: 800;
@@ -55,7 +55,7 @@
 
 .subtitle {
   margin: 10px 0 0;
-  color: #102b5b;
+  color: var(--color-heading);
   font-size: clamp(1.65rem, 2.4vw, 2.35rem);
   line-height: 1.15;
   font-weight: 750;
@@ -65,7 +65,7 @@
 .description {
   max-width: 560px;
   margin: 28px 0 0;
-  color: #506789;
+  color: var(--color-text-body);
   font-size: clamp(1rem, 1.4vw, 1.2rem);
   line-height: 1.7;
 }
@@ -79,7 +79,7 @@
 }
 
 .primaryBtn {
-  background-color: #1761b8 !important;
+  background-color: var(--color-primary) !important;
   color: #ffffff !important;
   min-height: 52px;
   height: 52px;
@@ -91,20 +91,20 @@
   align-items: center;
   justify-content: center;
   border: none;
-  box-shadow: 0 4px 12px rgba(23, 97, 184, 0.25);
+  box-shadow: 0 4px 12px rgba(26, 92, 176, 0.25);
   transition: background-color 0.2s ease;
   white-space: nowrap;
 }
 
 .primaryBtn:hover {
-  background-color: #134e94 !important;
+  background-color: var(--color-primary-dark) !important;
 }
 
 /* Tombol Kedua (Tentang HIMAFOR) - Outline */
 .secondaryBtn {
   background-color: transparent !important;
-  color: #102b5b !important;
-  border: 1.5px solid #b0c7e8 !important;
+  color: var(--color-primary) !important;
+  border: 1.5px solid var(--color-primary) !important;
   min-height: 52px;
   padding: 0 24px;
   border-radius: 999px;
@@ -113,8 +113,8 @@
 }
 
 .secondaryBtn:hover {
-  border-color: #1761b8 !important;
-  background-color: rgba(23, 97, 184, 0.03) !important;
+  border-color: var(--color-primary) !important;
+  background-color: rgba(26, 92, 176, 0.03) !important;
 }
 
 .buttonIcon {
@@ -137,7 +137,7 @@
   min-height: 560px;
   overflow: hidden;
   isolation: isolate;
-  background: #dceaff;
+  background: var(--color-surface-badge);
 }
 
 /* Kontainer pembungkus gambar dengan ukuran absolut yang konsisten */
@@ -164,28 +164,31 @@
   z-index: 2;
   background: linear-gradient(
     90deg,
-    rgba(247, 250, 255, 1) 0%,
-    rgba(247, 250, 255, 0.4) 15%,
-    rgba(247, 250, 255, 0) 35%
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.4) 15%,
+    rgba(255, 255, 255, 0) 35%
   );
   pointer-events: none;
 }
 
-/* =========================
-   BLUE DIAGONAL
-========================= */
-
 .blueShape {
   position: absolute;
   z-index: 3;
-  width: 35%;
-  height: 35%;
+  width: 90%;         /* Lebar dibatasi agar hanya fokus di sisi kanan saja */
+  height: 100%;       /* Tinggi penuh agar diagonalnya melintang dari atas ke bawah */
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, transparent 50%, rgba(23, 97, 184, 0.85) 50%);
   pointer-events: none;
+  
+  /* Membuat 1 garis diagonal biru solid yang miring tajam */
+  background: linear-gradient(
+    140deg, 
+    transparent 45%, 
+    rgba(23, 97, 184, 0.85) 45%, 
+    rgba(23, 97, 184, 0.85) 85%, 
+    transparent 85%
+  );
 }
-
 /* =========================
    LOGO
 ========================= */
@@ -201,7 +204,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 12px 25px rgba(8, 35, 77, 0.18));
+  filter: drop-shadow(0 12px 25px rgba(var(--color-shadow), 0.18));
 }
 
 .logo img {
@@ -229,7 +232,7 @@
   width: 135px;
   height: 4px;
   border-radius: 999px;
-  background: #c7d9ef;
+  background: var(--color-deco);
 }
 
 /* =========================
@@ -255,7 +258,7 @@
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
-  color: #145db2;
+  color: var(--color-primary);
   font-size: 1.7rem;
   line-height: 1;
   cursor: pointer;
