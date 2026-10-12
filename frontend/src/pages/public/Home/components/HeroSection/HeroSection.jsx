@@ -118,8 +118,43 @@ function HeroSection() {
           />
         </div>
 
-        {/* Shape biru diagonal */}
-        <div className={styles.blueShape} />
+        {/* Pita biru diagonal (path & gradasi dari desain Hero, frame 1440px) */}
+        <svg
+          className={styles.blueShape}
+          viewBox="648 0 792 467"
+          preserveAspectRatio="xMaxYMax meet"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <defs>
+            <linearGradient
+              id="heroRibbonGradient"
+              gradientUnits="userSpaceOnUse"
+              x1="905"
+              y1="467"
+              x2="1291.12"
+              y2="-46.8678"
+            >
+              <stop stopColor="#1250A8" />
+              <stop offset="1" stopColor="#4A86DA" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M905 467L1440 65V165L1040 467H905Z"
+            fill="url(#heroRibbonGradient)"
+          />
+        </svg>
+
+        {/* Segitiga biru pojok kanan atas (dari desain hero-blue-shapes) */}
+        <svg
+          className={styles.cornerShape}
+          viewBox="415 0 120 180"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M415 0H535V180L415 0Z" fill="#1A5CB0" opacity="0.1" />
+          <path d="M487 0H535V82L487 0Z" fill="#1A5CB0" />
+        </svg>
 
         {/* Logo HIMAFOR */}
         <div className={styles.logo}>

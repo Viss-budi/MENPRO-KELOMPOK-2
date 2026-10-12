@@ -171,24 +171,29 @@
   pointer-events: none;
 }
 
+/* Pita biru diagonal: bentuk & gradasi (#1250A8 -> #4A86DA) dari desain Hero.
+   SVG diskalakan proporsional dengan lebar area foto dan menempel di kanan-bawah. */
 .blueShape {
   position: absolute;
   z-index: 3;
-  width: 90%;         /* Lebar dibatasi agar hanya fokus di sisi kanan saja */
-  height: 100%;       /* Tinggi penuh agar diagonalnya melintang dari atas ke bawah */
   right: 0;
   bottom: 0;
+  width: 135%;
+  height: auto;
   pointer-events: none;
-  
-  /* Membuat 1 garis diagonal biru solid yang miring tajam */
-  background: linear-gradient(
-    140deg, 
-    transparent 45%, 
-    rgba(23, 97, 184, 0.85) 45%, 
-    rgba(23, 97, 184, 0.85) 85%, 
-    transparent 85%
-  );
 }
+
+/* Segitiga biru pojok kanan atas; skala sama dengan pita (120 / 792 lebar area foto) */
+.cornerShape {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  width: 15.15%;
+  height: auto;
+  pointer-events: none;
+}
+
 /* =========================
    LOGO
 ========================= */
@@ -298,6 +303,16 @@
 ========================= */
 
 @media (max-width: 768px) {
+  .blueShape {
+    width: auto;
+    height: 100%;
+  }
+
+  .cornerShape {
+    width: auto;
+    height: 38.5%;
+  }
+
   .hero {
     display: flex;
     flex-direction: column;
