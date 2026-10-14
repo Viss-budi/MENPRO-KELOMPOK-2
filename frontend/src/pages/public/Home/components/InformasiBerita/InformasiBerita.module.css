@@ -110,50 +110,53 @@
 .readMoreLink:hover {
   color: var(--color-primary-dark);
 }
+/* Kartu statistik: 289 x 309 pada desain, 4 baris (lingkaran ikon 54px, jarak antarbaris 19px) */
 .statsCard {
   background-color: var(--color-surface-panel);
-  border-radius: 16px;
-  padding: 32px 24px;
+  border-radius: 14px;
+  padding: 17px 29px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
 }
 .statsGrid {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  justify-content: space-between;
+  gap: 19px;
   width: 100%;
 }
 .statItem {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 22px;
 }
 .iconCircle {
-  background: white;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-primary);
-  box-shadow: 0 2px 4px rgba(var(--color-shadow), 0.05);
   flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  color: var(--color-primary);
+}
+.iconBg {
+  fill: var(--color-surface-icon);
 }
 .statText {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 .statValue {
   margin: 0;
-  font-size: 20px;
+  font-size: 24px;
+  line-height: 24px;
   font-weight: 700;
-  color: var(--color-heading);
+  color: var(--color-primary);
 }
 .statLabel {
-  margin: 2px 0 0 0;
-  font-size: 13px;
-  color: var(--color-text-muted);
+  margin: 6px 0 0 0;
+  font-size: 12.5px;
+  line-height: 16px;
+  font-weight: 400;
+  color: #4a5a75;
 }
 @media (max-width: 1024px) {
   .mainGrid { grid-template-columns: repeat(2, 1fr); }

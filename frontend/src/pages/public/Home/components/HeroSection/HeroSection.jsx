@@ -96,9 +96,34 @@ function HeroSection() {
 
           <div className={styles.actions}>
             <Button href={current.primaryRoute} className={styles.primaryBtn}>
-              <span className={styles.buttonIcon}>📅</span>
+              <svg
+                className={styles.buttonIcon}
+                viewBox="20 20 14 15"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M31.5 22H22.5C21.1193 22 20 23.1193 20 24.5V32.5C20 33.8807 21.1193 35 22.5 35H31.5C32.8807 35 34 33.8807 34 32.5V24.5C34 23.1193 32.8807 22 31.5 22Z" />
+                <path d="M20 26.5H34M24 20V24M30 20V24" />
+              </svg>
               {current.primaryButton}
-              <span className={styles.arrow}>→</span>
+              <svg
+                className={styles.arrow}
+                viewBox="165 23 11 8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M165 27H176M172 31L176 27L172 23" />
+              </svg>
             </Button>
 
             <Button href={current.secondaryRoute} variant="outline" className={styles.secondaryBtn}>

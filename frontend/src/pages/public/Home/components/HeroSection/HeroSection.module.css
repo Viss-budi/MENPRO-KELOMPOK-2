@@ -78,20 +78,22 @@
   margin-top: 26px;
 }
 
+/* Tombol "Lihat Kegiatan": 196 x 54, pill, tanpa bayangan (desain btn-lihat-kegiatan) */
 .primaryBtn {
   background-color: var(--color-primary) !important;
   color: #ffffff !important;
-  min-height: 52px;
-  height: 52px;
-  padding: 0 24px;
+  height: 54px;
+  min-height: 54px;
+  padding: 0 20px;
   border-radius: 999px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
-  box-shadow: 0 4px 12px rgba(26, 92, 176, 0.25);
+  box-shadow: none;
   transition: background-color 0.2s ease;
   white-space: nowrap;
 }
@@ -118,13 +120,19 @@
 }
 
 .buttonIcon {
-  margin-right: 8px;
-  font-size: 1rem;
+  flex: none;
+  width: 14px;
+  height: 15px;
+  margin-right: 10px;
+  overflow: visible;
 }
 
 .arrow {
-  margin-left: 14px;
-  font-size: 1.2rem;
+  flex: none;
+  width: 11px;
+  height: 8px;
+  margin-left: 20px;
+  overflow: visible;
 }
 
 /* =========================
