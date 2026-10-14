@@ -1,0 +1,7 @@
+Salin folder backend/ dan frontend/ ini ke ROOT repo (timpa file yang sama).
+package.json TIDAK disertakan, jalankan manual:
+
+  cd backend  && npm i bcryptjs jsonwebtoken multer slugify
+  (tambah di scripts package.json backend: "create-admin": "node scripts/createAdmin.js", "sql": "node scripts/runSql.js")
+
+Lalu: isi backend/.env (JWT_SECRET wajib), jalankan SQL di backend/database/, buat frontend/.env dari .env.example.

@@ -95,29 +95,91 @@ function HeroSection() {
           <p className={styles.description}>{current.description}</p>
 
           <div className={styles.actions}>
-            <Button href={current.primaryRoute}>
-              <span className={styles.buttonIcon}>▣</span>
+            <Button href={current.primaryRoute} className={styles.primaryBtn}>
+              <svg
+                className={styles.buttonIcon}
+                viewBox="20 20 14 15"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M31.5 22H22.5C21.1193 22 20 23.1193 20 24.5V32.5C20 33.8807 21.1193 35 22.5 35H31.5C32.8807 35 34 33.8807 34 32.5V24.5C34 23.1193 32.8807 22 31.5 22Z" />
+                <path d="M20 26.5H34M24 20V24M30 20V24" />
+              </svg>
               {current.primaryButton}
-              <span className={styles.arrow}>→</span>
+              <svg
+                className={styles.arrow}
+                viewBox="165 23 11 8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M165 27H176M172 31L176 27L172 23" />
+              </svg>
             </Button>
 
-            <Button href={current.secondaryRoute} variant="outline">
+            <Button href={current.secondaryRoute} variant="outline" className={styles.secondaryBtn}>
               {current.secondaryButton}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Media kanan */}
+      {/* Media kanan dengan ukuran tetap & konsisten */}
       <div className={styles.media}>
-        <ImageWithFallback
-          key={current.id}
-          src={current.image}
-          alt={current.imageAlt}
-        />
+        <div className={styles.imageContainer}>
+          <ImageWithFallback
+            key={current.id}
+            src={current.image}
+            alt={current.imageAlt}
+          />
+        </div>
 
-        {/* Shape biru diagonal */}
-        <div className={styles.blueShape} />
+        {/* Pita biru diagonal (path & gradasi dari desain Hero, frame 1440px) */}
+        <svg
+          className={styles.blueShape}
+          viewBox="648 0 792 467"
+          preserveAspectRatio="xMaxYMax meet"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <defs>
+            <linearGradient
+              id="heroRibbonGradient"
+              gradientUnits="userSpaceOnUse"
+              x1="905"
+              y1="467"
+              x2="1291.12"
+              y2="-46.8678"
+            >
+              <stop stopColor="#1250A8" />
+              <stop offset="1" stopColor="#4A86DA" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M905 467L1440 65V165L1040 467H905Z"
+            fill="url(#heroRibbonGradient)"
+          />
+        </svg>
+
+        {/* Segitiga biru pojok kanan atas (dari desain hero-blue-shapes) */}
+        <svg
+          className={styles.cornerShape}
+          viewBox="415 0 120 180"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M415 0H535V180L415 0Z" fill="#1A5CB0" opacity="0.1" />
+          <path d="M487 0H535V82L487 0Z" fill="#1A5CB0" />
+        </svg>
 
         {/* Logo HIMAFOR */}
         <div className={styles.logo}>

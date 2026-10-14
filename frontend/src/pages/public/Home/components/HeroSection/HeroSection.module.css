@@ -1,10 +1,11 @@
 .hero {
   position: relative;
+  height: 560px;
   min-height: 560px;
   overflow: hidden;
   display: grid;
   grid-template-columns: 45% 55%;
-  background: #f7faff;
+  background: var(--color-surface-hero);
 }
 
 /* =========================
@@ -21,8 +22,8 @@
   background: linear-gradient(
     110deg,
     #ffffff 0%,
-    #f8fbff 75%,
-    rgba(247, 250, 255, 0.8) 100%
+    var(--color-surface-hero) 50%,
+    #e6eef8 100%
   );
 }
 
@@ -37,15 +38,15 @@
   min-height: 38px;
   padding: 8px 18px;
   border-radius: 999px;
-  background: #dceaff;
-  color: #1761b8;
+  background: var(--color-surface-badge);
+  color: var(--color-primary);
   font-size: 0.9rem;
   font-weight: 700;
 }
 
 .title {
   margin: 18px 0 0;
-  color: #09204d;
+  color: var(--color-heading-hero);
   font-size: clamp(4rem, 6vw, 6.2rem);
   line-height: 0.95;
   font-weight: 800;
@@ -54,7 +55,7 @@
 
 .subtitle {
   margin: 10px 0 0;
-  color: #102b5b;
+  color: var(--color-heading);
   font-size: clamp(1.65rem, 2.4vw, 2.35rem);
   line-height: 1.15;
   font-weight: 750;
@@ -64,7 +65,7 @@
 .description {
   max-width: 560px;
   margin: 28px 0 0;
-  color: #506789;
+  color: var(--color-text-body);
   font-size: clamp(1rem, 1.4vw, 1.2rem);
   line-height: 1.7;
 }
@@ -77,48 +78,90 @@
   margin-top: 26px;
 }
 
-.actions a {
-  min-height: 64px;
-  padding: 0 28px;
+/* Tombol "Lihat Kegiatan": 196 x 54, pill, tanpa bayangan (desain btn-lihat-kegiatan) */
+.primaryBtn {
+  background-color: var(--color-primary) !important;
+  color: #ffffff !important;
+  height: 54px;
+  min-height: 54px;
+  padding: 0 20px;
   border-radius: 999px;
-  font-size: 1rem;
+  font-size: 14.5px;
   font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: none;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.primaryBtn:hover {
+  background-color: var(--color-primary-dark) !important;
+}
+
+/* Tombol Kedua (Tentang HIMAFOR) - Outline */
+.secondaryBtn {
+  background-color: transparent !important;
+  color: var(--color-primary) !important;
+  border: 1.5px solid var(--color-primary) !important;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.secondaryBtn:hover {
+  border-color: var(--color-primary) !important;
+  background-color: rgba(26, 92, 176, 0.03) !important;
 }
 
 .buttonIcon {
-  margin-right: 9px;
-  font-size: 1rem;
+  flex: none;
+  width: 14px;
+  height: 15px;
+  margin-right: 10px;
+  overflow: visible;
 }
 
 .arrow {
+  flex: none;
+  width: 11px;
+  height: 8px;
   margin-left: 20px;
-  font-size: 1.35rem;
+  overflow: visible;
 }
 
 /* =========================
-   IMAGE / RIGHT SIDE
+   IMAGE / RIGHT SIDE (UKURAN TETAP)
 ========================= */
 
 .media {
   position: relative;
+  height: 560px;
   min-height: 560px;
   overflow: hidden;
   isolation: isolate;
-  background: #dceaff;
+  background: var(--color-surface-badge);
 }
 
-.media > img,
-.media > div:first-child {
+/* Kontainer pembungkus gambar dengan ukuran absolut yang konsisten */
+.imageContainer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.media img {
-  display: block;
+.imageContainer img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center;
+  display: block;
 }
 
 /* Fade putih dari kiri agar transisi teks dan foto mulus */
@@ -129,30 +172,34 @@
   z-index: 2;
   background: linear-gradient(
     90deg,
-    rgba(247, 250, 255, 1) 0%,
-    rgba(247, 250, 255, 0.4) 15%,
-    rgba(247, 250, 255, 0) 35%
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.4) 15%,
+    rgba(255, 255, 255, 0) 35%
   );
   pointer-events: none;
 }
 
-/* =========================
-   BLUE DIAGONAL (DIPERAPI AGAR TIDAK MENUTUPI FOTO)
-========================= */
-
+/* Pita biru diagonal: bentuk & gradasi (#1250A8 -> #4A86DA) dari desain Hero.
+   SVG diskalakan proporsional dengan lebar area foto dan menempel di kanan-bawah. */
 .blueShape {
   position: absolute;
   z-index: 3;
-  width: 35%;
-  height: 35%;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, transparent 50%, rgba(23, 97, 184, 0.85) 50%);
+  width: 135%;
+  height: auto;
   pointer-events: none;
 }
 
-.blueShape::after {
-  display: none; /* Nonaktifkan shape tambahan */
+/* Segitiga biru pojok kanan atas; skala sama dengan pita (120 / 792 lebar area foto) */
+.cornerShape {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  width: 15.15%;
+  height: auto;
+  pointer-events: none;
 }
 
 /* =========================
@@ -170,7 +217,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 12px 25px rgba(8, 35, 77, 0.18));
+  filter: drop-shadow(0 12px 25px rgba(var(--color-shadow), 0.18));
 }
 
 .logo img {
@@ -198,7 +245,7 @@
   width: 135px;
   height: 4px;
   border-radius: 999px;
-  background: #c7d9ef;
+  background: var(--color-deco);
 }
 
 /* =========================
@@ -224,7 +271,7 @@
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
-  color: #145db2;
+  color: var(--color-primary);
   font-size: 1.7rem;
   line-height: 1;
   cursor: pointer;
@@ -260,47 +307,24 @@
 }
 
 /* =========================
-   TABLET
-========================= */
-
-@media (max-width: 1100px) {
-  .hero {
-    grid-template-columns: 48% 52%;
-  }
-
-  .content {
-    padding-right: 24px;
-  }
-
-  .title {
-    font-size: clamp(3.5rem, 7vw, 5rem);
-  }
-
-  .subtitle {
-    font-size: clamp(1.4rem, 2.5vw, 2rem);
-  }
-
-  .description {
-    font-size: 1rem;
-  }
-
-  .logo {
-    width: 240px;
-  }
-
-  .blueShape {
-    right: -65%;
-  }
-}
-
-/* =========================
-   MOBILE
+   RESPonsive MOBILE / TABLET
 ========================= */
 
 @media (max-width: 768px) {
+  .blueShape {
+    width: auto;
+    height: 100%;
+  }
+
+  .cornerShape {
+    width: auto;
+    height: 38.5%;
+  }
+
   .hero {
     display: flex;
     flex-direction: column;
+    height: auto;
     min-height: auto;
   }
 
@@ -309,125 +333,9 @@
     padding: 42px 20px 38px;
   }
 
-  .text {
-    max-width: 100%;
-  }
-
-  .badge {
-    font-size: 0.8rem;
-  }
-
-  .title {
-    margin-top: 15px;
-    font-size: clamp(3.2rem, 16vw, 5rem);
-  }
-
-  .subtitle {
-    font-size: clamp(1.35rem, 6vw, 1.8rem);
-  }
-
-  .description {
-    margin-top: 18px;
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-
-  .actions {
-    gap: 12px;
-  }
-
-  .actions a {
-    min-height: 54px;
-    padding: 0 20px;
-  }
-
   .media {
     order: 2;
-    min-height: 360px;
     height: 360px;
-  }
-
-  .media::before {
-    background: linear-gradient(
-      180deg,
-      rgba(247, 250, 255, 0.95) 0%,
-      rgba(247, 250, 255, 0) 30%
-    );
-  }
-
-  .blueShape {
-    width: 140%;
-    height: 100%;
-    right: -60%;
-    bottom: -60%;
-  }
-
-  .logo {
-    width: 155px;
-  }
-
-  .lines {
-    bottom: 45px;
-    left: 20px;
-  }
-
-  .lines span {
-    width: 85px;
-    height: 3px;
-  }
-
-  .navigation {
-    right: 18px;
-    bottom: 18px;
-  }
-}
-
-/* =========================
-   SMALL MOBILE
-========================= */
-
-@media (max-width: 480px) {
-  .content {
-    padding: 32px 16px;
-  }
-
-  .actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .actions a {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .media {
-    min-height: 300px;
-    height: 300px;
-  }
-
-  .logo {
-    width: 125px;
-  }
-
-  .navigation {
-    right: 12px;
-    bottom: 12px;
-  }
-
-  .navButton {
-    width: 34px;
-    height: 34px;
-  }
-}
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .navButton,
-  .dot {
-    transition: none;
+    min-height: 360px;
   }
 }
