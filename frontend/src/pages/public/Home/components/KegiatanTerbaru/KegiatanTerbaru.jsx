@@ -35,7 +35,7 @@ function Kalender() {
     });
 
   return (
-    <div className={styles.calendarWidget}>
+    <div id="kalender" className={styles.calendarWidget}>
       <h3 className={styles.calendarTitle}>Kalender HIMAFOR</h3>
 
       <div className={styles.calendarHeader}>
@@ -100,7 +100,7 @@ const KegiatanTerbaru = () => {
   const { data: activities, loading, error } = useApi((signal) => getEvents(3, signal), 'events');
 
   return (
-    <div className={styles.container}>
+    <div id="kegiatan" className={styles.container}>
       {/* Header Section */}
       <div className={styles.header}>
         <h2 className={styles.title}>Kegiatan Terbaru</h2>

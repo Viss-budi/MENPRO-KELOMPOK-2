@@ -14,11 +14,11 @@
 .title {
   font-size: 24px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-heading);
   margin: 0 0 8px 0;
 }
 .subtitle {
-  color: #64748b;
+  color: var(--color-text-muted);
   margin: 0;
   font-size: 15px;
 }
@@ -26,13 +26,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #2563eb;
+  color: var(--color-primary);
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
 }
 .seeAllLink:hover {
-  color: #1d4ed8;
+  color: var(--color-primary-dark);
 }
 .mainGrid {
   display: grid;
@@ -41,7 +41,7 @@
 }
 .card {
   background: white;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -50,11 +50,11 @@
 }
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 15px -3px rgba(var(--color-shadow), 0.1);
 }
 .cardImageWrapper {
   height: 160px;
-  background-color: #f1f5f9;
+  background-color: var(--color-surface-panel);
 }
 .cardImage {
   width: 100%;
@@ -68,7 +68,7 @@
   flex-grow: 1;
 }
 .tag {
-  background-color: #2563eb;
+  background-color: var(--color-primary);
   color: white;
   font-size: 11px;
   font-weight: 600;
@@ -80,7 +80,7 @@
 .cardTitle {
   font-size: 15px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-heading);
   margin: 0 0 16px 0;
   line-height: 1.4;
   display: -webkit-box;
@@ -93,7 +93,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 12px;
   margin-top: auto;
   margin-bottom: 20px;
@@ -102,58 +102,61 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #2563eb;
+  color: var(--color-primary);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
 }
 .readMoreLink:hover {
-  color: #1d4ed8;
+  color: var(--color-primary-dark);
 }
+/* Kartu statistik: 289 x 309 pada desain, 4 baris (lingkaran ikon 54px, jarak antarbaris 19px) */
 .statsCard {
-  background-color: #f4f7fc;
-  border-radius: 16px;
-  padding: 32px 24px;
+  background-color: var(--color-surface-panel);
+  border-radius: 14px;
+  padding: 17px 29px;
   display: flex;
-  align-items: center;
+  align-items: stretch;
 }
 .statsGrid {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  justify-content: space-between;
+  gap: 19px;
   width: 100%;
 }
 .statItem {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 22px;
 }
 .iconCircle {
-  background: white;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2563eb;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  color: var(--color-primary);
+}
+.iconBg {
+  fill: var(--color-surface-icon);
 }
 .statText {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 .statValue {
   margin: 0;
-  font-size: 20px;
+  font-size: 24px;
+  line-height: 24px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-primary);
 }
 .statLabel {
-  margin: 2px 0 0 0;
-  font-size: 13px;
-  color: #64748b;
+  margin: 6px 0 0 0;
+  font-size: 12.5px;
+  line-height: 16px;
+  font-weight: 400;
+  color: #4a5a75;
 }
 @media (max-width: 1024px) {
   .mainGrid { grid-template-columns: repeat(2, 1fr); }
@@ -165,6 +168,6 @@
 .statusText {
   grid-column: 1 / -1;
   margin: 0;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 14px;
 }

@@ -1,18 +1,20 @@
+import Navbar from '../../../components/layout/Navbar/Navbar'
 import HeroSection from './components/HeroSection/HeroSection'
-// Tambahkan baris import ini
-import KegiatanTerbaru from './components/KegiatanTerbaru/KegiatanTerbaru' 
+import KegiatanTerbaru from './components/KegiatanTerbaru/KegiatanTerbaru'
 import InformasiBerita from './components/InformasiBerita/InformasiBerita'
-import Footer from '../../../components/Footer/Footer'
+import Footer from '../../../components/layout/Footer/Footer'
 
 function Home() {
   return (
-    <main>
-      <HeroSection />
-      {/* Tambahkan komponennya di bawah HeroSection */}
-      <KegiatanTerbaru />
-      <InformasiBerita />
+    <>
+      <Navbar />
+      <main id="beranda">
+        <HeroSection />
+        <KegiatanTerbaru />
+        <InformasiBerita />
+      </main>
       <Footer />
-    </main>
+    </>
   )
 }
 

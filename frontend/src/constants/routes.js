@@ -2,4 +2,6 @@
 export const ROUTES = {
   agenda: '/agenda',
   tentang: '/tentang',
+  dokumentasi: '/dokumentasi',
+  prestasi: '/prestasi',
 }
