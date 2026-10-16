@@ -1,0 +1,231 @@
+/* =========================================================
+   Halaman Login Admin
+   Semua warna menggunakan token dari global.css.
+   Responsif: 390px (mobile) hingga 1440px (desktop).
+   ========================================================= */
+
+/* ── Latar halaman ─────────────────────────────────────── */
+.page {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-hero);
+  padding: 24px 16px;
+}
+
+/* ── Kartu ─────────────────────────────────────────────── */
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 40px 32px 32px;
+  box-shadow: 0 4px 24px rgba(var(--color-shadow), 0.10);
+}
+
+/* ── Header ────────────────────────────────────────────── */
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  line-height: 1.25;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Alert error global ─────────────────────────────────── */
+.alertBox {
+  min-height: 0;
+  margin-bottom: 0;
+}
+
+.alertText {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Pesan sesi berakhir – amber, berbeda dari error login */
+.sessionAlert {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #c2410c;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+
+/* ── Form ───────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Field ─────────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  background: var(--color-bg);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+/* Kondisi error pada input */
+.input.inputError {
+  border-color: #ef4444;
+}
+
+.input.inputError:focus {
+  box-shadow: 0 0 0 3px #fee2e2;
+}
+
+/* Input password punya padding-right ekstra untuk tombol */
+.inputPassword {
+  padding-right: 44px;
+}
+
+.input:disabled {
+  background: var(--color-surface-panel);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* ── Wrapper password ──────────────────────────────────── */
+.passwordWrapper {
+  position: relative;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.togglePassword:hover {
+  color: var(--color-primary);
+}
+
+.togglePassword:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.togglePassword:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* ── Pesan error per kolom ─────────────────────────────── */
+.fieldError {
+  font-size: 0.8125rem;
+  color: #b91c1c;
+  line-height: 1.4;
+}
+
+/* ── Tombol Login ──────────────────────────────────────── */
+.submitButton {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  margin-top: 4px;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid var(--color-primary-dark);
+  outline-offset: 2px;
+}
+
+.submitButton:disabled {
+  background: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ── Catatan kecil di bawah form ───────────────────────── */
+.note {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ── Responsif mobile (390px) ──────────────────────────── */
+@media (max-width: 480px) {
+  .card {
+    padding: 28px 20px 24px;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+}
