@@ -10,9 +10,12 @@ const crud = makeCrud({
            'start_at', 'end_at', 'is_featured', 'is_published'],
   required: ['title', 'start_at'],
   slugFrom: 'title',
+  ownerField: 'created_by',
+  searchFields: ['title', 'location'],
+  filterFields: ['category', 'is_published', 'is_featured'],
 });
 
-// Kegiatan Terbaru (?limit=3) dan Agenda Hari Ini (?date=YYYY-MM-DD)
+// Kegiatan Terbaru (?limit=3&featured=1) dan Agenda Hari Ini (?date=YYYY-MM-DD)
 const getEvents = async (req, res) => {
   const { date } = req.query;
   if (date && !isDate(date)) {
@@ -22,7 +25,8 @@ const getEvents = async (req, res) => {
   const where = ['is_published = 1'];
   const params = [];
   if (date) { where.push('DATE(start_at) = ?'); params.push(date); }
-  if (req.query.featured === '1') where.push('is_featured = 1');
+  if (req.query.featured === '1') where.push('is_featured = 1'); // kartu Kegiatan Terbaru di landing page
+
   const [rows] = await db.query(
     `SELECT id, title, slug, category, thumbnail_url, location, start_at, end_at
      FROM events WHERE ${where.join(' AND ')}
