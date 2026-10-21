@@ -188,7 +188,7 @@
   width: 50%;
   min-height: 100svh;
   margin-left: 50%;
-  padding: 142px 24px 45px;
+  padding: 106px 24px 45px;
 }
 
 .back {
@@ -205,8 +205,7 @@
   text-decoration: none;
 }
 .back:hover { text-decoration: underline; }
-.back:focus-visible,
-.forgot:focus-visible {
+.back:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 3px;
   border-radius: 4px;
@@ -254,29 +253,40 @@
   color: var(--login-subtitle);
 }
 
-/* ── Alert ─────────────────────────────────────────────── */
-.alertBox { min-height: 0; }
-
-.alertText {
-  margin: 16px 0 0;
-  padding: 12px 16px;
-  border: 1px solid #fca5a5;
-  border-radius: 12px;
-  background: #fef2f2;
-  color: #b91c1c;
-  font-size: 0.875rem;
-  line-height: 1.5;
+/* ── Area pesan ────────────────────────────────────────── */
+/* Tinggi tetap 103px (subjudul → label): pesan muncul tanpa menggeser form */
+.alertBox {
+  height: 103px;
+  padding-top: 21px;
 }
 
-.sessionAlert {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border: 1px solid #fdba74;
-  border-radius: 12px;
-  background: #fff7ed;
-  color: #c2410c;
-  font-size: 0.875rem;
-  line-height: 1.5;
+.errorAlert,
+.infoAlert {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 57px;
+  padding: 0 17px;
+  border: 1.5px solid;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+.errorAlert svg,
+.infoAlert svg { flex: none; }
+
+.errorAlert {
+  border-color: #FECDCA;
+  background: #FEF3F2;
+  color: #B42318;
+}
+.errorAlert svg { color: #F04438; }
+
+.infoAlert {
+  border-color: var(--color-deco);
+  background: var(--color-surface-panel);
+  color: var(--color-primary);
 }
 
 /* ── Form ──────────────────────────────────────────────── */
@@ -284,7 +294,6 @@
   display: flex;
   flex-direction: column;
   gap: 13px;
-  margin-top: 55px;
 }
 
 .field {
@@ -294,7 +303,7 @@
 }
 
 .label {
-  font-size: 13.75px;
+  font-size: 13.5px;
   font-weight: 600;
   line-height: 17px;
   color: var(--login-label);
@@ -316,7 +325,7 @@
   outline: none;
   background: var(--color-bg);
   font: inherit;
-  font-size: 15px;
+  font-size: 14.8px;
   color: var(--color-text);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -331,8 +340,8 @@
 
 .inputPassword { padding-right: 52px; }
 
-.input.inputError { border-color: #ef4444; }
-.input.inputError:focus { box-shadow: 0 0 0 3px #fee2e2; }
+.input.inputError { border-width: 2px; border-color: #F04438; }
+.input.inputError:focus { box-shadow: 0 0 0 3px #FEE4E2; }
 
 .input:disabled {
   background: var(--color-surface-panel);
@@ -349,6 +358,7 @@
   transition: color 0.15s;
 }
 .inputWrap:focus-within .iconLeft { color: var(--color-primary); }
+.inputWrap:has(.inputError) .iconLeft { color: #F04438; }
 
 .togglePassword {
   position: absolute;
@@ -370,76 +380,36 @@
 .togglePassword:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
 .togglePassword:disabled { cursor: not-allowed; opacity: 0.4; }
 
+/* Slot tetap 22px di bawah tiap kolom, supaya pesan kolom tidak menggeser tata letak */
+/* margin -8px menghapus jarak 8px antar-anak .field */
+.errorSlot {
+  min-height: 22px;
+  margin-top: -8px;
+  padding-top: 4px;
+}
+
 .fieldError {
-  font-size: 0.8125rem;
-  line-height: 1.4;
-  color: #b91c1c;
+  display: block;
+  font-size: 12.2px;
+  line-height: 18px;
+  color: #B42318;
 }
-
-/* ── Ingat saya / Lupa password ────────────────────────── */
-.options {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 29px;   /* 13 (gap) + 29 = 42 dari kolom password */
-}
-
-.remember {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: var(--color-text-body);
-  cursor: pointer;
-}
-
-.checkbox {
-  appearance: none;
-  flex: none;
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  border: 1.5px solid var(--color-deco);
-  border-radius: 6px;
-  background: var(--color-bg) center / 13px 13px no-repeat;
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-.checkbox:checked {
-  border-color: var(--color-primary);
-  background-color: var(--color-primary);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
-}
-.checkbox:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
-.checkbox:disabled { cursor: not-allowed; opacity: 0.6; }
-
-.forgot {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-primary);
-  cursor: pointer;
-}
-.forgot:hover { text-decoration: underline; }
 
 /* ── Tombol Masuk ──────────────────────────────────────── */
 .submitButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 1px;
+  gap: 6px;
   width: 100%;
   height: 54px;
-  margin-top: 17px;   /* 13 (gap) + 17 = 30 dari baris opsi */
-  padding: 0 6px 2px 0;
+  margin-top: 18px;   /* 13 (gap) + 18 + slot error 22 = 53 dari kolom password */
+  padding: 0 2px 2px 0;
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--color-primary);
   font: inherit;
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   color: #fff;
   cursor: pointer;
@@ -453,9 +423,10 @@
 .note {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 11px;
   margin: 38px 0 0;
-  padding: 26px 2px 0;
+  padding: 22px 0 0 6px;
   border-top: 1px solid var(--color-border);
   font-size: 13px;
   line-height: 20px;

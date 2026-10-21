@@ -1,7 +1,6 @@
-import { useState, useRef, useId } from 'react'
-import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import { useState, useRef, useId, useEffect } from 'react'
+import { ArrowLeft, ArrowRight, CircleAlert, Eye, EyeOff, Info, Lock, User } from 'lucide-react'
 import { loginAdmin } from '../../../services/api'
-import { setSession } from '../../../utils/auth'
 import gedung from '../../../assets/images/login-gedung.webp'
 import logo from '../../../assets/images/logo-himafor.webp'
 import styles from './Login.module.css'
@@ -11,17 +10,21 @@ import styles from './Login.module.css'
 const FITUR = ['Kegiatan', 'Berita', 'Dokumentasi', 'Prestasi']
 
 const VALIDASI = {
-  emailKosong: 'Email wajib diisi',
-  emailFormat: 'Format email tidak valid',
+  usernameKosong: 'Username wajib diisi',
   passwordKosong: 'Password wajib diisi',
 }
 
-function validasiForm(email, password) {
+// Teks desain UI/UX untuk kredensial salah (BE membalas 401).
+const PESAN_KREDENSIAL = 'Username atau password salah.'
+
+// Lama tombol Login nonaktif setelah server membalas 429 (terlalu banyak percobaan)
+const JEDA_429_MS = 30_000
+
+// Hanya cek kolom kosong (sesuai desain). Format & kebenaran akun diputuskan BE.
+function validasiForm(username, password) {
   const errors = {}
-  if (!email.trim()) {
-    errors.email = VALIDASI.emailKosong
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-    errors.email = VALIDASI.emailFormat
+  if (!username.trim()) {
+    errors.email = VALIDASI.usernameKosong
   }
   if (!password) {
     errors.password = VALIDASI.passwordKosong
@@ -36,10 +39,19 @@ function Login({ onLoginSuccess, sessionMessage }) {
   const [showPassword, setShowPassword] = useState(false)
   const [fieldErrors, setFieldErrors] = useState({})
   const [globalError, setGlobalError] = useState('')
+  const [kredensialSalah, setKredensialSalah] = useState(false) // 401 → kedua kolom merah
   const [loading, setLoading] = useState(false)
+  const [jeda, setJeda] = useState(false) // 429 -> tombol Login nonaktif sebentar
 
   // Untuk membatalkan request jika komponen dilepas
   const abortRef = useRef(null)
+
+  // Jeda singkat setelah 429 supaya pengguna tidak terus mengirim ulang
+  useEffect(() => {
+    if (!jeda) return undefined
+    const t = setTimeout(() => setJeda(false), JEDA_429_MS)
+    return () => clearTimeout(t)
+  }, [jeda])
 
   const emailId = useId()
   const passwordId = useId()
@@ -50,17 +62,19 @@ function Login({ onLoginSuccess, sessionMessage }) {
     setEmail(e.target.value)
     if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: '' }))
     if (globalError) setGlobalError('')
+    if (kredensialSalah) setKredensialSalah(false)
   }
 
   function handlePasswordChange(e) {
     setPassword(e.target.value)
     if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: '' }))
     if (globalError) setGlobalError('')
+    if (kredensialSalah) setKredensialSalah(false)
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (loading) return // Cegah kirim ganda
+    if (loading || jeda) return // Cegah kirim ganda
 
     // Validasi sisi klien
     const errors = validasiForm(email, password)
@@ -71,6 +85,7 @@ function Login({ onLoginSuccess, sessionMessage }) {
 
     setLoading(true)
     setGlobalError('')
+    setKredensialSalah(false)
     setFieldErrors({})
 
     // Batalkan request sebelumnya jika masih berjalan
@@ -78,13 +93,22 @@ function Login({ onLoginSuccess, sessionMessage }) {
     abortRef.current = new AbortController()
 
     try {
-      const { token, user } = await loginAdmin(email, password, abortRef.current.signal)
-      setSession(token, user)
-      // Navigasi ke dashboard; onLoginSuccess mengurus history
-      onLoginSuccess()
+      // Server memasang cookie sesi (HttpOnly); frontend hanya menerima data user.
+      const user = await loginAdmin(email, password, abortRef.current.signal)
+      // Pindah ke dashboard; App.jsx mengurus history
+      onLoginSuccess(user)
     } catch (err) {
       if (err.name === 'AbortError') return
-      setGlobalError(err.message || 'Login gagal, silakan coba lagi beberapa saat')
+      if (err.status === 401) {
+        setKredensialSalah(true)
+        setGlobalError(PESAN_KREDENSIAL)
+      } else if (err.status === 429) {
+        // Batas percobaan login terlampaui: tampilkan pesan server, tombol dinonaktifkan sementara
+        setGlobalError(err.message)
+        setJeda(true)
+      } else {
+        setGlobalError(err.message || 'Login gagal, silakan coba lagi beberapa saat')
+      }
     } finally {
       setLoading(false)
     }
@@ -142,25 +166,24 @@ function Login({ onLoginSuccess, sessionMessage }) {
           <div className={styles.logoWrap}>
             <img src={logo} alt="Logo HIMAFOR" width="94" height="97" />
           </div>
-          <h1 className={styles.title}>Masuk ke Admin Panel</h1>
+          <h1 className={styles.title}>Login Admin Panel</h1>
           <p className={styles.subtitle}>Gunakan akun admin HIMAFOR untuk melanjutkan.</p>
 
-          {/* Pesan sesi berakhir — ditampilkan sekali setelah redirect dari dashboard */}
-          {sessionMessage && (
-            <div role="alert" aria-live="assertive" className={styles.sessionAlert}>
-              {sessionMessage}
-            </div>
-          )}
-
-          {/* Pesan error global — dibaca langsung oleh pembaca layar */}
-          <div
-            id={errorLiveId}
-            role="alert"
-            aria-live="assertive"
-            aria-atomic="true"
-            className={styles.alertBox}
-          >
-            {globalError && <p className={styles.alertText}>{globalError}</p>}
+          {/* Area pesan (tinggi tetap agar form tidak melompat). Sesi berakhir = info biru,
+              error login = merah. Dibaca pembaca layar lewat role="alert". */}
+          <div className={styles.alertBox}>
+            {sessionMessage && !globalError && (
+              <div role="status" aria-live="polite" className={styles.infoAlert}>
+                <Info size={20} strokeWidth={2} aria-hidden="true" />
+                <span>{sessionMessage}</span>
+              </div>
+            )}
+            {globalError && (
+              <div id={errorLiveId} role="alert" aria-live="assertive" className={styles.errorAlert}>
+                <CircleAlert size={20} strokeWidth={2} aria-hidden="true" />
+                <span>{globalError}</span>
+              </div>
+            )}
           </div>
 
           <form
@@ -172,30 +195,32 @@ function Login({ onLoginSuccess, sessionMessage }) {
             {/* Kolom Email */}
             <div className={styles.field}>
               <label htmlFor={emailId} className={styles.label}>
-                Email / Username
+                Username
               </label>
               <div className={styles.inputWrap}>
-                <Mail className={styles.iconLeft} size={18} strokeWidth={1.9} aria-hidden="true" />
+                <User className={styles.iconLeft} size={18} strokeWidth={1.9} aria-hidden="true" />
                 <input
                   id={emailId}
-                  type="email"
-                  className={`${styles.input} ${fieldErrors.email ? styles.inputError : ''}`}
+                  type="text"
+                  className={`${styles.input} ${fieldErrors.email || kredensialSalah ? styles.inputError : ''}`}
                   value={email}
                   onChange={handleEmailChange}
                   autoComplete="username"
                   autoCapitalize="none"
                   spellCheck={false}
-                  aria-invalid={fieldErrors.email ? 'true' : 'false'}
+                  aria-invalid={fieldErrors.email || kredensialSalah ? 'true' : 'false'}
                   aria-describedby={fieldErrors.email ? `${emailId}-err` : undefined}
                   disabled={loading}
-                  placeholder="admin@himafor.ac.id"
+                  placeholder="Masukkan username"
                 />
               </div>
-              {fieldErrors.email && (
-                <span id={`${emailId}-err`} className={styles.fieldError} role="alert" aria-live="polite">
-                  {fieldErrors.email}
-                </span>
-              )}
+              <div className={styles.errorSlot}>
+                {fieldErrors.email && (
+                  <span id={`${emailId}-err`} className={styles.fieldError} role="alert" aria-live="polite">
+                    {fieldErrors.email}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Kolom Password */}
@@ -208,13 +233,14 @@ function Login({ onLoginSuccess, sessionMessage }) {
                 <input
                   id={passwordId}
                   type={showPassword ? 'text' : 'password'}
-                  className={`${styles.input} ${styles.inputPassword} ${fieldErrors.password ? styles.inputError : ''}`}
+                  className={`${styles.input} ${styles.inputPassword} ${fieldErrors.password || kredensialSalah ? styles.inputError : ''}`}
                   value={password}
                   onChange={handlePasswordChange}
                   autoComplete="current-password"
-                  aria-invalid={fieldErrors.password ? 'true' : 'false'}
+                  aria-invalid={fieldErrors.password || kredensialSalah ? 'true' : 'false'}
                   aria-describedby={fieldErrors.password ? `${passwordId}-err` : undefined}
                   disabled={loading}
+                  placeholder="Masukkan password"
                 />
                 <button
                   type="button"
@@ -228,39 +254,28 @@ function Login({ onLoginSuccess, sessionMessage }) {
                     : <Eye size={18} strokeWidth={1.9} aria-hidden="true" />}
                 </button>
               </div>
-              {fieldErrors.password && (
-                <span id={`${passwordId}-err`} className={styles.fieldError} role="alert" aria-live="polite">
-                  {fieldErrors.password}
-                </span>
-              )}
-            </div>
-
-            {/*
-              "Ingat saya" dan "Lupa password?" ada di desain UI/UX, tetapi
-              endpoint BE-nya belum tersedia. Keduanya hanya tampilan dulu:
-              checkbox belum memengaruhi sesi, tombol belum punya aksi.
-            */}
-            <div className={styles.options}>
-              <label className={styles.remember}>
-                <input type="checkbox" className={styles.checkbox} defaultChecked disabled={loading} />
-                <span>Ingat saya</span>
-              </label>
-              <button type="button" className={styles.forgot}>Lupa password?</button>
+              <div className={styles.errorSlot}>
+                {fieldErrors.password && (
+                  <span id={`${passwordId}-err`} className={styles.fieldError} role="alert" aria-live="polite">
+                    {fieldErrors.password}
+                  </span>
+                )}
+              </div>
             </div>
 
             <button
               type="submit"
               className={styles.submitButton}
-              disabled={loading}
+              disabled={loading || jeda}
               aria-busy={loading}
             >
-              {loading ? 'Memproses...' : (<>Masuk<ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" /></>)}
+              {loading ? 'Memproses...' : (<>Login<ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" /></>)}
             </button>
           </form>
 
           <p className={styles.note}>
             <Lock size={14} strokeWidth={1.75} aria-hidden="true" />
-            Hanya untuk pengurus HIMAFOR yang terdaftar sebagai Admin.
+            Hanya untuk pengurus HIMAFOR yang terdaftar.
           </p>
         </div>
 
