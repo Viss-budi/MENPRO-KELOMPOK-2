@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const slugify = require('slugify');
+const { hasColumn } = require('./schema');
 
 const clamp = (v, def, max) => Math.min(Math.max(parseInt(v) || def, 1), max);
 const escapeLike = (s) => s.replace(/[\\%_]/g, '\\$&');
@@ -70,7 +71,7 @@ const makeCrud = ({
     if (slugFrom) {
       data.slug = `${slugify(String(data[slugFrom]), { lower: true, strict: true })}-${Date.now().toString(36)}`;
     }
-    if (ownerField) data[ownerField] = req.user.id; // dicatat dari sesi login, bukan dari input client
+    if (ownerField && hasColumn(table, ownerField)) data[ownerField] = req.user.id; // dicatat dari sesi login, bukan dari input client
 
     const [r] = await db.query(`INSERT INTO ${table} SET ?`, [data]);
     res.status(201).json({ success: true, message: 'Berhasil ditambahkan', data: { id: r.insertId, slug: data.slug } });

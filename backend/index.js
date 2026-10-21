@@ -6,6 +6,10 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const fs = require('fs');
 const csrfGuard = require('./middleware/csrf');
+const db = require('./config/db');
+const schema = require('./utils/schema');
+
+const VERSION = '1.1.0-sprint2'; // naikkan setiap rilis; dipakai untuk memastikan backend yang jalan adalah versi terbaru
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET belum diisi di .env');
@@ -53,6 +57,14 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1', csrfGuard); // semua POST/PUT/DELETE wajib header X-Requested-With
 
+// Cek cepat: backend hidup, versi berapa, database tersambung, dan skema lengkap atau belum
+app.get('/api/v1/health', async (req, res) => {
+  let database = false;
+  try { await db.query('SELECT 1'); database = true; } catch { /* dilaporkan di bawah */ }
+  const ok = database && schema.status().ok;
+  res.status(database ? 200 : 503).json({ success: database, data: { status: ok ? 'ok' : 'degraded', version: VERSION, database } });
+});
+
 app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/hero-slides', require('./routes/heroRoutes'));
 app.use('/api/v1/events', require('./routes/eventRoutes'));
@@ -77,6 +89,14 @@ app.use((err, req, res, next) => {
     return res.status(409).json({ success: false, message: 'Data sudah ada (duplikat)' });
   if ([1048, 1264, 1265, 1292, 1366, 1406].includes(err.errno))
     return res.status(400).json({ success: false, message: 'Data tidak valid' });
+  if (err.errno === 1146 || err.code === 'ER_NO_SUCH_TABLE') {
+    console.error('[SKEMA] Tabel belum ada:', err.sqlMessage);
+    return res.status(503).json({ success: false, message: 'Fitur belum siap: struktur database belum lengkap' });
+  }
+  if (err.errno === 1054 || err.code === 'ER_BAD_FIELD_ERROR') {
+    console.error('[SKEMA] Kolom belum ada:', err.sqlMessage);
+    return res.status(503).json({ success: false, message: 'Fitur belum siap: struktur database belum diperbarui' });
+  }
   if (err.name === 'MulterError' || err.message === 'INVALID_FILE')
     return res.status(400).json({ success: false, message: 'File harus jpg/png/webp, maks 5MB' });
 
@@ -86,5 +106,6 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
+  console.log(`Server berjalan di http://localhost:${PORT} (versi ${VERSION})`);
+  schema.check().catch((e) => console.error('[SKEMA] Gagal memeriksa struktur database:', e.message));
 });
