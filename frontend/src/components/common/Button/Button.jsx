@@ -7,6 +7,7 @@ function Button({
   onClick,
   type = 'button',
   className = '',
+  disabled = false,
 }) {
   const buttonClassName = `${styles.button} ${styles[variant]} ${className}`
 
@@ -23,6 +24,7 @@ function Button({
       className={buttonClassName}
       type={type}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>

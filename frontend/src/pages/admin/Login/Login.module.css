@@ -1,136 +1,347 @@
 /* =========================================================
-   Halaman Login Admin
-   Semua warna menggunakan token dari global.css.
-   Responsif: 390px (mobile) hingga 1440px (desktop).
+   Halaman Login Admin — mengikuti desain UI/UX (frame 1440×900)
+   himafor-admin-login.svg. Warna memakai token global.css;
+   hanya 2 warna teks yang khusus desain ini (lihat .page).
+   Responsif: panel kiri disembunyikan di bawah 960px.
    ========================================================= */
 
-/* ── Latar halaman ─────────────────────────────────────── */
 .page {
+  /* warna khusus desain login (tidak ada di palette global) */
+  --login-subtitle: #5B6B85;
+  --login-label: #33445F;
+  --login-ring: rgba(219, 233, 251, 0.8);
+
+  position: relative;
   min-height: 100svh;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  background: linear-gradient(148deg, var(--color-bg) 0%, var(--color-surface-hero) 100%);
+}
+
+/* ── Lingkaran dekoratif (kanan & bawah) ───────────────── */
+.blob { position: absolute; border-radius: 50%; pointer-events: none; }
+.blobA { width: 240px; height: 240px; top: -30px; right: -60px; background: #E0ECFA; opacity: 0.7; }
+.blobB { width: 80px; height: 80px; top: 20px; right: 100px; background: var(--color-primary-soft); opacity: 0.8; }
+.blobC { width: 140px; height: 140px; bottom: 0; left: 50%; background: #E0ECFA; opacity: 0.8; }
+.blobD { width: 180px; height: 180px; bottom: -20px; right: -50px; background: var(--color-primary-soft); opacity: 0.55; }
+
+/* ── Panel kiri ────────────────────────────────────────── */
+.visual {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 51.6667%;           /* 744 / 1440 */
+  z-index: 1;
+}
+
+/* Foto dipotong miring: (0,0) (700,0) (640,900) (0,900) dari lebar 744 */
+.photoClip {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 94.086% 0, 86.022% 100%, 0 100%);
+}
+
+.photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 96.774%;            /* 720 / 744 */
+  height: 100%;
+  max-width: none;
+  object-fit: fill;
+}
+
+.photoShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(11, 34, 71, 0.45) 0%,
+    rgba(11, 34, 71, 0.72) 55%,
+    rgba(11, 34, 71, 0.94) 100%
+  );
+}
+
+/* Pita biru diagonal */
+.stripe {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(94.086% 0, 100% 0, 91.935% 100%, 86.022% 100%);
+  background: linear-gradient(180deg, var(--color-primary-dark) 0%, var(--color-accent) 100%);
+}
+
+.brand {
+  position: absolute;
+  top: 80px;
+  left: 80px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: var(--color-surface-hero);
-  padding: 24px 16px;
+  gap: 16px;
 }
 
-/* ── Kartu ─────────────────────────────────────────────── */
-.card {
-  width: 100%;
-  max-width: 440px;
+.brandLogo {
+  display: grid;
+  place-items: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 40px 32px 32px;
-  box-shadow: 0 4px 24px rgba(var(--color-shadow), 0.10);
+}
+.brandLogo img { width: 56px; height: 58px; }
+
+.brandText { padding-top: 2px; }
+
+.brandName {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+  color: #fff;
 }
 
-/* ── Header ────────────────────────────────────────────── */
-.header {
+.brandSub {
+  margin: 4.6px 0 0;
+  font-size: 13.8px;
+  line-height: 20px;
+  color: var(--color-footer-sub);
+}
+
+.lines {
+  position: absolute;
+  top: 300px;
+  left: 60px;
+  width: 96px;
+  height: 23px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)) 0 0 / 96px 3px no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)) 0 10px / 80px 3px no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)) 0 20px / 64px 3px no-repeat;
+  border-radius: 2px;
+}
+
+/* Kartu info kiri bawah */
+.infoCard {
+  position: absolute;
+  left: 60px;
+  bottom: 70px;
+  width: min(520px, calc(100% - 164px));
+  height: 180px;
+  padding: 35.5px 32px 0;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--color-bg);
+  box-shadow: 0 0 0 1px var(--color-border), 0 8px 24px rgba(var(--color-shadow), 0.16);
+}
+
+.infoCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+
+.infoTitle {
+  margin: 0 0 7px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 32px;
+  color: var(--color-heading);
+}
+
+.infoText {
+  max-width: 380px;
+  margin: 0 0 16px;
+  font-size: 14.55px;
+  line-height: 23px;
+  color: var(--color-text-body);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  height: 28px;
+  padding: 0 16px;
+  min-width: 72px;
   text-align: center;
-  margin-bottom: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  font-size: 12.2px;
+  font-weight: 600;
+  line-height: 28px;
+  color: var(--color-primary);
+}
+
+/* ── Panel kanan ───────────────────────────────────────── */
+.panel {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+  min-height: 100svh;
+  margin-left: 50%;
+  padding: 106px 24px 45px;
+}
+
+.back {
+  position: absolute;
+  top: 40px;
+  right: 88px;
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.back:hover { text-decoration: underline; }
+.back:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.content {
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 40px;
+}
+
+.logoWrap {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+  border: 2px solid var(--color-deco);
+  border-radius: 50%;
+  background: var(--color-bg);
+  box-shadow: 0 8px 24px rgba(var(--color-shadow), 0.16);
+}
+.logoWrap img {
+  position: absolute;
+  top: -6.7px;
+  left: -3.9px;
+  width: 94px;
+  height: 97px;
+  max-width: none;
 }
 
 .title {
-  margin: 0 0 6px;
-  font-family: var(--font-sans);
-  font-size: 1.5rem;
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 32px;
   font-weight: 700;
+  line-height: 40px;
   color: var(--color-heading);
-  line-height: 1.25;
 }
 
 .subtitle {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
+  margin: 7px 0 0;
+  text-align: center;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--login-subtitle);
 }
 
-/* ── Alert error global ─────────────────────────────────── */
+/* ── Area pesan ────────────────────────────────────────── */
+/* Tinggi tetap 103px (subjudul → label): pesan muncul tanpa menggeser form */
 .alertBox {
-  min-height: 0;
-  margin-bottom: 0;
+  height: 103px;
+  padding-top: 21px;
 }
 
-.alertText {
-  margin: 0 0 16px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: #fef2f2;
-  border: 1px solid #fca5a5;
-  color: #b91c1c;
-  font-size: 0.875rem;
-  line-height: 1.5;
+.errorAlert,
+.infoAlert {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 57px;
+  padding: 0 17px;
+  border: 1.5px solid;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+.errorAlert svg,
+.infoAlert svg { flex: none; }
+
+.errorAlert {
+  border-color: #FECDCA;
+  background: #FEF3F2;
+  color: #B42318;
+}
+.errorAlert svg { color: #F04438; }
+
+.infoAlert {
+  border-color: var(--color-deco);
+  background: var(--color-surface-panel);
+  color: var(--color-primary);
 }
 
-/* Pesan sesi berakhir – amber, berbeda dari error login */
-.sessionAlert {
-  margin-bottom: 16px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: #fff7ed;
-  border: 1px solid #fdba74;
-  color: #c2410c;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-
-/* ── Form ───────────────────────────────────────────────── */
+/* ── Form ──────────────────────────────────────────────── */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 13px;
 }
 
-/* ── Field ─────────────────────────────────────────────── */
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .label {
-  font-size: 0.875rem;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--color-text);
+  line-height: 17px;
+  color: var(--login-label);
+}
+
+/* Border desain digambar di tengah garis → kotak 422px (1px keluar tiap sisi) */
+.inputWrap {
+  position: relative;
+  margin-inline: -1px;
 }
 
 .input {
+  display: block;
   width: 100%;
-  padding: 11px 14px;
-  border: 1.5px solid var(--color-border);
-  border-radius: 8px;
-  font: inherit;
-  font-size: 0.9375rem;
-  color: var(--color-text);
-  background: var(--color-bg);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  height: 50px;
+  padding: 0 16px 1px 54px;
+  border: 1.5px solid var(--color-deco);
+  border-radius: 13px;
   outline: none;
+  background: var(--color-bg);
+  font: inherit;
+  font-size: 14.8px;
+  color: var(--color-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.input::placeholder {
-  color: var(--color-text-disabled);
-}
+.input::placeholder { color: var(--color-text-muted); opacity: 1; }
 
 .input:focus {
+  border-width: 2px;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  box-shadow: 0 0 0 3px var(--login-ring);
 }
 
-/* Kondisi error pada input */
-.input.inputError {
-  border-color: #ef4444;
-}
+.inputPassword { padding-right: 52px; }
 
-.input.inputError:focus {
-  box-shadow: 0 0 0 3px #fee2e2;
-}
-
-/* Input password punya padding-right ekstra untuk tombol */
-.inputPassword {
-  padding-right: 44px;
-}
+.input.inputError { border-width: 2px; border-color: #F04438; }
+.input.inputError:focus { box-shadow: 0 0 0 3px #FEE4E2; }
 
 .input:disabled {
   background: var(--color-surface-panel);
@@ -138,94 +349,115 @@
   cursor: not-allowed;
 }
 
-/* ── Wrapper password ──────────────────────────────────── */
-.passwordWrapper {
-  position: relative;
+.iconLeft {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: color 0.15s;
 }
+.inputWrap:focus-within .iconLeft { color: var(--color-primary); }
+.inputWrap:has(.inputError) .iconLeft { color: #F04438; }
 
 .togglePassword {
   position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 8px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
   background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
   color: var(--color-text-muted);
-  display: flex;
-  align-items: center;
-  border-radius: 4px;
+  cursor: pointer;
   transition: color 0.15s;
 }
+.togglePassword:hover { color: var(--color-primary); }
+.togglePassword:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.togglePassword:disabled { cursor: not-allowed; opacity: 0.4; }
 
-.togglePassword:hover {
-  color: var(--color-primary);
+/* Slot tetap 22px di bawah tiap kolom, supaya pesan kolom tidak menggeser tata letak */
+/* margin -8px menghapus jarak 8px antar-anak .field */
+.errorSlot {
+  min-height: 22px;
+  margin-top: -8px;
+  padding-top: 4px;
 }
 
-.togglePassword:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-.togglePassword:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-/* ── Pesan error per kolom ─────────────────────────────── */
 .fieldError {
-  font-size: 0.8125rem;
-  color: #b91c1c;
-  line-height: 1.4;
+  display: block;
+  font-size: 12.2px;
+  line-height: 18px;
+  color: #B42318;
 }
 
-/* ── Tombol Login ──────────────────────────────────────── */
+/* ── Tombol Masuk ──────────────────────────────────────── */
 .submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   width: 100%;
-  padding: 12px;
-  background: var(--color-primary);
-  color: #fff;
-  border: none;
+  height: 54px;
+  margin-top: 18px;   /* 13 (gap) + 18 + slot error 22 = 53 dari kolom password */
+  padding: 0 2px 2px 0;
+  border: 0;
   border-radius: var(--radius-pill);
+  background: var(--color-primary);
   font: inherit;
-  font-size: 1rem;
+  font-size: 14.5px;
   font-weight: 600;
+  color: #fff;
   cursor: pointer;
   transition: background-color 0.15s;
-  margin-top: 4px;
 }
+.submitButton:hover:not(:disabled) { background: var(--color-primary-dark); }
+.submitButton:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.submitButton:disabled { background: var(--color-text-disabled); cursor: not-allowed; }
 
-.submitButton:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-}
-
-.submitButton:focus-visible {
-  outline: 3px solid var(--color-primary-dark);
-  outline-offset: 2px;
-}
-
-.submitButton:disabled {
-  background: var(--color-text-disabled);
-  cursor: not-allowed;
-}
-
-/* ── Catatan kecil di bawah form ───────────────────────── */
+/* ── Catatan & hak cipta ───────────────────────────────── */
 .note {
-  margin: 20px 0 0;
-  text-align: center;
-  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  margin: 38px 0 0;
+  padding: 22px 0 0 6px;
+  border-top: 1px solid var(--color-border);
+  font-size: 13px;
+  line-height: 20px;
   color: var(--color-text-muted);
-  line-height: 1.5;
+}
+.note svg { flex: none; }
+
+.copyright {
+  margin: auto 0 0;
+  text-align: center;
+  font-size: 12.4px;
+  line-height: 18px;
+  color: var(--color-text-muted);
 }
 
-/* ── Responsif mobile (390px) ──────────────────────────── */
-@media (max-width: 480px) {
-  .card {
-    padding: 28px 20px 24px;
+/* ── Responsif ─────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .visual { display: none; }
+  .blobC { left: 20px; }
+  .panel {
+    width: 100%;
+    margin-left: 0;
+    padding: 112px 20px 32px;
   }
+  .back { top: 28px; right: 24px; }
+}
 
-  .title {
-    font-size: 1.25rem;
-  }
+@media (max-width: 480px) {
+  .panel { padding-top: 96px; }
+  .title { font-size: 26px; line-height: 34px; }
+  .subtitle { font-size: 14px; }
+  .note { font-size: 12.5px; }
+  .blobA { width: 180px; height: 180px; }
 }
