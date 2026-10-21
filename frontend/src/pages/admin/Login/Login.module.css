@@ -131,17 +131,10 @@
   overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.1);
-  -webkit-backdrop-filter: blur(10px); /* efek kaca; blur tidak ada di SVG, boleh dihapus */
-  backdrop-filter: blur(10px);
-}
-
-.infoCard::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 6px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  background: rgba(255, 255, 255, 0.1); /* sesuai desain: putih 10% + garis tepi #E7EDF6, tanpa garis biru di atas */
+  --kaca-blur: 10px; /* SVG tidak memuat nilai blur; samakan dengan Effects > Background blur di Figma */
+  -webkit-backdrop-filter: blur(var(--kaca-blur));
+  backdrop-filter: blur(var(--kaca-blur));
 }
 
 .infoTitle {
