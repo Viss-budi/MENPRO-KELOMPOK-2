@@ -5,6 +5,7 @@ const { verifyToken } = require('../middleware/auth');
 
 router.get('/', c.getNews);
 router.get('/admin/all', verifyToken, c.listAll);
+router.get('/admin/:id', verifyToken, c.getById);
 router.get('/:slug', c.getNewsBySlug);
 router.post('/', verifyToken, c.create);
 router.put('/:id', verifyToken, c.update);

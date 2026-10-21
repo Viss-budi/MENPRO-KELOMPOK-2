@@ -9,6 +9,9 @@ const crud = makeCrud({
   fields: ['title', 'category', 'excerpt', 'content', 'cover_url', 'published_at', 'is_published'],
   required: ['title'],
   slugFrom: 'title',
+  ownerField: 'author_id',
+  searchFields: ['title', 'excerpt'],
+  filterFields: ['category', 'is_published'],
 });
 
 // Landing: ?per_page=3 | Halaman "Lihat Semua": ?page=1&per_page=9
