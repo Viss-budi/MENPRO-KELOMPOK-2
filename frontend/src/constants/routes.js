@@ -4,4 +4,6 @@ export const ROUTES = {
   tentang: '/tentang',
   dokumentasi: '/dokumentasi',
   prestasi: '/prestasi',
+  admin: '/admin',
+  adminLogin: '/admin/login',
 }

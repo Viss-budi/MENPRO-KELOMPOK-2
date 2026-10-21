@@ -1,0 +1,176 @@
+/* Ukuran, jarak, dan font diukur dari desain UI/UX (Footer.svg, frame 1440 x 264):
+   font Inter, judul kolom 13px bold, teks 12px, teks bawah 11.4px. */
+.footer {
+  background-color: var(--color-footer-bg);
+  color: #fff;
+  font-family: var(--font-sans);
+  margin-top: 64px;
+}
+.container {
+  width: min(1267px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 22px 0 34px;
+}
+
+/* 4 kolom dengan proporsi sama seperti desain (385 : 312 : 349 : 222) */
+.grid {
+  display: grid;
+  grid-template-columns: 385fr 312fr 349fr 222fr;
+  margin-bottom: 20.5px;
+}
+
+/* Kolom 1: logo + nama + deskripsi */
+.colProfile {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-left: -1px;
+}
+.logo {
+  width: 64px;
+  height: 66px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-top: -1px;
+}
+.profileText {
+  margin-top: 12px;
+}
+.brandName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 16px;
+  color: #fff;
+}
+.brandSub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--color-footer-sub);
+}
+.description {
+  margin: 11px 0 0;
+  max-width: 230px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 19px;
+  color: var(--color-footer-text-muted);
+}
+
+/* Judul kolom */
+.heading {
+  margin: 5px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 16px;
+  color: #fff;
+}
+
+/* Kolom 2: tautan, jarak antar baris 21px */
+.linkList {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.linkList li {
+  font-size: 12px;
+  line-height: 21px;
+}
+.linkList a {
+  font-size: 12px;
+  line-height: 21px;
+  color: var(--color-footer-text);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.linkList a:hover {
+  color: #fff;
+}
+
+/* Kolom 3: kontak, jarak antar baris 28.5px */
+.contactList {
+  list-style: none;
+  margin: 16.4px 0 0;
+  padding: 0 0 0 6px;
+}
+.contactList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 12.5px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-footer-text);
+}
+.contactIcon {
+  flex-shrink: 0;
+  overflow: visible;
+  color: #fff;
+}
+
+/* Kolom 4: sosial media, tombol 30px, radius 8px, jarak 14px */
+.colSocial {
+  margin-left: -1px;
+}
+.socialIcons {
+  display: flex;
+  gap: 14px;
+  margin-top: 11.75px;
+}
+.socialBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background-color: var(--color-footer-icon-bg);
+  color: #fff;
+  text-decoration: none;
+  transition: filter 0.2s;
+}
+.socialBtn:hover {
+  filter: brightness(1.25);
+}
+.socialBtn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Garis dan teks bawah */
+.bottomBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 11.4px;
+  line-height: 16px;
+  color: var(--color-footer-text-muted);
+}
+.bottomBar p {
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 24px;
+  }
+  .colProfile,
+  .colSocial {
+    margin-left: 0;
+  }
+}
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .bottomBar {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}

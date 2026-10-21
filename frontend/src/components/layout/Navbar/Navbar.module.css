@@ -1,0 +1,240 @@
+/* Ukuran dan warna diukur dari desain UI/UX (Navbar.svg, frame 1440 px):
+   tinggi 90px + bayangan 8px, font Inter, menu 14px, tombol 14px bold. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+}
+
+/* Bayangan 8px di bawah navbar: navy 8% -> transparan */
+.header::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(rgba(var(--color-shadow), 0.08), rgba(var(--color-shadow), 0));
+  pointer-events: none;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  width: min(1280px, calc(100% - 48px));
+  height: 90px;
+  margin: 0 auto;
+}
+
+/* Logo + nama */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.logo {
+  width: 65px;
+  height: 67px;
+  object-fit: contain;
+}
+.brandText {
+  display: flex;
+  flex-direction: column;
+  margin-top: 5px; /* di desain blok teks sedikit lebih rendah dari tengah logo */
+}
+.brandName {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--color-navy);
+}
+.brandSub {
+  margin-top: 1px;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 12px;
+  color: var(--color-nav-sub);
+}
+
+/* Menu */
+.nav {
+  display: flex;
+  align-items: center;
+  margin-left: clamp(24px, 9vw, 129px);
+}
+.list {
+  display: flex;
+  align-items: center;
+  gap: 36.6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: relative;
+  top: -2px; /* teks menu di desain 2px lebih tinggi dari tengah */
+}
+.link {
+  position: relative;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--color-nav);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+/* Slot menu selalu selebar teks regular, teks bold (aktif) hanya melebar ke
+   kedua sisi dari tengah, jadi posisi menu lain tidak bergeser (sama seperti desain) */
+.link::before {
+  content: attr(data-label);
+  display: block;
+  height: 20px;
+  visibility: hidden;
+}
+.label {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+/* garis bawah menu aktif: 20 x 3 px, di tengah, 8px di bawah teks */
+.link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 9px);
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-nav-active);
+  transform: translateX(-50%) scaleX(0);
+  transition: transform 0.2s;
+}
+.link:hover {
+  color: var(--color-nav-active);
+}
+.linkActive {
+  font-weight: 700;
+  color: var(--color-nav-active);
+}
+.linkActive::after {
+  transform: translateX(-50%) scaleX(1);
+}
+.link:focus-visible,
+.iconBtn:focus-visible {
+  outline: 3px solid var(--color-primary-dark);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* Ikon cari + tombol Hubungi Kami */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-left: auto;
+  margin-right: 3px; /* di desain tepi kanan tombol 3px lebih ke dalam */
+  flex-shrink: 0;
+}
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.iconBtn:hover {
+  background: var(--color-surface-panel);
+}
+.header .cta {
+  height: 42px;
+  padding: 0 23.5px;
+  border: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ctaMobile,
+.toggle {
+  display: none;
+}
+
+/* Tablet dan HP: menu jadi panel yang dibuka tombol hamburger */
+@media (max-width: 1180px) {
+  .inner {
+    height: 72px;
+    width: calc(100% - 40px);
+  }
+  .logo {
+    width: 48px;
+    height: 50px;
+  }
+  .brandSub {
+    display: none;
+  }
+  .brandText {
+    margin-top: 0;
+  }
+  .actions {
+    gap: 8px;
+  }
+  .toggle {
+    display: inline-flex;
+  }
+  .header .ctaDesktop {
+    display: none;
+  }
+  .nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    margin: 0;
+    padding: 12px 20px 24px;
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 12px 16px rgba(var(--color-shadow), 0.08);
+  }
+  .navOpen {
+    display: flex;
+  }
+  .list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    top: 0;
+  }
+  .link {
+    display: block;
+    padding: 14px 4px;
+    font-size: 15px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .link::before,
+  .link::after {
+    display: none;
+  }
+  .label {
+    position: static;
+    transform: none;
+  }
+  .header .ctaMobile {
+    display: inline-flex;
+  }
+}

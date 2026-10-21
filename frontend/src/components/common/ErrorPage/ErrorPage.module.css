@@ -1,0 +1,229 @@
+/* Halaman error publik: 404, 500, pemeliharaan, offline.
+   Ukuran diukur dari desain UI/UX (himafor-error-publik, frame 1440 px):
+   ikon 108px, kode angka ~165px, judul 34px, tombol 50px. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+}
+
+/* Footer di desain menempel langsung ke konten */
+.page > footer {
+  margin-top: 0;
+}
+
+.main {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 48px 24px 64px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9fd 100%);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 760px;
+  text-align: center;
+}
+
+/* ── Dekorasi lingkaran ──────────────────────────────── */
+.deco {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  pointer-events: none;
+}
+.decoTopRight {
+  top: -40px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  opacity: 0.45;
+}
+.decoTopRightDot {
+  top: 20px;
+  right: 10px;
+  width: 70px;
+  height: 70px;
+  opacity: 0.7;
+}
+.decoBottomLeft {
+  bottom: -50px;
+  left: 30px;
+  width: 200px;
+  height: 200px;
+  opacity: 0.45;
+}
+.decoDotA {
+  bottom: 140px;
+  left: 232px;
+  width: 24px;
+  height: 24px;
+}
+.decoDotB {
+  bottom: 120px;
+  right: 242px;
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Ikon + halo ─────────────────────────────────────── */
+.halo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f0fa;
+}
+.haloSingle {
+  width: 152px;
+  height: 152px;
+}
+.haloDouble {
+  width: 208px;
+  height: 208px;
+}
+.haloDouble::before {
+  content: '';
+  position: absolute;
+  inset: 24px;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  opacity: 0.75;
+}
+.core {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  border: 1.5px solid var(--color-deco);
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--color-primary);
+  box-shadow: 0 10px 28px rgba(var(--color-shadow), 0.12);
+}
+
+/* ── Kode angka (404 / 500) ──────────────────────────── */
+.code {
+  margin: 8px 0 0;
+  font-size: clamp(96px, 26vw, 165px);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.02em;
+  color: var(--color-primary-soft);
+  user-select: none;
+}
+
+/* ── Teks ────────────────────────────────────────────── */
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.title {
+  margin: 28px 0 0;
+  font-size: clamp(26px, 6vw, 34px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--color-heading);
+}
+.title:focus {
+  outline: none;
+}
+/* Tanpa kode angka, jarak judul ke ikon mengikuti desain (lebih lega) */
+.titleNoCode {
+  margin-top: 36px;
+}
+.description {
+  max-width: 520px;
+  margin: 10px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text-body);
+}
+
+/* ── Perkiraan selesai (pemeliharaan) ────────────────── */
+.estimate {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 28px 0 0;
+  padding: 12px 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-heading);
+  box-shadow: 0 6px 20px rgba(var(--color-shadow), 0.08);
+}
+.estimate svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+/* ── Tombol ──────────────────────────────────────────── */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+/* .actions .btn lebih spesifik daripada .button di Button.module.css */
+.actions .btn {
+  gap: 8px;
+  height: 50px;
+  padding: 0 28px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 32px 20px 48px;
+  }
+  .haloDouble {
+    width: 176px;
+    height: 176px;
+  }
+  .haloDouble::before {
+    inset: 20px;
+  }
+  .haloSingle {
+    width: 136px;
+    height: 136px;
+  }
+  .core {
+    width: 96px;
+    height: 96px;
+  }
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .actions .btn {
+    width: 100%;
+  }
+  .decoDotA,
+  .decoDotB {
+    display: none;
+  }
+}
