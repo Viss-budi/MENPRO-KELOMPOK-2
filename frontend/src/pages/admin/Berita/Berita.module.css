@@ -1,0 +1,153 @@
+/* =========================================================
+   Gaya bersama halaman Kelola Berita (daftar dan form).
+   Angka mengikuti desain UI/UX; warna memakai token global.css.
+   ========================================================= */
+
+.page { max-width: 1100px; }
+
+/* ── Judul halaman + tombol aksi ───────────────────────── */
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 36px;
+  letter-spacing: -0.4px; /* desain sistem: Heading/H3 28 / 800 / LS -0.4 */
+  color: var(--color-heading);
+}
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--color-text-body);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ── Tombol pil ────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 28px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.btn:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.btn:disabled { cursor: not-allowed; }
+.btn svg { flex: none; }
+
+.primary { background: var(--color-primary); color: #fff; }
+.primary:hover:not(:disabled) { background: var(--color-primary-dark); }
+.primary:disabled { background: var(--color-text-disabled); }
+
+.outline {
+  border-color: var(--color-primary);
+  background: #fff;
+  color: var(--color-primary);
+}
+.outline:hover:not(:disabled) { background: var(--color-surface-panel); }
+.outline:disabled { border-color: var(--color-border); color: var(--color-text-disabled); }
+
+.danger {
+  border-color: #EF4444;
+  background: #fff;
+  color: #B42318;
+}
+.danger:hover:not(:disabled) { background: #FEF3F2; }
+.danger:disabled { border-color: #F5C6C2; color: #E9A29C; }
+
+.sm { height: 36px; padding: 0 16px; font-size: 13.5px; }
+
+/* ── Panel status (memuat / gagal / tidak ditemukan / kosong) ── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 72px 24px;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.06);
+  text-align: center;
+}
+.panelIcon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-surface-icon);
+  color: var(--color-primary);
+}
+.panelIconWarn { background: #FEF3F2; color: #D92D20; }
+.panelTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--color-heading);
+}
+.panelText {
+  max-width: 420px;
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--color-text-body);
+}
+
+/* ── Kerangka saat memuat ──────────────────────────────── */
+.skel {
+  display: block;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--color-border) 25%, #F1F5FA 50%, var(--color-border) 75%);
+  background-size: 200% 100%;
+  animation: kilau 1.4s ease-in-out infinite;
+}
+@keyframes kilau {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skel { animation: none; }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1023px) {
+  .title { font-size: 26px; line-height: 32px; letter-spacing: -0.4px; }
+}
+@media (max-width: 480px) {
+  .actions { width: 100%; }
+  .actions .btn { flex: 1; padding: 0 16px; }
+}

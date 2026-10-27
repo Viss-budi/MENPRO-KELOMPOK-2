@@ -1,0 +1,251 @@
+/* Form tambah / edit berita: desain 05 sampai 08, 10, 11.
+   Kartu kiri fleksibel, kartu kanan 340 px; input 50 px, radius 13; editor radius 16. */
+
+/* ── Kotak pesan gagal simpan (desain 08) ───────────────── */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 54px;
+  margin-top: 24px;
+  padding: 12px 24px;
+  border: 1px solid #F9C9C5;
+  border-radius: 16px;
+  background: #FEF3F2;
+  box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.04);
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 20px;
+  color: #B42318;
+}
+.banner svg { flex: none; color: #D92D20; }
+.banner:focus-visible { outline: 2px solid #D92D20; outline-offset: 2px; }
+
+/* ── Tata letak dua kolom ──────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.card {
+  padding: 24px 23px 26px;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.06);
+}
+.cardTitle {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  color: var(--color-heading);
+}
+
+/* ── Kolom ─────────────────────────────────────────────── */
+.field + .field { margin-top: 22px; }
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 16px;
+  color: var(--color-text);
+}
+
+.inputWrap { position: relative; }
+
+.input {
+  display: block;
+  width: 100%;
+  height: 50px;
+  padding: 0 16px;
+  border: 1.5px solid var(--color-deco);
+  border-radius: 13px;
+  outline: none;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-heading);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input::placeholder { font-weight: 400; color: var(--color-text-muted); opacity: 1; }
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(219, 233, 251, 0.8);
+}
+.input:disabled { background: var(--color-surface-panel); cursor: not-allowed; }
+.input.inputError { padding-right: 46px; border-color: #EF4444; border-width: 2px; }
+.input.inputError:focus { box-shadow: 0 0 0 3px #FEE2E2; }
+.inputIcon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: #D92D20;
+  pointer-events: none;
+}
+
+.fieldError {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 16px;
+  color: #B42318;
+}
+.hitung {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: right;
+  color: var(--color-text-muted);
+}
+
+/* ── Editor isi berita ─────────────────────────────────── */
+.editor {
+  overflow: hidden;
+  border: 1.5px solid var(--color-deco);
+  border-radius: 16px;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.editor:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(219, 233, 251, 0.8);
+}
+.editor.editorError { border-color: #EF4444; border-width: 2px; }
+.editor.editorError:focus-within { box-shadow: 0 0 0 3px #FEE2E2; }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 12px;
+  background: var(--color-surface-panel);
+  border-bottom: 1px solid var(--color-deco-soft);
+}
+.toolBtn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-heading);
+}
+.toolBtn:disabled { cursor: not-allowed; opacity: 0.6; }
+.toolSep {
+  width: 1px;
+  height: 22px;
+  margin: 0 8px;
+  background: var(--color-deco);
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: 250px;
+  padding: 16px 20px;
+  border: 0;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  font: inherit;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-text-body);
+}
+.textarea::placeholder { color: var(--color-text-muted); opacity: 1; }
+.textarea:disabled { background: var(--color-surface-hero); cursor: not-allowed; }
+
+/* ── Gambar berita ─────────────────────────────────────── */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 192px;
+  padding: 24px 16px;
+  border: 2px dashed var(--color-deco);
+  border-radius: 16px;
+  background: var(--color-surface-hero);
+  color: var(--color-primary);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.dropzone:hover,
+.dropAktif { border-color: var(--color-primary); background: var(--color-surface-panel); }
+.dropzone:focus-within { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.dropzone strong {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  color: var(--color-heading);
+}
+.dropzone small {
+  font-size: 11.5px;
+  line-height: 16px;
+  color: var(--color-text-muted);
+}
+.dropzone.dropError { border-color: #EF4444; background: #FFF1F0; color: #D92D20; }
+.dropzone.dropError strong { color: #B42318; }
+.dropzone.dropError small { color: #B42318; }
+
+.previewBox {
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--color-surface-panel);
+  aspect-ratio: 3 / 2;
+}
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.previewKosong {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+.fileMeta {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+.previewAksi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+/* label berperan sebagai tombol: fokus input tersembunyi ditampilkan di label */
+.gantiGambar:focus-within { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
+/* ── Kerangka saat memuat data lama ────────────────────── */
+.skelJudul { width: 100%; height: 50px; border-radius: 13px; }
+.skelIsi { width: 100%; height: 300px; margin-top: 30px; border-radius: 16px; }
+.skelGambar { width: 100%; aspect-ratio: 3 / 2; border-radius: 16px; }
+
+/* ── Layar kecil ───────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .card { padding: 20px 16px 22px; }
+  .banner { padding: 12px 16px; }
+}

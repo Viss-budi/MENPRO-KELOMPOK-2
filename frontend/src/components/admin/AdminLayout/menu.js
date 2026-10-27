@@ -11,10 +11,11 @@ import {
   Users,
 } from 'lucide-react'
 import { ROUTES } from '../../../constants/routes'
+import { bacaRuteBerita } from '../../../pages/admin/Berita/rute'
 
 // Menu samping admin (sesuai desain UI/UX). Dipakai juga oleh App.jsx untuk memetakan URL.
 // roles : kosong = admin dan editor; ['admin'] = hanya admin (kontrak bagian 6).
-// Halaman kelola selain Dashboard belum dibuat; sementara memakai halaman "sedang disiapkan".
+// Halaman kelola selain Dashboard dan Berita belum dibuat; sementara memakai halaman "sedang disiapkan".
 export const MENU = [
   { key: 'dashboard', label: 'Dashboard', path: ROUTES.admin, icon: LayoutDashboard, group: 'utama' },
   { key: 'kegiatan', label: 'Kegiatan', path: `${ROUTES.admin}/kegiatan`, icon: CalendarCheck, group: 'utama' },
@@ -33,8 +34,27 @@ export const GRUP_MENU = [
   { key: 'sistem', label: 'Sistem' },
 ]
 
+// Sub-halaman di bawah satu menu (form tambah/ubah, dsb.). Menu tetap menyala untuk semua sub-halamannya.
+//   baca  : (path) => { mode, ... } | null  (null = path bukan milik menu ini)
+//   label : mode -> teks sub-halaman di breadcrumb (mode tanpa label = halaman utama menu)
+const SUB_RUTE = {
+  berita: {
+    baca: bacaRuteBerita,
+    label: { tambah: 'Tambah Berita', ubah: 'Edit Berita' },
+  },
+}
+
 export function cariMenu(path) {
-  return MENU.find((item) => item.path === path) ?? null
+  const persis = MENU.find((item) => item.path === path)
+  if (persis) return persis
+  return MENU.find((item) => SUB_RUTE[item.key]?.baca(path)) ?? null
+}
+
+// Teks sub-halaman untuk breadcrumb ("Tambah Berita"), atau null bila path adalah halaman utama menu.
+export function labelSubhalaman(item, path) {
+  const sub = item ? SUB_RUTE[item.key] : null
+  const rute = sub?.baca(path)
+  return (rute && sub.label[rute.mode]) || null
 }
 
 export function bolehAkses(item, role) {

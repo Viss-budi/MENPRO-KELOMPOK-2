@@ -12,22 +12,26 @@ function klikBiasa(e) {
 }
 
 // Kerangka halaman admin: menu samping + bilah atas. Dipakai semua halaman kelola.
-// activePath : path halaman yang sedang tampil (salah satu path di MENU)
-// onNavigate : (path) => void ; onLogout : () => void
-function AdminLayout({ user, activePath, onNavigate, onLogout, children }) {
+// activePath  : path menu yang menyala (salah satu path di MENU)
+// currentPath : path yang sedang tampil; beda dari activePath di sub-halaman (mis. /admin/berita/tambah).
+//               Bila tidak diisi dianggap sama dengan activePath.
+// subLabel    : nama sub-halaman untuk breadcrumb ("Tambah Berita"), opsional
+// onNavigate  : (path) => void ; onLogout : () => void
+function AdminLayout({ user, activePath, currentPath, subLabel, onNavigate, onLogout, children }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const aktif = cariMenu(activePath)
   const role = user?.role
   const nama = user?.name || 'Pengguna'
+  const lokasiSaatIni = currentPath ?? activePath
 
   // Judul tab sesuai halaman, dikembalikan saat layout dilepas
   useEffect(() => {
     const sebelumnya = document.title
-    document.title = `${aktif?.label ?? 'Admin'} | Admin HIMAFOR`
+    document.title = `${subLabel ?? aktif?.label ?? 'Admin'} | Admin HIMAFOR`
     return () => {
       document.title = sebelumnya
     }
-  }, [aktif])
+  }, [aktif, subLabel])
 
   // Escape menutup menu di layar kecil
   useEffect(() => {
@@ -39,11 +43,13 @@ function AdminLayout({ user, activePath, onNavigate, onLogout, children }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [drawerOpen])
 
+  // Tujuan yang sama dengan halaman yang sedang tampil tidak perlu didorong ke riwayat lagi.
+  // Dari sub-halaman, klik menu induknya (mis. "Berita") tetap berpindah ke halaman utama menu.
   function pergi(e, path) {
     if (!klikBiasa(e)) return
     e.preventDefault()
     setDrawerOpen(false)
-    if (path !== activePath) onNavigate(path)
+    if (path !== lokasiSaatIni) onNavigate(path)
   }
 
   return (
@@ -139,7 +145,21 @@ function AdminLayout({ user, activePath, onNavigate, onLogout, children }) {
           <nav className={styles.crumbs} aria-label="Lokasi halaman">
             <span className={styles.crumbRoot}>Admin</span>
             <span className={styles.crumbSep} aria-hidden="true">/</span>
-            <span className={styles.crumbNow}>{aktif?.label ?? 'Admin'}</span>
+            {subLabel ? (
+              <>
+                <a
+                  href={activePath}
+                  className={`${styles.crumbRoot} ${styles.crumbLink}`}
+                  onClick={(e) => pergi(e, activePath)}
+                >
+                  {aktif?.label ?? 'Admin'}
+                </a>
+                <span className={styles.crumbSep} aria-hidden="true">/</span>
+                <span className={styles.crumbNow} aria-current="page">{subLabel}</span>
+              </>
+            ) : (
+              <span className={styles.crumbNow}>{aktif?.label ?? 'Admin'}</span>
+            )}
           </nav>
 
           <div className={styles.tools}>

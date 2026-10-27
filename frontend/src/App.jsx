@@ -7,8 +7,9 @@ import Home from './pages/public/Home/Home'
 import Login from './pages/admin/Login/Login'
 import Dashboard from './pages/admin/Dashboard/Dashboard'
 import Kelola from './pages/admin/Kelola/Kelola'
+import KelolaBerita from './pages/admin/Berita/KelolaBerita'
 import AdminLayout from './components/admin/AdminLayout/AdminLayout'
-import { bolehAkses, cariMenu } from './components/admin/AdminLayout/menu'
+import { bolehAkses, cariMenu, labelSubhalaman } from './components/admin/AdminLayout/menu'
 import SesiLoading from './components/admin/SesiLoading/SesiLoading'
 import ErrorPage from './components/common/ErrorPage/ErrorPage'
 import { ROUTES } from './constants/routes'
@@ -51,7 +52,8 @@ function normalisasi(pathname) {
   return (pathname || '').replace(/\/+$/, '') || '/'
 }
 
-// Halaman admin = login + semua path di menu admin. Path /admin/xyz lain dianggap 404.
+// Halaman admin = login + semua path di menu admin (termasuk sub-halamannya, mis. /admin/berita/tambah).
+// Path /admin/xyz lain dianggap 404.
 function wilayahAdmin(path) {
   return path === PATH_LOGIN || cariMenu(path) !== null
 }
@@ -197,18 +199,28 @@ function App() {
   const itemAdmin = cariMenu(halaman)
   if (itemAdmin) {
     const akses = bolehAkses(itemAdmin, auth.user?.role)
+
+    // Menu tetap menyala di sub-halaman (activePath = path menu), sedangkan breadcrumb
+    // menampilkan nama sub-halamannya (subLabel), mis. "Admin / Berita / Tambah Berita".
+    let isi
+    if (halaman === PATH_ADMIN) {
+      isi = <Dashboard user={auth.user} onNavigate={navigate} />
+    } else if (itemAdmin.key === 'berita' && akses) {
+      isi = <KelolaBerita pathname={halaman} onNavigate={navigate} />
+    } else {
+      isi = <Kelola item={itemAdmin} akses={akses} onNavigate={navigate} />
+    }
+
     return (
       <AdminLayout
         user={auth.user}
-        activePath={halaman}
+        activePath={itemAdmin.path}
+        currentPath={halaman}
+        subLabel={labelSubhalaman(itemAdmin, halaman)}
         onNavigate={navigate}
         onLogout={handleLogout}
       >
-        {halaman === PATH_ADMIN ? (
-          <Dashboard user={auth.user} onNavigate={navigate} />
-        ) : (
-          <Kelola item={itemAdmin} akses={akses} onNavigate={navigate} />
-        )}
+        {isi}
       </AdminLayout>
     )
   }

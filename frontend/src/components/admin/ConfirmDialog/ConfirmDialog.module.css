@@ -1,0 +1,110 @@
+/* Dialog konfirmasi hapus: mengikuti desain 03-dialog-hapus (kartu 464 px, tombol 144 x 44). */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(11, 34, 71, 0.5);
+  font-family: var(--font-sans);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(464px, 100%);
+  padding: 30px 32px 32px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(var(--color-shadow), 0.28);
+  text-align: center;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #FEF1F0;
+  color: #D92D20;
+}
+
+.title {
+  margin: 18px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--color-heading);
+}
+
+.text {
+  max-width: 330px;
+  margin: 8px 0 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--color-text-body);
+  overflow-wrap: anywhere;
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border: 1px solid #F9C9C5;
+  border-radius: 12px;
+  background: #FEF3F2;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: left;
+  color: #B42318;
+}
+.error svg { flex: none; margin-top: 1px; color: #D92D20; }
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.btn {
+  width: 144px;
+  height: 44px;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.btn:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.btn:disabled { cursor: not-allowed; }
+
+.batal {
+  border-color: var(--color-primary);
+  background: #fff;
+  color: var(--color-primary);
+}
+.batal:hover:not(:disabled) { background: var(--color-surface-panel); }
+.batal:disabled { border-color: var(--color-border); color: var(--color-text-disabled); }
+
+.ya { background: #D92D20; color: #fff; }
+.ya:hover:not(:disabled) { background: #B42318; }
+.ya:disabled { background: #E9A29C; }
+
+@media (max-width: 420px) {
+  .dialog { padding: 26px 20px 24px; }
+  .actions { width: 100%; gap: 12px; }
+  .btn { flex: 1; width: auto; }
+}

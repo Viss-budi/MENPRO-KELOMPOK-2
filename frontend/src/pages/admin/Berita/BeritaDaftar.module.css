@@ -1,0 +1,179 @@
+/* Tabel daftar berita: desain 01-daftar-default (baris 69 px, gambar mini 54 x 44, tombol 36 px). */
+
+.meta {
+  margin: 28px 0 14px;
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--color-text-muted);
+}
+
+.card {
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.06);
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.colThumb { width: 100px; }
+.colTanggal { width: 190px; }
+.colAksi { width: 236px; }
+
+.table th {
+  height: 44px;
+  padding: 0;
+  background: var(--color-surface-panel);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: left;
+  color: var(--color-text-muted);
+}
+.table th:first-child { padding-left: 30px; }
+
+.table td {
+  height: 69px;
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+.table td:first-child { padding-left: 30px; }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr:hover { background: #FAFCFF; }
+
+/* ── Gambar mini ───────────────────────────────────────── */
+.thumb,
+.thumbKosong {
+  display: block;
+  width: 54px;
+  height: 44px;
+  border-radius: 8px;
+}
+.thumb { object-fit: cover; background: var(--color-border); }
+.thumbKosong {
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-panel);
+  color: var(--color-text-disabled);
+}
+
+/* ── Judul dan tanggal ─────────────────────────────────── */
+/* td.selJudul / td:last-child setara spesifisitas dengan ".table td", jadi tidak tertimpa padding: 0 di atas */
+.table td.selJudul { padding-right: 24px; }
+.table th:last-child,
+.table td:last-child { padding-right: 20px; }
+.judul {
+  display: block;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--color-heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tanggalKecil { display: none; }
+
+.tanggal {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--color-text-body);
+  white-space: nowrap;
+}
+.tanggal svg { flex: none; color: var(--color-text-muted); }
+
+/* ── Tombol aksi ───────────────────────────────────────── */
+.aksi {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.btnAksi { padding: 0 18px; }
+
+/* ── Keadaan kosong (desain 02) ────────────────────────── */
+/* div.kosong lebih spesifik daripada .panel di Berita.module.css, jadi urutan muat CSS tidak berpengaruh */
+div.kosong { padding: 110px 24px 120px; gap: 10px; }
+.kosongHalo {
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: #E8F0FA;
+}
+.kosongIcon {
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+/* ── Kerangka memuat ──────────────────────────────────── */
+.skelThumb { width: 54px; height: 44px; border-radius: 8px; }
+.skelJudul { width: 60%; height: 14px; }
+.skelTanggal { width: 110px; height: 12px; }
+.skelAksi { width: 150px; height: 30px; border-radius: 999px; }
+
+/* ── Paginasi ─────────────────────────────────────────── */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 18px;
+}
+.pagerInfo {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+}
+
+/* ── Layar kecil ──────────────────────────────────────── */
+@media (max-width: 720px) {
+  .colThumb { width: 78px; }
+  .colAksi { width: 92px; }
+  .colTanggal,
+  .kolTanggal { display: none; }
+
+  .table th:first-child,
+  .table td:first-child { padding-left: 16px; }
+  .table td { height: 76px; }
+  .table td.selJudul { padding-right: 12px; }
+  .table th:last-child,
+  .table td:last-child { padding-right: 12px; }
+  /* judul boleh dua baris agar tidak terlalu terpotong */
+  .judul {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-size: 14px;
+    line-height: 20px;
+    white-space: normal;
+  }
+  .tanggalKecil {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--color-text-muted);
+  }
+
+  /* Tombol jadi ikon saja; nama aksesibel tetap lewat aria-label */
+  .aksi { gap: 8px; }
+  .btnAksi { width: 36px; padding: 0; }
+  .labelAksi { display: none; }
+
+  .pager { flex-wrap: wrap; justify-content: center; }
+  .pagerInfo { order: -1; flex: 1 1 100%; text-align: center; }
+}

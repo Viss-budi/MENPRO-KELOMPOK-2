@@ -277,6 +277,11 @@
   text-overflow: ellipsis;
 }
 
+/* Breadcrumb induk yang bisa diklik di sub-halaman (mis. Admin / Berita / Tambah Berita) */
+.crumbLink { text-decoration: none; }
+.crumbLink:hover { color: var(--color-heading); text-decoration: underline; }
+.crumbLink:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: 4px; }
+
 .tools {
   display: flex;
   align-items: center;
