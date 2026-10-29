@@ -2,6 +2,12 @@
 workspace:
   id: d4338147-8d64-45dc-819e-b3a1024a5988
 
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/HIMAFOR API v1.1 (Sprint 2): 9b16917a-3a03-4da5-8a29-3e04fcb09c9d
+
 # All resources in the `postman/` folder are automatically registered in Local View.
 # Point to additional files outside the `postman/` folder to register them individually. Example:
 #localResources:
