@@ -42,7 +42,15 @@ const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173').spli
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// /uploads hanya menyajikan gambar (jpg, png, webp), tanpa eksekusi skrip
+app.use('/uploads',
+  (req, res, next) => (/\.(jpe?g|png|webp)$/i.test(req.path) ? next() : res.status(404).json({ success: false, message: 'Endpoint tidak ditemukan' })),
+  express.static(path.join(__dirname, 'uploads'), {
+    setHeaders: (res) => {
+      res.setHeader('Content-Security-Policy', "default-src 'none'");
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+    },
+  }));
 
 // Opsional: sajikan hasil build frontend (frontend/dist) dari server yang sama -> cukup 1 port / 1 tunnel ngrok
 const distPath = path.join(__dirname, '..', 'frontend', 'dist');
