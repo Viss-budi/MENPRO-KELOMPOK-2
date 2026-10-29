@@ -121,6 +121,7 @@
 .toolbar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 4px;
   padding: 7px 12px;
   background: var(--color-surface-panel);
@@ -136,13 +137,44 @@
   border-radius: 8px;
   background: transparent;
   color: var(--color-heading);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
 }
-.toolBtn:disabled { cursor: not-allowed; opacity: 0.6; }
+.toolBtn:hover:not(:disabled) {
+  background: var(--color-surface-icon);
+  color: var(--color-primary);
+}
+.toolBtn:active:not(:disabled) {
+  background: var(--color-primary-soft);
+}
+.toolBtn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+.toolBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .toolSep {
   width: 1px;
   height: 22px;
-  margin: 0 8px;
+  margin: 0 6px;
   background: var(--color-deco);
+}
+
+.uploadInfo {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.spin {
+  animation: putar 1s linear infinite;
+}
+@keyframes putar {
+  to { transform: rotate(360deg); }
 }
 
 .textarea {
@@ -155,7 +187,7 @@
   resize: vertical;
   background: transparent;
   font: inherit;
-  font-size: 14.5px;
+  font-size: 15px;
   line-height: 1.6;
   color: var(--color-text-body);
 }
@@ -245,7 +277,17 @@
 @media (max-width: 1023px) {
   .grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+@media (max-width: 768px) {
+  .input { font-size: 16px; } /* Prevents iOS Safari auto-zoom */
+  .textarea { font-size: 16px; }
+}
+
 @media (max-width: 480px) {
   .card { padding: 20px 16px 22px; }
   .banner { padding: 12px 16px; }
+  .dropzone { padding: 20px 12px; min-height: 160px; }
+  .previewAksi { flex-direction: column; }
+  .previewAksi button,
+  .previewAksi label { width: 100%; justify-content: center; }
 }

@@ -7,6 +7,7 @@ import {
   Italic,
   Link as LinkIcon,
   List,
+  Loader2,
   RefreshCw,
   SearchX,
   Trash2,
@@ -30,14 +31,12 @@ import styles from './BeritaForm.module.css'
 
 const PESAN_GAGAL_SIMPAN = 'Berita gagal disimpan, silakan coba lagi'
 
-// Alat format teks ada di desain, tetapi isi berita pada kontrak (5.4 dan 7.3) adalah teks biasa
-// yang ditampilkan apa adanya. Tombolnya dinonaktifkan sampai tim sepakat format isi berita.
 const ALAT_EDITOR = [
-  { key: 'tebal', label: 'Tebal', icon: Bold },
-  { key: 'miring', label: 'Miring', icon: Italic },
-  { key: 'daftar', label: 'Daftar', icon: List },
-  { key: 'tautan', label: 'Tautan', icon: LinkIcon },
-  { key: 'gambar', label: 'Sisipkan gambar', icon: ImageIcon },
+  { key: 'tebal',  label: 'Tebal',          icon: Bold,      shortcut: 'Ctrl+B' },
+  { key: 'miring', label: 'Miring',          icon: Italic,    shortcut: 'Ctrl+I' },
+  { key: 'daftar', label: 'Daftar',          icon: List,      shortcut: null },
+  { key: 'tautan', label: 'Tautan',          icon: LinkIcon,  shortcut: 'Ctrl+K' },
+  { key: 'gambar', label: 'Sisipkan gambar', icon: ImageIcon, shortcut: null },
 ]
 
 // mode: 'tambah' | 'ubah' (dengan id)
@@ -58,6 +57,7 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
   const [banner, setBanner] = useState(null) // { pesan, n } n supaya pesan sama tetap memicu fokus
   const [menyimpan, setMenyimpan] = useState(false)
   const [seret, setSeret] = useState(false)
+  const [mengunggahEditor, setMengunggahEditor] = useState(false)
 
   // Memuat data lama (hanya mode ubah): 'memuat' | 'siap' | 'gagal' | 'tidak-ada'
   const [muat, setMuat] = useState(edit ? 'memuat' : 'siap')
@@ -70,6 +70,7 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
   const judulRef = useRef(null)
   const isiRef = useRef(null)
   const fileRef = useRef(null)
+  const editorFileRef = useRef(null) // input file tersembunyi untuk sisipkan gambar di editor
   const bannerRef = useRef(null)
   const abortRef = useRef(null)
 
@@ -153,6 +154,157 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
   function hapusGambar() {
     setPreview(null)
     setGambar(null)
+  }
+
+  // ── Format teks editor ─────────────────────────────────────────────────────
+  // Sisipkan teks ke textarea dengan memulihkan posisi kursor setelah setState.
+  function sisipTeks(nilaiBaru, posisiKursor) {
+    setIsi(nilaiBaru)
+    bersihkan('isi')
+    // Fokus kembali ke textarea dan pindah kursor ke posisi yang tepat
+    requestAnimationFrame(() => {
+      const el = isiRef.current
+      if (!el) return
+      el.focus()
+      el.setSelectionRange(posisiKursor, posisiKursor)
+    })
+  }
+
+  function formatTeks(key) {
+    const el = isiRef.current
+    if (!el) return
+    const awal = el.selectionStart
+    const akhir = el.selectionEnd
+    const nilai = el.value
+    const terpilih = nilai.slice(awal, akhir)
+
+    switch (key) {
+      case 'tebal': {
+        // Toggle: bila sudah dikelilingi **, lepas; bila tidak, bungkus
+        const sebelum = nilai.slice(awal - 2, awal)
+        const sesudah = nilai.slice(akhir, akhir + 2)
+        if (sebelum === '**' && sesudah === '**') {
+          // Lepas bold
+          const baru = nilai.slice(0, awal - 2) + terpilih + nilai.slice(akhir + 2)
+          sisipTeks(baru, awal - 2 + terpilih.length)
+        } else if (terpilih) {
+          const baru = nilai.slice(0, awal) + `**${terpilih}**` + nilai.slice(akhir)
+          sisipTeks(baru, awal + terpilih.length + 4)
+        } else {
+          const placeholder = 'teks tebal'
+          const baru = nilai.slice(0, awal) + `**${placeholder}**` + nilai.slice(akhir)
+          sisipTeks(baru, awal + 2 + placeholder.length)
+          requestAnimationFrame(() => {
+            el.setSelectionRange(awal + 2, awal + 2 + placeholder.length)
+          })
+        }
+        break
+      }
+      case 'miring': {
+        const sebelum = nilai.slice(awal - 1, awal)
+        const sesudah = nilai.slice(akhir, akhir + 1)
+        if (sebelum === '*' && sesudah === '*') {
+          const baru = nilai.slice(0, awal - 1) + terpilih + nilai.slice(akhir + 1)
+          sisipTeks(baru, awal - 1 + terpilih.length)
+        } else if (terpilih) {
+          const baru = nilai.slice(0, awal) + `*${terpilih}*` + nilai.slice(akhir)
+          sisipTeks(baru, awal + terpilih.length + 2)
+        } else {
+          const placeholder = 'teks miring'
+          const baru = nilai.slice(0, awal) + `*${placeholder}*` + nilai.slice(akhir)
+          sisipTeks(baru, awal + 1 + placeholder.length)
+          requestAnimationFrame(() => {
+            el.setSelectionRange(awal + 1, awal + 1 + placeholder.length)
+          })
+        }
+        break
+      }
+      case 'daftar': {
+        // Tambah "- " di awal setiap baris yang terpilih; bila tidak ada seleksi, tambah di baris saat ini
+        const barisBaru = '\n'
+        const mulaiBarisKursor = nilai.lastIndexOf(barisBaru, awal - 1) + 1
+        if (terpilih) {
+          // Semua baris dalam seleksi
+          const bagian = nilai.slice(mulaiBarisKursor, akhir)
+          const sudahDaftar = bagian.split('\n').every((b) => b.startsWith('- '))
+          const diubah = sudahDaftar
+            ? bagian.split('\n').map((b) => b.replace(/^- /, '')).join('\n')
+            : bagian.split('\n').map((b) => (b.startsWith('- ') ? b : `- ${b}`)).join('\n')
+          const baru = nilai.slice(0, mulaiBarisKursor) + diubah + nilai.slice(akhir)
+          const geser = diubah.length - bagian.length
+          sisipTeks(baru, akhir + geser)
+        } else {
+          const akhirBaris = nilai.indexOf(barisBaru, awal)
+          const posAkhir = akhirBaris === -1 ? nilai.length : akhirBaris
+          const baris = nilai.slice(mulaiBarisKursor, posAkhir)
+          let baru, posBaru
+          if (baris.startsWith('- ')) {
+            baru = nilai.slice(0, mulaiBarisKursor) + baris.slice(2) + nilai.slice(posAkhir)
+            posBaru = Math.max(mulaiBarisKursor, awal - 2)
+          } else {
+            baru = nilai.slice(0, mulaiBarisKursor) + '- ' + baris + nilai.slice(posAkhir)
+            posBaru = awal + 2
+          }
+          sisipTeks(baru, posBaru)
+        }
+        break
+      }
+      case 'tautan': {
+        // eslint-disable-next-line no-alert
+        const url = window.prompt('Masukkan URL tautan:', 'https://')
+        if (!url) return
+        const teksLabel = terpilih || 'teks tautan'
+        const markdown = `[${teksLabel}](${url})`
+        const baru = nilai.slice(0, awal) + markdown + nilai.slice(akhir)
+        sisipTeks(baru, awal + markdown.length)
+        break
+      }
+      case 'gambar': {
+        // Pilihan: URL langsung atau upload file lokal
+        editorFileRef.current?.click()
+        break
+      }
+      default:
+        break
+    }
+  }
+
+  // Upload gambar yang dipilih via toolbar dan sisipkan markdown-nya
+  async function handleEditorImageUpload(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    const masalah = validasiFileGambar(file)
+    if (masalah) {
+      // eslint-disable-next-line no-alert
+      window.alert(masalah)
+      return
+    }
+
+    setMengunggahEditor(true)
+    try {
+      const url = await uploadImage(file)
+      const el = isiRef.current
+      const pos = el ? el.selectionStart : isi.length
+      const nilai = isi
+      const markdown = `\n![${file.name}](${url})\n`
+      const baru = nilai.slice(0, pos) + markdown + nilai.slice(pos)
+      sisipTeks(baru, pos + markdown.length)
+    } catch (err) {
+      // eslint-disable-next-line no-alert
+      window.alert(pesanGagal(err, 'Gagal mengunggah gambar, silakan coba lagi.'))
+    } finally {
+      setMengunggahEditor(false)
+    }
+  }
+
+  // Pintasan keyboard di textarea
+  function handleKeyDown(e) {
+    if (!e.ctrlKey && !e.metaKey) return
+    if (e.key === 'b' || e.key === 'B') { e.preventDefault(); formatTeks('tebal') }
+    if (e.key === 'i' || e.key === 'I') { e.preventDefault(); formatTeks('miring') }
+    if (e.key === 'k' || e.key === 'K') { e.preventDefault(); formatTeks('tautan') }
   }
 
   // ── Simpan ─────────────────────────────────────────────────────────────────
@@ -288,6 +440,7 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
   const errJudul = errors.judul
   const errIsi = errors.isi
   const errGambar = errors.gambar
+  const sibuk = menyimpan || mengunggahEditor
 
   return (
     <form className={base.page} onSubmit={simpan} noValidate>
@@ -303,14 +456,14 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
             type="button"
             className={`${base.btn} ${base.outline}`}
             onClick={batal}
-            disabled={menyimpan}
+            disabled={sibuk}
           >
             Batal
           </button>
           <button
             type="submit"
             className={`${base.btn} ${base.primary}`}
-            disabled={menyimpan}
+            disabled={sibuk}
             aria-busy={menyimpan}
           >
             {menyimpan ? 'Menyimpan...' : 'Simpan'}
@@ -342,7 +495,7 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
                 onChange={ubahJudul}
                 placeholder="Masukkan judul berita"
                 autoComplete="off"
-                disabled={menyimpan}
+                disabled={sibuk}
                 aria-invalid={errJudul ? 'true' : 'false'}
                 aria-describedby={errJudul ? `${judulId}-err` : undefined}
               />
@@ -361,17 +514,21 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
           <div className={styles.field}>
             <label htmlFor={isiId} className={styles.label}>Isi Berita</label>
             <div className={`${styles.editor} ${errIsi ? styles.editorError : ''}`}>
-              <div className={styles.toolbar} role="toolbar" aria-label="Format teks (segera hadir)">
-                {ALAT_EDITOR.map(({ key, label, icon: Icon }) => (
+              <div className={styles.toolbar} role="toolbar" aria-label="Format teks">
+                {ALAT_EDITOR.map(({ key, label, icon: Icon, shortcut }) => (
                   <button
                     key={key}
                     type="button"
-                    className={styles.toolBtn}
-                    disabled
-                    aria-label={`${label} (segera hadir)`}
-                    title={`${label} (segera hadir)`}
+                    className={`${styles.toolBtn} ${mengunggahEditor && key === 'gambar' ? styles.toolBtnSpin : ''}`}
+                    disabled={sibuk}
+                    aria-label={shortcut ? `${label} (${shortcut})` : label}
+                    title={shortcut ? `${label} (${shortcut})` : label}
+                    onClick={() => formatTeks(key)}
                   >
-                    <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                    {mengunggahEditor && key === 'gambar'
+                      ? <Loader2 size={18} strokeWidth={1.9} aria-hidden="true" className={styles.spin} />
+                      : <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
+                    }
                   </button>
                 ))}
                 <span className={styles.toolSep} aria-hidden="true" />
@@ -382,8 +539,9 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
                 className={styles.textarea}
                 value={isi}
                 onChange={ubahIsi}
+                onKeyDown={handleKeyDown}
                 placeholder="Tulis isi berita di sini..."
-                disabled={menyimpan}
+                disabled={sibuk}
                 aria-invalid={errIsi ? 'true' : 'false'}
                 aria-describedby={errIsi ? `${isiId}-err` : undefined}
               />
@@ -424,14 +582,14 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
                     className={base.srOnly}
                     accept="image/png,image/jpeg,image/webp"
                     onChange={ubahFile}
-                    disabled={menyimpan}
+                    disabled={sibuk}
                   />
                 </label>
                 <button
                   type="button"
                   className={`${base.btn} ${base.danger} ${base.sm}`}
                   onClick={hapusGambar}
-                  disabled={menyimpan}
+                  disabled={sibuk}
                 >
                   <Trash2 size={15} strokeWidth={2} aria-hidden="true" />
                   Hapus
@@ -459,7 +617,7 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
                 className={base.srOnly}
                 accept="image/png,image/jpeg,image/webp"
                 onChange={ubahFile}
-                disabled={menyimpan}
+                disabled={sibuk}
                 aria-invalid={errGambar ? 'true' : 'false'}
                 aria-describedby={errGambar ? `${gambarId}-err` : undefined}
               />
@@ -471,6 +629,17 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
           )}
         </aside>
       </div>
+
+      {/* Input file tersembunyi untuk sisipkan gambar di editor */}
+      <input
+        ref={editorFileRef}
+        type="file"
+        className={base.srOnly}
+        accept="image/png,image/jpeg,image/webp"
+        onChange={handleEditorImageUpload}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
     </form>
   )
 }

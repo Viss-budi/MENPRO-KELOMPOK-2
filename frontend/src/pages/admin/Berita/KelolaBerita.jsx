@@ -35,7 +35,7 @@ function KelolaBerita({ pathname, onNavigate }) {
       if (!edit) setHalaman(1)
       tampilkanToast({
         judul: edit ? 'Berita berhasil diperbarui' : 'Berita berhasil disimpan',
-        pesan: `“${judul}” sudah tampil di daftar.`,
+        pesan: edit ? 'Judul baru sudah tampil di daftar.' : `“${judul}” sudah tampil di daftar.`,
       })
       onNavigate(PATH_BERITA)
     },

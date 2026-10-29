@@ -1,6 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
+  ArrowDownAZ,
+  ArrowUpAZ,
+  ArrowUpDown,
   Calendar,
+  CalendarArrowDown,
+  CalendarArrowUp,
   ChevronLeft,
   ChevronRight,
   CircleAlert,
@@ -25,6 +30,32 @@ import styles from './BeritaDaftar.module.css'
 const PER_HALAMAN = 10
 const BARIS_SKELETON = [0, 1, 2, 3, 4]
 
+// Opsi urutan
+const OPSI_URUT = [
+  { key: 'terbaru', label: 'Terbaru', icon: CalendarArrowDown },
+  { key: 'terlama', label: 'Terlama', icon: CalendarArrowUp },
+  { key: 'az',      label: 'A \u2192 Z', icon: ArrowDownAZ },
+  { key: 'za',      label: 'Z \u2192 A', icon: ArrowUpAZ },
+]
+
+// Fungsi pengurutan client-side
+function urutkanItems(items, urutan) {
+  if (!items || items.length === 0) return items
+  const copy = [...items]
+  switch (urutan) {
+    case 'terbaru':
+      return copy.sort((a, b) => new Date(b.published_at) - new Date(a.published_at))
+    case 'terlama':
+      return copy.sort((a, b) => new Date(a.published_at) - new Date(b.published_at))
+    case 'az':
+      return copy.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '', 'id'))
+    case 'za':
+      return copy.sort((a, b) => (b.title ?? '').localeCompare(a.title ?? '', 'id'))
+    default:
+      return copy
+  }
+}
+
 // Gambar mini; bila cover_url kosong atau gagal dimuat tampil kotak ikon.
 function Thumb({ src }) {
   const [gagal, setGagal] = useState(false)
@@ -45,6 +76,9 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
   const [target, setTarget] = useState(null) // berita yang akan dihapus (membuka dialog)
   const [menghapus, setMenghapus] = useState(false)
   const [errorHapus, setErrorHapus] = useState('')
+  const [urutan, setUrutan] = useState('terbaru')
+  const [dropdownTerbuka, setDropdownTerbuka] = useState(false)
+  const dropdownRef = useRef(null)
 
   // Setiap daftar dibuka (termasuk setelah tambah/ubah) dan setiap halaman/muatUlang berubah, data diambil ulang.
   const { data, loading, error } = useApi(
@@ -52,14 +86,36 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
     `berita-${page}-${muatUlang}`
   )
 
-  const items = data?.items ?? []
+  const rawItems = data?.items ?? []
   const total = Number(data?.meta?.total) || 0
   const totalHalaman = Number(data?.meta?.total_pages) || 1
+
+  // Terapkan urutan client-side
+  const items = urutkanItems(rawItems, urutan)
 
   // Menghapus berita terakhir di halaman > 1: mundur satu halaman supaya tidak tampil kosong.
   useEffect(() => {
     if (data && data.items.length === 0 && page > 1) onPage(page - 1)
   }, [data, page, onPage])
+
+  // Tutup dropdown saat klik di luar
+  useEffect(() => {
+    if (!dropdownTerbuka) return
+    function handleClick(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownTerbuka(false)
+      }
+    }
+    function handleKey(e) {
+      if (e.key === 'Escape') setDropdownTerbuka(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKey)
+    }
+  }, [dropdownTerbuka])
 
   function bukaHapus(item) {
     setErrorHapus('')
@@ -81,13 +137,13 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
       await deleteNews(target.id)
       setTarget(null)
       setMuatUlang((n) => n + 1) // daftar diperbarui otomatis
-      onSukses({ judul: 'Berita berhasil dihapus', pesan: `“${judul}” sudah dihapus dari daftar.` })
+      onSukses({ judul: 'Berita berhasil dihapus', pesan: `"${judul}" sudah dihapus dari daftar.` })
     } catch (err) {
       if (err.status === 404) {
         // Sudah dihapus pihak lain: tujuan pengguna tercapai, jadi tutup dialog dan segarkan daftar
         setTarget(null)
         setMuatUlang((n) => n + 1)
-        onSukses({ judul: 'Berita sudah terhapus', pesan: `“${judul}” sudah dihapus sebelumnya. Daftar diperbarui.` })
+        onSukses({ judul: 'Berita sudah terhapus', pesan: `"${judul}" sudah dihapus sebelumnya. Daftar diperbarui.` })
         return
       }
       // Dialog tetap terbuka dengan pesan dari server; pengguna boleh mencoba lagi atau membatalkan
@@ -103,8 +159,15 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
     onNavigate(path)
   }
 
+  function pilihUrutan(key) {
+    setUrutan(key)
+    setDropdownTerbuka(false)
+  }
+
   const kosong = !loading && !error && total === 0 && items.length === 0 && page === 1
   const adaData = !loading && !error && items.length > 0
+
+  const opsiAktif = OPSI_URUT.find((o) => o.key === urutan) ?? OPSI_URUT[0]
 
   const tombolTambah = (
     <a
@@ -160,13 +223,55 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
 
       {!error && !kosong && (
         <>
-          <p className={styles.meta} role="status" aria-live="polite">
-            {loading
-              ? 'Memuat berita...'
-              : total > items.length
-                ? `Menampilkan ${items.length} dari ${total} berita`
-                : `Menampilkan ${items.length} berita`}
-          </p>
+          {/* ── Baris info + tombol urut ─────────────────── */}
+          <div className={styles.metaBar}>
+            <p className={styles.meta} role="status" aria-live="polite">
+              {loading
+                ? 'Memuat berita...'
+                : total > rawItems.length
+                  ? `Menampilkan ${rawItems.length} dari ${total} berita`
+                  : `Menampilkan ${rawItems.length} berita`}
+            </p>
+
+            {/* Tombol dropdown urutan */}
+            <div className={styles.urutWrap} ref={dropdownRef}>
+              <button
+                type="button"
+                className={styles.urutBtn}
+                aria-haspopup="listbox"
+                aria-expanded={dropdownTerbuka}
+                aria-label={`Urutan: ${opsiAktif.label}`}
+                onClick={() => setDropdownTerbuka((v) => !v)}
+                disabled={loading}
+              >
+                <ArrowUpDown size={15} strokeWidth={2} aria-hidden="true" />
+                <span>Urut: {opsiAktif.label}</span>
+              </button>
+
+              {dropdownTerbuka && (
+                <ul
+                  className={styles.urutDropdown}
+                  role="listbox"
+                  aria-label="Pilih urutan berita"
+                >
+                  {OPSI_URUT.map(({ key, label, icon: Ikon }) => (
+                    <li
+                      key={key}
+                      role="option"
+                      aria-selected={urutan === key}
+                      className={`${styles.urutOpsi} ${urutan === key ? styles.urutAktif : ''}`}
+                      onClick={() => pilihUrutan(key)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') pilihUrutan(key) }}
+                      tabIndex={0}
+                    >
+                      <Ikon size={15} strokeWidth={2} aria-hidden="true" />
+                      {label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
 
           <div className={styles.card} aria-busy={loading}>
             <table className={styles.table}>
@@ -270,7 +375,7 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
       {target && (
         <ConfirmDialog
           judul="Hapus berita ini?"
-          pesan={`Berita “${target.title}” akan dihapus permanen dan tidak dapat dikembalikan.`}
+          pesan={`Berita "${target.title}" akan dihapus permanen dan tidak dapat dikembalikan.`}
           error={errorHapus}
           loading={menghapus}
           labelLoading="Menghapus..."

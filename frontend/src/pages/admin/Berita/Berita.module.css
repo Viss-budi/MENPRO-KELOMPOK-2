@@ -147,7 +147,11 @@
 @media (max-width: 1023px) {
   .title { font-size: 26px; line-height: 32px; letter-spacing: -0.4px; }
 }
+
 @media (max-width: 480px) {
-  .actions { width: 100%; }
-  .actions .btn { flex: 1; padding: 0 16px; }
+  .title { font-size: 22px; line-height: 28px; }
+  .head { gap: 12px; }
+  .actions { width: 100%; gap: 8px; }
+  .actions .btn { flex: 1; padding: 0 12px; font-size: 13.5px; }
+  .panel { padding: 48px 16px; border-radius: 18px; }
 }

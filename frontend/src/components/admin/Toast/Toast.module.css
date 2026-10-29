@@ -93,5 +93,11 @@
 }
 
 @media (max-width: 480px) {
-  .region { right: 16px; bottom: 16px; }
+  .region {
+    right: 14px;
+    left: 14px;
+    bottom: max(14px, var(--safe-bottom));
+    width: auto;
+    max-width: 100%;
+  }
 }

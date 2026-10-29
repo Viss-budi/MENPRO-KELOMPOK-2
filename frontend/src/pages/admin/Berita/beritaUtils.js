@@ -34,9 +34,14 @@ export function validasiBerita({ judul, isi, gambar }) {
 
 // Form tidak punya kolom ringkasan, jadi excerpt dibuat dari isi berita (maks 300 karakter, kontrak 5.4).
 export function ringkas(isi) {
-  const teks = String(isi).replace(/\s+/g, ' ').trim()
-  if (teks.length <= MAKS_RINGKASAN) return teks
-  return `${teks.slice(0, MAKS_RINGKASAN - 1).trimEnd()}…`
+  const bersih = String(isi)
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/[*_~`#>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (bersih.length <= MAKS_RINGKASAN) return bersih
+  return `${bersih.slice(0, MAKS_RINGKASAN - 1).trimEnd()}…`
 }
 
 // 188416 -> "184 KB"; 2411724 -> "2,3 MB"

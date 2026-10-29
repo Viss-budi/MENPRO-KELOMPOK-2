@@ -48,6 +48,7 @@
   font-weight: 700;
   color: var(--color-primary);
   text-decoration: none;
+  min-height: 40px;
 }
 .back:hover { text-decoration: underline; }
 .back:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 4px; }
@@ -55,4 +56,10 @@
 @media (max-width: 1023px) {
   .title { font-size: 26px; line-height: 32px; }
   .panel { padding: 40px 20px; }
+}
+
+@media (max-width: 480px) {
+  .title { font-size: 22px; line-height: 28px; }
+  .panel { padding: 32px 16px; border-radius: 16px; }
+  .text { font-size: 14px; }
 }

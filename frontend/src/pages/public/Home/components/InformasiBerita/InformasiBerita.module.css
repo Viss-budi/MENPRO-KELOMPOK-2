@@ -10,6 +10,8 @@
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 .title {
   font-size: 24px;
@@ -23,13 +25,14 @@
   font-size: 15px;
 }
 .seeAllLink {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   color: var(--color-primary);
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
+  min-height: 40px;
 }
 .seeAllLink:hover {
   color: var(--color-primary-dark);
@@ -84,10 +87,11 @@
   margin: 0 0 16px 0;
   line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3; /* Tambahkan baris ini untuk menghilangkan warning */
   -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   overflow: hidden;
+  word-break: break-word;
 }
 .cardMeta {
   display: flex;
@@ -98,23 +102,27 @@
   margin-top: auto;
   margin-bottom: 20px;
 }
+.metaIcon {
+  flex-shrink: 0;
+}
 .readMoreLink {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   color: var(--color-primary);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
+  min-height: 36px;
 }
 .readMoreLink:hover {
   color: var(--color-primary-dark);
 }
-/* Kartu statistik: 289 x 309 pada desain, 4 baris (lingkaran ikon 54px, jarak antarbaris 19px) */
+/* Kartu statistik */
 .statsCard {
   background-color: var(--color-surface-panel);
   border-radius: 14px;
-  padding: 17px 29px;
+  padding: 20px 24px;
   display: flex;
   align-items: stretch;
 }
@@ -128,12 +136,12 @@
 .statItem {
   display: flex;
   align-items: flex-start;
-  gap: 22px;
+  gap: 18px;
 }
 .iconCircle {
   flex-shrink: 0;
-  width: 54px;
-  height: 54px;
+  width: 52px;
+  height: 52px;
   color: var(--color-primary);
 }
 .iconBg {
@@ -157,14 +165,62 @@
   line-height: 16px;
   font-weight: 400;
   color: #4a5a75;
+  word-break: break-word;
 }
+
 @media (max-width: 1024px) {
-  .mainGrid { grid-template-columns: repeat(2, 1fr); }
-  .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .mainGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
+
 @media (max-width: 640px) {
-  .mainGrid { grid-template-columns: 1fr; }
+  .container {
+    padding: 36px 16px;
+  }
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .statsCard {
+    padding: 20px 18px;
+  }
+  .statsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 12px;
+  }
+  .statItem {
+    gap: 12px;
+  }
+  .iconCircle {
+    width: 44px;
+    height: 44px;
+  }
+  .statValue {
+    font-size: 20px;
+    line-height: 22px;
+  }
+  .statLabel {
+    font-size: 11.5px;
+    line-height: 15px;
+  }
 }
+
+@media (max-width: 400px) {
+  .container {
+    padding: 28px 12px;
+  }
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
 .statusText {
   grid-column: 1 / -1;
   margin: 0;

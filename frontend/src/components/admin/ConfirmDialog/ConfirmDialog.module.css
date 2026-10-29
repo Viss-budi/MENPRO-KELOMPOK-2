@@ -103,8 +103,8 @@
 .ya:hover:not(:disabled) { background: #B42318; }
 .ya:disabled { background: #E9A29C; }
 
-@media (max-width: 420px) {
-  .dialog { padding: 26px 20px 24px; }
-  .actions { width: 100%; gap: 12px; }
-  .btn { flex: 1; width: auto; }
+@media (max-width: 480px) {
+  .dialog { padding: 26px 18px 22px; border-radius: 20px; }
+  .actions { width: 100%; gap: 10px; flex-direction: column-reverse; }
+  .btn { width: 100%; }
 }
