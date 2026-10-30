@@ -1,8 +1,3 @@
-Cara pakai: salin SEMUA isi folder ini ke root folder backend-mu (timpa file yang sama).
-
-Setelah itu:
-1. npm i
-2. Isi .env (lihat .env.example). Wajib: JWT_SECRET
-3. Jalankan database/schema.sql lalu database/seed.sql di TiDB Cloud
-4. npm run create-admin -- "Nama" email password
-5. node index.js
+Salin ke folder backend (timpa file yang sama). Tidak perlu npm install baru.
+Tidak mengubah tabel database. Setelah restart, lihat terminal: baris [SKEMA] menunjukkan tabel/kolom yang belum ada.
+Opsional untuk uji lokal saja (.env): LOGIN_MAX_ATTEMPTS=100  (jangan dipakai di server sungguhan)

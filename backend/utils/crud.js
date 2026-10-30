@@ -18,12 +18,14 @@ const cleanBody = (body = {}, fields) => {
 };
 
 const bad = (res, message) => res.status(400).json({ success: false, message });
+// Kegagalan validasi per field: message = masalah pertama, errors = seluruh masalah
+const badFields = (res, errors) => res.status(400).json({ success: false, message: errors[0].message, errors });
 const notFound = (res) => res.status(404).json({ success: false, message: 'Data tidak ditemukan' });
 
 // Pabrik CRUD admin: dipakai hero_slides, events, news, members
 const makeCrud = ({
   table, fields, required = [], slugFrom, ownerField,
-  searchFields = [], filterFields = [], orderBy = 'id DESC',
+  searchFields = [], filterFields = [], orderBy = 'id DESC', validate,
 }) => ({
   // GET /admin/all?page=1&per_page=10&q=kata&category=...
   listAll: async (req, res) => {
@@ -67,6 +69,8 @@ const makeCrud = ({
     if (invalid) return bad(res, `Tipe data tidak valid pada field: ${invalid}`);
     const missing = required.filter((f) => data[f] === undefined || data[f] === '' || data[f] === null);
     if (missing.length) return bad(res, `Field wajib diisi: ${missing.join(', ')}`);
+    const problems = validate ? validate(data) : [];
+    if (problems.length) return badFields(res, problems);
 
     if (slugFrom) {
       data.slug = `${slugify(String(data[slugFrom]), { lower: true, strict: true })}-${Date.now().toString(36)}`;
@@ -84,6 +88,8 @@ const makeCrud = ({
     for (const f of required) {
       if (f in data && (data[f] === '' || data[f] === null)) return bad(res, `Field tidak boleh kosong: ${f}`);
     }
+    const problems = validate ? validate(data) : [];
+    if (problems.length) return badFields(res, problems);
 
     const [r] = await db.query(`UPDATE ${table} SET ? WHERE id = ?`, [data, req.params.id]);
     if (!r.affectedRows) return notFound(res);

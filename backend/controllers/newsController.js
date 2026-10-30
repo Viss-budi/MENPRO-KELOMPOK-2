@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { makeCrud } = require('../utils/crud');
+const validateNews = require('../utils/validators/news');
 
 const clamp = (v, def, max) => Math.min(Math.max(parseInt(v) || def, 1), max);
 const PUBLIC = 'is_published = 1 AND published_at <= NOW()';
@@ -10,6 +11,7 @@ const crud = makeCrud({
   required: ['title'],
   slugFrom: 'title',
   ownerField: 'author_id',
+  validate: validateNews,
   searchFields: ['title', 'excerpt'],
   filterFields: ['category', 'is_published'],
 });

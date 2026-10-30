@@ -9,6 +9,7 @@ router.get('/admin/:id', verifyToken, c.getById);
 router.get('/:slug', c.getEventBySlug);
 router.post('/', verifyToken, c.create);
 router.put('/:id', verifyToken, c.update);
+router.patch('/:id', verifyToken, c.update); // alias PUT (keduanya parsial)
 router.delete('/:id', verifyToken, c.remove);
 
 module.exports = router;
