@@ -43,10 +43,11 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
 .card:hover {
   box-shadow: 0 4px 6px rgba(var(--color-shadow), 0.1);
+  transform: translateY(-2px);
 }
 .cardImageWrapper {
   height: 160px;
@@ -78,6 +79,13 @@
   font-weight: 700;
   color: var(--color-heading);
   margin: 0 0 16px 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  word-break: break-word;
 }
 .cardMeta {
   margin-top: auto;
@@ -91,18 +99,21 @@
   align-items: center;
   font-size: 14px;
   color: var(--color-text-muted);
+  word-break: break-word;
 }
 .metaIcon {
+  flex-shrink: 0;
   margin-right: 8px;
 }
 .detailLink {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   color: var(--color-primary);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   gap: 4px;
+  min-height: 36px;
 }
 .detailLink:hover {
   color: var(--color-primary-dark);
@@ -132,8 +143,9 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 700;
 }
 .navBtn:hover {
   background-color: var(--color-border);
@@ -161,9 +173,13 @@
   gap: 4px;
 }
 .dateItem {
-  padding: 6px;
+  padding: 6px 2px;
   color: var(--color-text);
   border-radius: 9999px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .activeDate,
 .dateButton.activeDate {
@@ -184,12 +200,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   box-shadow: 0 1px 2px rgba(var(--color-shadow), 0.05);
 }
 .agendaInfo {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  min-width: 0;
 }
 .agendaDot {
   width: 8px;
@@ -197,12 +215,14 @@
   background-color: var(--color-primary);
   border-radius: 50%;
   margin-top: 6px;
+  flex-shrink: 0;
 }
 .agendaName {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
   color: var(--color-heading);
+  word-break: break-word;
 }
 .agendaTime {
   margin: 4px 0 0 0;
@@ -211,6 +231,7 @@
 }
 .agendaArrow {
   color: var(--color-text-disabled);
+  flex-shrink: 0;
 }
 
 /* CTA Section */
@@ -268,11 +289,13 @@
   border-radius: 9999px;
   font-size: 14px;
   font-weight: 500;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   width: max-content;
+  min-height: 44px;
+  transition: background-color 0.15s ease;
 }
 .ctaButton:hover {
   background-color: var(--color-primary-dark);
@@ -283,6 +306,7 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
+  gap: 12px;
 }
 .benefitItem {
   display: flex;
@@ -319,6 +343,59 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 640px) {
+  .container {
+    padding: 36px 16px;
+  }
+  .ctaImageWrapper {
+    min-height: 200px;
+    max-height: 240px;
+  }
+  .ctaContent {
+    padding: 24px 18px;
+  }
+  .ctaBenefits {
+    padding: 24px 18px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .benefitItem {
+    font-size: 11px;
+  }
+  .benefitIcon {
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+  .ctaButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .container {
+    padding: 28px 12px;
+  }
+  .calendarWidget {
+    padding: 16px 12px;
+  }
+  .ctaBenefits {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .benefitItem {
+    flex-direction: row;
+    text-align: left;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .benefitIcon {
+    margin-bottom: 0;
+  }
+}
+
 /* ---- Kalender dinamis ---- */
 .dateButton {
   border: 0;

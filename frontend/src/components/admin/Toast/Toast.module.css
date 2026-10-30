@@ -1,0 +1,103 @@
+/* Toast: kartu putih 385 px, garis warna 4 px di kiri, ikon bulat, tombol tutup (desain 09 / 12 / 04). */
+
+.region {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 90;
+  width: min(385px, calc(100% - 32px));
+  pointer-events: none;
+  font-family: var(--font-sans);
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 16px 16px 24px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(var(--color-shadow), 0.16);
+  pointer-events: auto;
+  animation: masuk 0.22s ease-out;
+}
+
+/* Garis warna di sisi kiri */
+.toast::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  bottom: 14px;
+  width: 4px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.sukses { color: #12B76A; }
+.gagal { color: #D92D20; }
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: #E8F9F0;
+}
+.gagal .icon { background: #FEF1F0; }
+
+.body { flex: 1; min-width: 0; }
+.judul {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 20px;
+  color: var(--color-heading);
+}
+.pesan {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--color-text-body);
+  overflow-wrap: anywhere;
+}
+
+.tutup {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.tutup:hover { background: var(--color-surface-panel); }
+.tutup:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+
+@keyframes masuk {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+}
+
+@media (max-width: 480px) {
+  .region {
+    right: 14px;
+    left: 14px;
+    bottom: max(14px, var(--safe-bottom));
+    width: auto;
+    max-width: 100%;
+  }
+}

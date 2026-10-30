@@ -9,38 +9,37 @@
 .container {
   width: min(1267px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 22px 0 34px;
+  padding: 32px 0 34px;
 }
 
 /* 4 kolom dengan proporsi sama seperti desain (385 : 312 : 349 : 222) */
 .grid {
   display: grid;
   grid-template-columns: 385fr 312fr 349fr 222fr;
-  margin-bottom: 20.5px;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
 /* Kolom 1: logo + nama + deskripsi */
 .colProfile {
   display: flex;
   align-items: flex-start;
-  gap: 7px;
-  margin-left: -1px;
+  gap: 12px;
 }
 .logo {
   width: 64px;
   height: 66px;
   object-fit: contain;
   flex-shrink: 0;
-  margin-top: -1px;
 }
 .profileText {
-  margin-top: 12px;
+  margin-top: 6px;
 }
 .brandName {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
-  line-height: 16px;
+  line-height: 20px;
   color: #fff;
 }
 .brandSub {
@@ -52,7 +51,7 @@
 }
 .description {
   margin: 11px 0 0;
-  max-width: 230px;
+  max-width: 260px;
   font-size: 12px;
   font-weight: 400;
   line-height: 19px;
@@ -62,13 +61,13 @@
 /* Judul kolom */
 .heading {
   margin: 5px 0 0;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
-  line-height: 16px;
+  line-height: 18px;
   color: #fff;
 }
 
-/* Kolom 2: tautan, jarak antar baris 21px */
+/* Kolom 2: tautan */
 .linkList {
   list-style: none;
   margin: 8px 0 0;
@@ -76,60 +75,65 @@
 }
 .linkList li {
   font-size: 12px;
-  line-height: 21px;
+  line-height: 22px;
 }
 .linkList a {
-  font-size: 12px;
-  line-height: 21px;
+  font-size: 12.5px;
+  line-height: 22px;
   color: var(--color-footer-text);
   text-decoration: none;
   transition: color 0.2s;
+  display: inline-block;
+  padding: 2px 0;
 }
 .linkList a:hover {
   color: #fff;
 }
 
-/* Kolom 3: kontak, jarak antar baris 28.5px */
+/* Kolom 3: kontak */
 .contactList {
   list-style: none;
-  margin: 16.4px 0 0;
-  padding: 0 0 0 6px;
+  margin: 12px 0 0;
+  padding: 0;
 }
 .contactList li {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
-  margin-bottom: 12.5px;
-  font-size: 12px;
-  line-height: 16px;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+  line-height: 18px;
   color: var(--color-footer-text);
+  word-break: break-word;
 }
 .contactIcon {
   flex-shrink: 0;
   overflow: visible;
   color: #fff;
+  margin-top: 1px;
 }
 
-/* Kolom 4: sosial media, tombol 30px, radius 8px, jarak 14px */
+/* Kolom 4: sosial media */
 .colSocial {
   margin-left: -1px;
 }
 .socialIcons {
   display: flex;
-  gap: 14px;
-  margin-top: 11.75px;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
 }
 .socialBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   background-color: var(--color-footer-icon-bg);
   color: #fff;
   text-decoration: none;
-  transition: filter 0.2s;
+  transition: filter 0.2s, background-color 0.2s;
 }
 .socialBtn:hover {
   filter: brightness(1.25);
@@ -144,9 +148,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 15px;
+  padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 11.4px;
+  font-size: 11.5px;
   line-height: 16px;
   color: var(--color-footer-text-muted);
 }
@@ -163,10 +167,22 @@
   .colSocial {
     margin-left: 0;
   }
+  .description {
+    max-width: 100%;
+  }
 }
+
 @media (max-width: 640px) {
+  .footer {
+    margin-top: 48px;
+  }
+  .container {
+    width: calc(100% - 32px);
+    padding: 28px 0 24px;
+  }
   .grid {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
   .bottomBar {
     flex-direction: column;

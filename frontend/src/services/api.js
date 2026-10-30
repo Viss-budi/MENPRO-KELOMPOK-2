@@ -11,17 +11,19 @@ const BASE_URL = (import.meta.env.VITE_API_URL || '/api/v1').replace(/\/$/, '')
 // - POST/PUT/DELETE wajib header X-Requested-With (kontrak 1.1 dan 7.1).
 // - admin: true = endpoint dashboard; 401 berarti sesi habis -> kirim SESI_BERAKHIR_EVENT.
 // - Publik: 503 berarti pemeliharaan -> kirim MAINTENANCE_EVENT.
+// - body berupa FormData (upload) dikirim apa adanya; Content-Type diatur browser (kontrak 7.1).
 async function request(method, path, { body, signal, admin = false } = {}) {
   const headers = {}
+  const isForm = typeof FormData !== 'undefined' && body instanceof FormData
   if (method !== 'GET') headers['X-Requested-With'] = 'himafor'
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json'
 
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
     signal,
     headers,
     credentials: 'same-origin',
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
   })
   const json = await res.json().catch(() => ({}))
 
@@ -91,6 +93,50 @@ export async function logoutAdmin() {
 export async function getAdminSummary(signal) {
   const json = await request('GET', '/admin/summary', { signal, admin: true })
   return json.data ?? {}
+}
+
+// ── Kelola berita (kontrak 5.2 dan 5.4) ──────────────────────────────────────
+// Daftar berpaginasi, termasuk berita yang belum dipublikasikan.
+// Mengembalikan { items, meta: { page, per_page, total, total_pages } }
+export async function getAdminNews({ page = 1, perPage = 10 } = {}, signal) {
+  const json = await request('GET', `/news/admin/all?page=${page}&per_page=${perPage}`, {
+    signal,
+    admin: true,
+  })
+  return { items: json.data ?? [], meta: json.meta ?? {} }
+}
+
+// Satu berita lengkap untuk mengisi form edit (termasuk content).
+export async function getAdminNewsById(id, signal) {
+  const json = await request('GET', `/news/admin/${id}`, { signal, admin: true })
+  return json.data
+}
+
+// POST /news -> 201 { data: { id, slug } }
+export async function createNews(body, signal) {
+  const json = await request('POST', '/news', { body, signal, admin: true })
+  return json.data
+}
+
+// PUT /news/:id -> 200. Hanya field yang dikirim yang berubah.
+export async function updateNews(id, body, signal) {
+  await request('PUT', `/news/${id}`, { body, signal, admin: true })
+}
+
+// DELETE /news/:id -> 200 (404 bila sudah terhapus)
+export async function deleteNews(id, signal) {
+  await request('DELETE', `/news/${id}`, { signal, admin: true })
+}
+
+// ── Upload gambar (kontrak 5.7) ──────────────────────────────────────────────
+// multipart/form-data, field "image". Mengembalikan URL yang dimasukkan ke cover_url dsb.
+export async function uploadImage(file, signal) {
+  const form = new FormData()
+  form.append('image', file)
+  const json = await request('POST', '/upload', { body: form, signal, admin: true })
+  const url = json.data?.url
+  if (!url) throw new Error('Upload gagal, silakan coba lagi')
+  return url
 }
 
 // ── Endpoint publik ───────────────────────────────────────────────────────────

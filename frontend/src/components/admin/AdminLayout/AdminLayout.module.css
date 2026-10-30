@@ -4,6 +4,8 @@
    ========================================================= */
 
 .shell {
+  min-height: 100vh;
+  min-height: 100dvh;
   min-height: 100svh;
   background: var(--color-surface-hero);
   font-family: var(--font-sans);
@@ -33,6 +35,7 @@
   display: flex;
   flex-direction: column;
   width: 260px;
+  max-width: calc(100vw - 48px);
   background: var(--color-footer-bg);
   color: var(--color-footer-text);
 }
@@ -91,6 +94,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0 14px;
 }
 
@@ -228,6 +232,8 @@
 
 /* ── Badan halaman ─────────────────────────────────────── */
 .body {
+  min-height: 100vh;
+  min-height: 100dvh;
   min-height: 100svh;
   margin-left: 260px;
 }
@@ -276,6 +282,11 @@
   color: var(--color-heading);
   text-overflow: ellipsis;
 }
+
+/* Breadcrumb induk yang bisa diklik di sub-halaman (mis. Admin / Berita / Tambah Berita) */
+.crumbLink { text-decoration: none; }
+.crumbLink:hover { color: var(--color-heading); text-decoration: underline; }
+.crumbLink:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: 4px; }
 
 .tools {
   display: flex;
@@ -371,7 +382,7 @@
   }
   .closeDrawer { display: grid; }
   .body { margin-left: 0; }
-  .topbar { padding: 0 20px; gap: 12px; }
+  .topbar { padding: 0 16px; gap: 12px; height: 64px; }
   .burger { display: grid; }
   .main { padding: 24px 20px 40px; }
 }
@@ -386,6 +397,27 @@
   .accountName,
   .accountChevron { display: none; }
   .tools { gap: 10px; }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding-left: max(12px, var(--safe-left));
+    padding-right: max(12px, var(--safe-right));
+  }
+  .main {
+    padding: 20px 14px 36px;
+  }
+  .crumbNow {
+    max-width: 130px;
+    font-size: 13.5px;
+  }
+  .tools {
+    gap: 8px;
+  }
+  .burger {
+    width: 38px;
+    height: 38px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
