@@ -8,6 +8,7 @@ router.get('/admin/all', verifyToken, requireAdmin, c.listAll); // admin
 router.get('/admin/:id', verifyToken, requireAdmin, c.getById);
 router.post('/', verifyToken, requireAdmin, c.create);
 router.put('/:id', verifyToken, requireAdmin, c.update);
+router.patch('/:id', verifyToken, requireAdmin, c.update); // alias PUT (keduanya parsial)
 router.delete('/:id', verifyToken, requireAdmin, c.remove);
 
 module.exports = router;

@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/upload');
+const verifyImage = require('../middleware/verifyImage');
 const { verifyToken } = require('../middleware/auth');
 
-router.post('/', verifyToken, upload.single('image'), (req, res) => {
+router.post('/', verifyToken, upload.single('image'), verifyImage, (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: "File 'image' wajib diisi" });
   }
