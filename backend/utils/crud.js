@@ -103,4 +103,4 @@ const makeCrud = ({
   },
 });
 
-module.exports = { makeCrud };
+module.exports = { makeCrud, cleanBody, clamp, escapeLike };

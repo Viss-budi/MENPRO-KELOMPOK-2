@@ -9,7 +9,7 @@ const csrfGuard = require('./middleware/csrf');
 const db = require('./config/db');
 const schema = require('./utils/schema');
 
-const VERSION = '1.1.0-sprint2'; // naikkan setiap rilis; dipakai untuk memastikan backend yang jalan adalah versi terbaru
+const VERSION = '1.3.0-sprint3'; // naikkan setiap rilis; dipakai untuk memastikan backend yang jalan adalah versi terbaru
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET belum diisi di .env');
@@ -79,6 +79,9 @@ app.use('/api/v1/events', require('./routes/eventRoutes'));
 app.use('/api/v1/calendar', require('./routes/calendarRoutes'));
 app.use('/api/v1/news', require('./routes/newsRoutes'));
 app.use('/api/v1/members', require('./routes/memberRoutes'));
+app.use('/api/v1/departments', require('./routes/departmentRoutes'));
+app.use('/api/v1/structure', require('./routes/structureRoutes'));
+app.use('/api/v1/periods', require('./routes/periodRoutes'));
 app.use('/api/v1/settings', require('./routes/settingRoutes'));
 app.use('/api/v1/upload', require('./routes/uploadRoutes'));
 app.use('/api/v1/admin', require('./routes/adminRoutes'));
