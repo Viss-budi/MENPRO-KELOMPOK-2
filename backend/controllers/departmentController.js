@@ -1,0 +1,130 @@
+const slugify = require('slugify');
+const db = require('../config/db');
+const { cleanBody, clamp, escapeLike } = require('../utils/crud');
+const validateDepartment = require('../utils/validators/department');
+const { isPeriod, PERIOD_MSG } = require('../utils/validators/common');
+const { getActivePeriod } = require('../utils/period');
+
+const CREATE_FIELDS = ['period', 'name', 'description', 'logo_url', 'sort_order', 'is_active'];
+const UPDATE_FIELDS = ['name', 'description', 'logo_url', 'sort_order', 'is_active']; // period dan slug tidak bisa diubah
+const HAS_MEMBERS = 'Departemen masih punya anggota. Pindahkan atau hapus anggotanya, atau nonaktifkan departemen.';
+
+const bad = (res, message) => res.status(400).json({ success: false, message });
+const badFields = (res, errors) => res.status(400).json({ success: false, message: errors[0].message, errors });
+const notFound = (res, message = 'Data tidak ditemukan') => res.status(404).json({ success: false, message });
+const conflict = (res, message) => res.status(409).json({ success: false, message });
+
+const normalize = (data) => {
+  for (const f of ['description', 'logo_url']) if (data[f] === '') data[f] = null;
+  for (const f of ['sort_order', 'is_active']) {
+    if (typeof data[f] === 'string' && /^-?\d+$/.test(data[f])) data[f] = Number(data[f]);
+  }
+  return data;
+};
+
+const COLS = `d.id, d.period, d.name, d.slug, d.description, d.logo_url, d.sort_order, d.is_active,
+  (SELECT COUNT(*) FROM members m WHERE m.department_id = d.id) AS member_count, d.created_at, d.updated_at`;
+
+// ---------- publik ----------
+// GET /departments/:slug?period=2026/2027  (tanpa period = periode aktif)
+const getBySlug = async (req, res) => {
+  let period = req.query.period ? String(req.query.period) : null;
+  if (period && !isPeriod(period)) return bad(res, PERIOD_MSG);
+  if (!period) period = await getActivePeriod();
+  if (!period) return notFound(res, 'Departemen tidak ditemukan');
+
+  const [[department]] = await db.query(
+    'SELECT id, name, slug, description, logo_url, period FROM departments WHERE slug = ? AND period = ? AND is_active = 1',
+    [req.params.slug, period]
+  );
+  if (!department) return notFound(res, 'Departemen tidak ditemukan');
+
+  const [members] = await db.query(
+    `SELECT id, name, position, photo_url FROM members
+     WHERE department_id = ? AND is_active = 1 ORDER BY sort_order, id`,
+    [department.id]
+  );
+  res.json({ success: true, data: { department, members } });
+};
+
+// ---------- admin ----------
+const listAll = async (req, res) => {
+  const page = clamp(req.query.page, 1, 100000);
+  const perPage = clamp(req.query.per_page, 10, 100);
+  const where = [];
+  const params = [];
+  const q = String(req.query.q ?? '').trim().slice(0, 100);
+  if (q) { where.push('d.name LIKE ?'); params.push(`%${escapeLike(q)}%`); }
+  for (const f of ['period', 'is_active']) {
+    const v = req.query[f];
+    if (v !== undefined && v !== '') { where.push(`d.${f} = ?`); params.push(String(v)); }
+  }
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+  const [[{ total }]] = await db.query(`SELECT COUNT(*) AS total FROM departments d ${whereSql}`, params);
+  const [rows] = await db.query(
+    `SELECT ${COLS} FROM departments d ${whereSql} ORDER BY d.period DESC, d.sort_order ASC, d.id ASC LIMIT ? OFFSET ?`,
+    [...params, perPage, (page - 1) * perPage]
+  );
+  res.json({ success: true, data: rows, meta: { page, per_page: perPage, total, total_pages: Math.ceil(total / perPage) } });
+};
+
+const getById = async (req, res) => {
+  const [[row]] = await db.query(`SELECT ${COLS} FROM departments d WHERE d.id = ?`, [req.params.id]);
+  if (!row) return notFound(res);
+  res.json({ success: true, data: row });
+};
+
+const create = async (req, res) => {
+  const { data, invalid } = cleanBody(req.body, CREATE_FIELDS);
+  if (invalid) return bad(res, `Tipe data tidak valid pada field: ${invalid}`);
+  normalize(data);
+  const missing = ['name', 'period'].filter((f) => data[f] === undefined || data[f] === '' || data[f] === null);
+  if (missing.length) return bad(res, `Field wajib diisi: ${missing.join(', ')}`);
+  const problems = validateDepartment(data);
+  if (problems.length) return badFields(res, problems);
+
+  data.slug = slugify(data.name, { lower: true, strict: true });
+  if (!data.slug) return badFields(res, [{ field: 'name', message: 'Nama departemen harus memuat huruf atau angka' }]);
+
+  const [[dup]] = await db.query('SELECT id FROM departments WHERE period = ? AND (slug = ? OR name = ?) LIMIT 1', [data.period, data.slug, data.name]);
+  if (dup) return conflict(res, 'Departemen dengan nama itu sudah ada di periode ini');
+
+  const [r] = await db.query('INSERT INTO departments SET ?', [data]);
+  res.status(201).json({ success: true, message: 'Berhasil ditambahkan', data: { id: r.insertId, slug: data.slug } });
+};
+
+const update = async (req, res) => {
+  const [[row]] = await db.query('SELECT id, period FROM departments WHERE id = ?', [req.params.id]);
+  if (!row) return notFound(res);
+
+  const { data, invalid } = cleanBody(req.body, UPDATE_FIELDS);
+  if (invalid) return bad(res, `Tipe data tidak valid pada field: ${invalid}`);
+  normalize(data);
+  if (!Object.keys(data).length) return bad(res, 'Tidak ada field yang diubah');
+  if ('name' in data && (data.name === '' || data.name === null)) return bad(res, 'Field tidak boleh kosong: name');
+  const problems = validateDepartment(data);
+  if (problems.length) return badFields(res, problems);
+
+  if ('name' in data) {
+    const [[dup]] = await db.query('SELECT id FROM departments WHERE period = ? AND name = ? AND id <> ? LIMIT 1', [row.period, data.name, row.id]);
+    if (dup) return conflict(res, 'Departemen dengan nama itu sudah ada di periode ini');
+  }
+  await db.query('UPDATE departments SET ? WHERE id = ?', [data, req.params.id]);
+  res.json({ success: true, message: 'Berhasil diperbarui' });
+};
+
+const remove = async (req, res) => {
+  const [[row]] = await db.query('SELECT id FROM departments WHERE id = ?', [req.params.id]);
+  if (!row) return notFound(res);
+  const [[{ n }]] = await db.query('SELECT COUNT(*) AS n FROM members WHERE department_id = ?', [row.id]);
+  if (n > 0) return conflict(res, HAS_MEMBERS);
+  try {
+    await db.query('DELETE FROM departments WHERE id = ?', [row.id]);
+  } catch (err) {
+    if (err.errno === 1451) return conflict(res, HAS_MEMBERS); // ada anggota baru masuk di antara dua query
+    throw err;
+  }
+  res.json({ success: true, message: 'Berhasil dihapus' });
+};
+
+module.exports = { getBySlug, listAll, getById, create, update, remove };
