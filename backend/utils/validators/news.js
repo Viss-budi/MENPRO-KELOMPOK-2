@@ -10,9 +10,7 @@ const isDateTime = (s) => {
   return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d && h < 24 && mi < 60 && se < 60;
 };
 
-// cover_url: nama file gambar, URL http(s), atau path berawalan "/"
-const isCoverUrl = (s) =>
-  /^https?:\/\/\S+$/i.test(s) || /^\/[^\s]*$/.test(s) || /^[\w.\-]+\.(webp|png|jpe?g|gif|svg)$/i.test(s);
+const { isImageRef: isCoverUrl } = require('./common');
 
 module.exports = function validateNews(data) {
   const errors = [];

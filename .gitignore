@@ -1,6 +1,6 @@
-/postman
-/.postman
-/backend
+postman/
+.postman/
+backend
 schema.sql
 seed.sql
 sprint2.sql

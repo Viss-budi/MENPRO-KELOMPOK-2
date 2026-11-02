@@ -5,7 +5,8 @@ const REQUIRED = {
   users: ['id', 'name', 'email', 'password_hash', 'role', 'is_active', 'token_version', 'last_login_at'],
   events: ['id', 'title', 'slug', 'category', 'description', 'thumbnail_url', 'location', 'start_at', 'end_at', 'is_featured', 'is_published'],
   news: ['id', 'title', 'slug', 'category', 'excerpt', 'content', 'cover_url', 'published_at', 'is_published'],
-  members: ['id', 'name', 'position', 'division', 'photo_url', 'period', 'sort_order', 'is_active'],
+  members: ['id', 'name', 'position', 'group_name', 'department_id', 'photo_url', 'period', 'sort_order', 'is_active', 'is_core'],
+  departments: ['id', 'period', 'name', 'slug', 'description', 'logo_url', 'sort_order', 'is_active'],
   settings: ['setting_key', 'setting_value'],
 };
 const OPTIONAL = { events: ['created_by'], news: ['author_id', 'views_count'] };
@@ -39,6 +40,7 @@ async function check() {
   if (state.missingRequired.length) {
     console.warn('[SKEMA] BELUM ADA (wajib):', state.missingRequired.join(', '));
     console.warn('[SKEMA] -> jalankan database/sprint2.sql (kolom users dan tabel members) atau schema.sql untuk tabel dasar');
+    console.warn('[SKEMA] -> struktur organisasi: jalankan database/sprint3_struktur.sql (tabel departments, kolom members.group_name/department_id/is_core)');
   }
   if (state.missingOptional.length) {
     console.warn('[SKEMA] Belum ada (fitur dilewati sementara):', state.missingOptional.join(', '));
