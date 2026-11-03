@@ -139,6 +139,40 @@ export async function uploadImage(file, signal) {
   return url
 }
 
+// ── Kelola struktur organisasi (anggota, departemen, periode) ───────────────
+// Khusus admin (403 jika editor).
+// GET /periods -> { active, periods } (publik). active = periode yang tampil di website.
+export async function getPeriods(signal) {
+  const json = await request('GET', '/periods', { signal })
+  return { active: json.data?.active ?? null, periods: json.data?.periods ?? [] }
+}
+
+// Daftar pengurus periode aktif untuk halaman admin.
+// GET /members/admin/all?period=&per_page=100 -> { items, meta }
+// Mengembalikan { period, items }. period null = belum ada periode aktif.
+export async function getAdminStruktur(signal) {
+  const { active } = await getPeriods(signal)
+  if (!active) return { period: null, items: [] }
+  const q = new URLSearchParams({ period: active, per_page: '100' })
+  const json = await request('GET', `/members/admin/all?${q}`, { signal, admin: true })
+  return { period: active, items: json.data ?? [] }
+}
+
+// Departemen aktif pada satu periode, untuk pilihan dropdown di form.
+// GET /departments/admin/all?period=&is_active=1&per_page=100 -> data[]
+export async function getAdminDepartments(period, signal) {
+  const q = new URLSearchParams({ period, is_active: '1', per_page: '100' })
+  const json = await request('GET', `/departments/admin/all?${q}`, { signal, admin: true })
+  return json.data ?? []
+}
+
+// POST /members -> 201 { data: { id } }
+// body: { name, position, department_id, photo_url, period, is_active }
+export async function createMember(body, signal) {
+  const json = await request('POST', '/members', { body, signal, admin: true })
+  return json.data
+}
+
 // ── Endpoint publik ───────────────────────────────────────────────────────────
 export const getHeroSlides = (signal) => get('/hero-slides', signal)
 export const getEvents = (limit = 3, signal) => get(`/events?limit=${limit}&featured=1`, signal)
@@ -146,3 +180,13 @@ export const getEventsByDate = (date, signal) => get(`/events?date=${date}`, sig
 export const getCalendar = (year, month, signal) => get(`/calendar?year=${year}&month=${month}`, signal)
 export const getNews = (perPage = 3, signal) => get(`/news?per_page=${perPage}`, signal)
 export const getSettings = (signal) => get('/settings', signal)
+// GET /structure?period= -> { period, inti: [{ group, members }], departments }
+// Tanpa period = periode aktif. Hanya pengurus is_active=1 (publik).
+export const getStructure = (period, signal) =>
+  get(`/structure${period ? `?period=${encodeURIComponent(period)}` : ''}`, signal)
+// GET /members?period= -> data[] (publik, hanya is_active=1): { id, name, position, group_name, department_id, photo_url, period }
+export const getMembers = (period, signal) =>
+  get(`/members${period ? `?period=${encodeURIComponent(period)}` : ''}`, signal)
+// GET /departments/:slug?period= -> { department, members }
+export const getDepartment = (slug, period, signal) =>
+  get(`/departments/${encodeURIComponent(slug)}${period ? `?period=${encodeURIComponent(period)}` : ''}`, signal)

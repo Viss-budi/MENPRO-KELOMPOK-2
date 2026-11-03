@@ -1,0 +1,260 @@
+/* Halaman Publik: Tentang & Struktur Organisasi HIMAFOR */
+
+.main {
+  min-height: calc(100vh - 200px);
+  padding: 40px 24px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ── Hero / Header Halaman ──────────────────────────────── */
+.hero {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: #E8F0FA;
+  color: #0056B3;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0B2247;
+}
+
+.subtitle {
+  margin: 0 auto;
+  max-width: 600px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #64748B;
+}
+
+/* ── Filter Periode ─────────────────────────────────────── */
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.filterLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.selectPeriode {
+  padding: 8px 16px;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0F172A;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.selectPeriode:focus {
+  border-color: #0056B3;
+}
+
+/* ── Bagian Seksi (Pengurus Inti & Tiap Divisi) ──────────── */
+.section {
+  margin-bottom: 56px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0B2247;
+  white-space: nowrap;
+}
+
+.sectionLine {
+  flex: 1;
+  height: 1.5px;
+  background: #E2E8F0;
+}
+
+/* ── Grid Kartu Pengurus ─────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 20px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 16px rgba(11, 34, 71, 0.05);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(11, 34, 71, 0.1);
+}
+
+.avatarWrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 18px;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #E8F0FA;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.avatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #E8F0FA;
+  color: #0056B3;
+  font-size: 28px;
+  font-weight: 700;
+  border: 3px solid #D0E2FF;
+}
+
+.nama {
+  margin: 0 0 6px;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.35;
+}
+
+.jabatan {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0056B3;
+  line-height: 1.4;
+}
+
+.metaBadge {
+  display: inline-block;
+  margin-top: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #F1F5F9;
+  color: #64748B;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+/* ── Panel Loading / Empty / Error ───────────────────────── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #E2E8F0;
+  margin: 32px 0;
+}
+
+.panelTitle {
+  margin: 16px 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.panelText {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #64748B;
+  max-width: 400px;
+}
+
+.btnRetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  background: #0056B3;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.btnRetry:hover {
+  background: #004494;
+}
+
+/* ── Skeleton Loading ───────────────────────────────────── */
+.skelCard {
+  height: 240px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Responsif ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main { padding: 24px 16px 60px; }
+  .title { font-size: 28px; }
+  .subtitle { font-size: 14.5px; }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .avatarWrap { width: 90px; height: 90px; margin-bottom: 12px; }
+  .avatarFallback { font-size: 22px; }
+  .nama { font-size: 14.5px; }
+  .jabatan { font-size: 12.5px; }
+}
+

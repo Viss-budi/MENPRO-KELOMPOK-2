@@ -1,0 +1,180 @@
+/* Daftar pengurus: desain 01 sampai 04 dan 12. */
+
+.meta {
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+  margin: 26px 0 24px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-text-muted);
+}
+
+.card {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.06);
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.colNama { width: 460px; }
+.colJabatan { width: 260px; }
+
+.table th {
+  height: 48px;
+  padding: 0 0 0 0;
+  background: var(--color-surface-panel);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: left;
+  color: var(--color-text);
+}
+.table th:first-child,
+.table td:first-child { padding-left: 32px; }
+.table th:last-child,
+.table td:last-child { padding-right: 32px; }
+
+.table td {
+  height: 72px;
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+.table tbody tr:last-child td { border-bottom: 0; }
+
+/* Baris yang baru ditambahkan (desain 12) */
+.barisBaru td { background: #ECFDF3; }
+
+/* ── Kolom Pengurus ─────────────────────────────────────── */
+.selPengurus {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding-right: 16px;
+}
+
+.nama {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--color-heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.belumDiisi {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+/* ── Kolom Jabatan ──────────────────────────────────────── */
+.selJabatan {
+  padding-right: 16px;
+  overflow: hidden;
+  font-size: 14.5px;
+  color: var(--color-text-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Kolom Department ───────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  height: 28px;
+  padding: 0 21px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Keadaan kosong / gagal ─────────────────────────────── */
+div.kosong {
+  padding: 80px 24px;
+  gap: 10px;
+}
+.kosongHalo {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: #E8F0FA;
+}
+.kosongIcon {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+/* ── Kerangka saat memuat (desain 03) ───────────────────── */
+.skelMeta { width: 180px; height: 12px; border-radius: 999px; }
+.skelFoto { flex: none; width: 44px; height: 44px; border-radius: 50%; }
+.skelTeks { display: flex; flex-direction: column; gap: 6px; }
+.skelNama { width: 180px; height: 10px; border-radius: 999px; }
+.skelSub { width: 100px; height: 8px; border-radius: 999px; }
+.skelJabatan { width: 110px; height: 10px; border-radius: 999px; }
+.skelBadge { width: 150px; height: 28px; border-radius: 999px; }
+
+/* ── Layar kecil: tiap pengurus menjadi satu kartu ──────── */
+@media (max-width: 640px) {
+  .meta { margin: 20px 0 16px; }
+
+  .card { overflow: visible; background: transparent; box-shadow: none; }
+  .table,
+  .table tbody { display: block; }
+  .table thead { display: none; }
+  .colNama,
+  .colJabatan { width: auto; }
+
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px 12px;
+    margin-bottom: 12px;
+    padding: 16px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.06);
+  }
+  .table td,
+  .table td:first-child,
+  .table td:last-child {
+    display: block;
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+  .table td:first-child { grid-column: 1 / -1; }
+  .barisBaru { background: #ECFDF3; }
+  .barisBaru td { background: transparent; }
+
+  .selPengurus { padding-right: 0; }
+  .selJabatan { padding-right: 0; font-size: 14px; }
+  .table td[data-label="Department"] { justify-self: end; max-width: 100%; }
+  .badge { padding: 0 14px; }
+}

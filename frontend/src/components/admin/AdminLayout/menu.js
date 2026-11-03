@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { ROUTES } from '../../../constants/routes'
 import { bacaRuteBerita } from '../../../pages/admin/Berita/rute'
+import { bacaRuteStruktur } from '../../../pages/admin/Struktur/rute'
 
 // Menu samping admin (sesuai desain UI/UX). Dipakai juga oleh App.jsx untuk memetakan URL.
 // roles : kosong = admin dan editor; ['admin'] = hanya admin (kontrak bagian 6).
@@ -41,6 +42,10 @@ const SUB_RUTE = {
   berita: {
     baca: bacaRuteBerita,
     label: { tambah: 'Tambah Berita', ubah: 'Edit Berita' },
+  },
+  struktur: {
+    baca: bacaRuteStruktur,
+    label: { daftar: 'Struktur Organisasi', tambah: 'Tambah Pengurus' },
   },
 }
 

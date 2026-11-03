@@ -1,0 +1,320 @@
+/* Form tambah pengurus: desain 05 sampai 11. */
+
+/* ── Kotak pesan gagal (desain 11) ──────────────────────── */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 54px;
+  margin-top: 24px;
+  padding: 12px 24px;
+  border: 1px solid #F9C9C5;
+  border-radius: 16px;
+  background: #FEF3F2;
+  box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.04);
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 20px;
+  color: #B42318;
+}
+.banner svg { flex: none; color: #D92D20; }
+.banner:focus-visible { outline: 2px solid #D92D20; outline-offset: 2px; }
+.bannerAksi {
+  margin-left: auto;
+  padding: 6px 14px;
+  border: 1.5px solid #D92D20;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #B42318;
+  cursor: pointer;
+}
+
+/* ── Tata letak ─────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 25px;
+  align-items: start;
+  margin-top: 24px;
+}
+.banner + .grid { margin-top: 24px; }
+.kolomKiri { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+.card {
+  padding: 21px 24px 24px;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.06);
+}
+.cardData { padding-bottom: 14px; }
+.cardTitle {
+  margin: 0 0 19px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  color: var(--color-heading);
+}
+
+/* ── Kolom isian ────────────────────────────────────────── */
+.field { margin-bottom: 15px; }
+.baris {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 24px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 16px;
+  color: var(--color-text);
+}
+
+.inputWrap { position: relative; }
+
+.input {
+  display: block;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid var(--color-deco);
+  border-radius: 13px;
+  outline: none;
+  background: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-heading);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input::placeholder { font-weight: 400; color: var(--color-text-muted); opacity: 1; }
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(219, 233, 251, 0.8);
+}
+.input:disabled {
+  border-color: var(--color-primary-soft);
+  background: var(--color-surface-panel);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+.input:disabled::placeholder { color: var(--color-text-disabled); }
+.input.inputError { padding-right: 44px; border-color: #EF4444; border-width: 2px; }
+.input.inputError:focus { box-shadow: 0 0 0 3px #FEE2E2; }
+.inputIcon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #D92D20;
+  pointer-events: none;
+}
+
+/* Dropdown Department */
+.select {
+  appearance: none;
+  padding-right: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.select.kosong { font-weight: 400; color: var(--color-text-muted); }
+.select option { font-weight: 500; color: var(--color-heading); }
+.select.inputError { padding-right: 44px; }
+.panah {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: var(--color-text);
+  pointer-events: none;
+}
+.select:disabled + .panah { color: var(--color-text-disabled); }
+
+/* Slot pesan error selalu ada supaya tata letak tidak bergeser */
+.fieldError {
+  min-height: 20px;
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 14px;
+  color: #B42318;
+}
+
+.hint {
+  margin: 9px 0 0;
+  font-size: 12.5px;
+  line-height: 16px;
+  color: var(--color-text-muted);
+}
+
+/* ── Pratinjau di Website ───────────────────────────────── */
+.pratinjau {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+.pratinjauTeks { min-width: 0; padding-top: 8px; }
+.pratinjauJudul {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--color-heading);
+}
+.pratinjauDesc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-body);
+}
+.catatan {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 43px 0 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-body);
+}
+.catatan svg { flex: none; color: var(--color-primary); }
+.catatanKecil {
+  margin: 20px 0 0;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--color-text-body);
+}
+
+.kartu {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 200px;
+  min-height: 186px;
+  margin-right: 20px;
+  padding: 22px 14px 18px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(var(--color-shadow), 0.1);
+  text-align: center;
+}
+.kartuNama {
+  margin-top: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 18px;
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+}
+.kartuJabatan {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 16px;
+  overflow-wrap: anywhere;
+}
+.kartuDept {
+  font-size: 11.5px;
+  line-height: 14px;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+/* ── Foto Pengurus ──────────────────────────────────────── */
+.cardFoto { padding-inline: 20px; padding-bottom: 33px; text-align: center; }
+.cardFoto .fotoHead { padding-inline: 3px; }
+.fotoHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cardTitleFoto {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  color: var(--color-heading);
+}
+.opsional {
+  padding: 3px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+.fotoBulat {
+  display: grid;
+  place-items: center;
+  width: 136px;
+  height: 136px;
+  margin: 14px auto 26px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+}
+.fotoSalah { border: 2px dashed #EF4444; }
+
+.fotoAksi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.tombolFoto { height: 40px; padding: 0 20px; font-size: 14px; }
+.tombolUnggah { min-width: 220px; }
+.tombolFoto:focus-within { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
+.fotoInfo {
+  margin: 16px -8px 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+.fotoInfoSalah { color: #B42318; }
+
+/* ── Tombol Simpan saat menyimpan (desain 10) ───────────── */
+.simpan { min-width: 140px; }
+.batal { min-width: 100px; }
+.simpan:disabled {
+  background: var(--color-primary-soft);
+  color: var(--color-text-disabled);
+}
+.putar { animation: putar 1s linear infinite; }
+@keyframes putar { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .putar { animation: none; }
+}
+
+/* ── Layar kecil ────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .cardFoto { order: -1; }
+}
+
+@media (max-width: 640px) {
+  .input { font-size: 16px; }
+  .baris { grid-template-columns: minmax(0, 1fr); }
+  .card { padding: 20px 16px; }
+  .banner { padding: 12px 16px; flex-wrap: wrap; }
+  .pratinjau { flex-direction: column; align-items: stretch; }
+  .kartu { align-self: center; }
+  .catatan { margin-top: 16px; }
+}

@@ -1,0 +1,25 @@
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.foto {
+  display: block;
+  object-fit: cover;
+  background: var(--color-border);
+}
+
+/* Foto bawaan: siluet orang di atas gradasi biru muda */
+.bawaan {
+  background: linear-gradient(160deg, #E3EEFB 0%, #BBD3F2 100%);
+  color: var(--color-primary);
+  user-select: none;
+}
+
+.cincin {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--color-deco-soft, #DCE8F8);
+}
