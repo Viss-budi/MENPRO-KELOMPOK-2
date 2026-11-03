@@ -4,10 +4,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Home from './pages/public/Home/Home'
+import Tentang from './pages/public/Tentang/Tentang'
 import Login from './pages/admin/Login/Login'
 import Dashboard from './pages/admin/Dashboard/Dashboard'
 import Kelola from './pages/admin/Kelola/Kelola'
 import KelolaBerita from './pages/admin/Berita/KelolaBerita'
+import KelolaStruktur from './pages/admin/Struktur/KelolaStruktur'
 import AdminLayout from './components/admin/AdminLayout/AdminLayout'
 import { bolehAkses, cariMenu, labelSubhalaman } from './components/admin/AdminLayout/menu'
 import SesiLoading from './components/admin/SesiLoading/SesiLoading'
@@ -39,7 +41,7 @@ const MAINTENANCE_AWAL =
 
 // Rute publik yang halamannya belum dibuat: sementara tetap menampilkan Home (perilaku lama).
 // Hapus dari daftar ini setiap kali halamannya selesai dibuat.
-const RUTE_PUBLIK_BELUM_ADA = [ROUTES.agenda, ROUTES.tentang, ROUTES.dokumentasi, ROUTES.prestasi]
+const RUTE_PUBLIK_BELUM_ADA = [ROUTES.agenda, ROUTES.dokumentasi, ROUTES.prestasi]
 
 // ── Penjaga sesi ─────────────────────────────────────────────────────────────
 // Sesi memakai cookie HttpOnly, jadi frontend tidak bisa membacanya. Status sesi
@@ -69,6 +71,7 @@ function halamanYangTepat(pathname, status) {
     return status === 'in' ? path : PATH_LOGIN
   }
   if (path === PATH_HOME || RUTE_PUBLIK_BELUM_ADA.includes(path)) return PATH_HOME
+  if (path === ROUTES.tentang) return ROUTES.tentang
 
   // Pratinjau halaman error saat pengembangan
   if (import.meta.env.DEV && path.startsWith(PREVIEW_PREFIX)) {
@@ -207,6 +210,8 @@ function App() {
       isi = <Dashboard user={auth.user} onNavigate={navigate} />
     } else if (itemAdmin.key === 'berita' && akses) {
       isi = <KelolaBerita pathname={halaman} onNavigate={navigate} />
+    } else if (itemAdmin.key === 'struktur' && akses) {
+      isi = <KelolaStruktur pathname={halaman} onNavigate={navigate} />
     } else {
       isi = <Kelola item={itemAdmin} akses={akses} onNavigate={navigate} />
     }
@@ -238,6 +243,7 @@ function App() {
   if (!online) return <ErrorPage variant="offline" onRetry={retry} />
   if (maintenance) return <ErrorPage variant="maintenance" estimatedEnd={maintenance.estimatedEnd} />
   if (halaman === PAGE_NOT_FOUND) return <ErrorPage variant="404" />
+  if (halaman === ROUTES.tentang) return <Tentang />
 
   return <Home />
 }
