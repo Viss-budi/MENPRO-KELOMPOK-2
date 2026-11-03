@@ -288,6 +288,9 @@
 .crumbLink:hover { color: var(--color-heading); text-decoration: underline; }
 .crumbLink:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: 4px; }
 
+.back,
+.mobileBrand { display: none; }
+
 .tools {
   display: flex;
   align-items: center;
@@ -399,24 +402,91 @@
   .tools { gap: 10px; }
 }
 
+/* ── Ponsel (desain mobile 390 px) ─────────────────────────
+   Halaman utama: tombol menu + merek HIMAFOR + lonceng + akun.
+   Sub-halaman (form): tombol kembali + judul di tengah, tanpa lonceng/akun. */
+@media (max-width: 640px) {
+  .sidebar {
+    width: min(300px, calc(100vw - 48px));
+    border-radius: 0 28px 28px 0;
+  }
+  .closeDrawer {
+    border-radius: 50%;
+    background: var(--color-footer-icon-bg);
+  }
+  /* Isi laci dimulai 16 px dari atas (desain 13); lebih rendah bila ada poni/area aman */
+  .brand { height: 84px; margin-top: calc(16px + var(--safe-top)); }
+  .group { padding-top: 22px; }
+  .group + .group { padding-top: 24px; }
+
+  .topbar { height: 65px; padding: 0 20px 0 16px; gap: 0; }
+  .burger,
+  .back {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  .back {
+    display: grid;
+    place-items: center;
+    flex: none;
+    background: var(--color-surface-panel);
+    color: var(--color-heading);
+    text-decoration: none;
+  }
+  .back:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+  .mobileBrand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin-left: 12px;
+  }
+  .mobileLogo { display: block; flex: none; width: 30px; height: 31px; }
+  .mobileLogo img { display: block; width: 30px; height: 31px; }
+  .mobileBrandName,
+  .mobileBrandSub { display: block; white-space: nowrap; }
+  .mobileBrandName {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 20px;
+    color: var(--color-heading);
+  }
+  .mobileBrandSub {
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--color-text-muted);
+  }
+
+  .topbar:not(.topbarSub) .crumbs { display: none; }
+  .tools { gap: 8px; }
+  .bell { width: 40px; height: 40px; }
+
+  /* Sub-halaman: judul di tengah bilah atas */
+  .topbarSub .burger,
+  .topbarSub .mobileBrand,
+  .topbarSub .tools { display: none; }
+  .topbarSub .crumbs {
+    position: absolute;
+    inset: 0 64px;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .topbarSub .crumbNow {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    max-width: none;
+  }
+
+  .main { padding: 17px 16px 30px; }
+}
+
 @media (max-width: 480px) {
   .topbar {
-    padding-left: max(12px, var(--safe-left));
-    padding-right: max(12px, var(--safe-right));
-  }
-  .main {
-    padding: 20px 14px 36px;
-  }
-  .crumbNow {
-    max-width: 130px;
-    font-size: 13.5px;
-  }
-  .tools {
-    gap: 8px;
-  }
-  .burger {
-    width: 38px;
-    height: 38px;
+    padding-left: max(16px, var(--safe-left));
+    padding-right: max(20px, var(--safe-right));
   }
 }
 

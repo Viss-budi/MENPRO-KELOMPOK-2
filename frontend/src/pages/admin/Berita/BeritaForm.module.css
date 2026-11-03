@@ -44,6 +44,9 @@
   color: var(--color-heading);
 }
 
+/* Teks dropzone: versi desktop (seret) dan ponsel (ketuk) */
+.teksPonsel { display: none; }
+
 /* ── Kolom ─────────────────────────────────────────────── */
 .field + .field { margin-top: 22px; }
 
@@ -284,10 +287,83 @@
 }
 
 @media (max-width: 480px) {
-  .card { padding: 20px 16px 22px; }
   .banner { padding: 12px 16px; }
-  .dropzone { padding: 20px 12px; min-height: 160px; }
-  .previewAksi { flex-direction: column; }
-  .previewAksi button,
-  .previewAksi label { width: 100%; justify-content: center; }
+}
+
+/* ── Ponsel: desain 05 sampai 08, 10, 11 (390 px) ───────── */
+@media (max-width: 640px) {
+  .formPage { margin-top: -6px; padding-bottom: 71px; }
+  .head { gap: 0; }
+  .head .subjudul { margin-top: 0; }
+  .judulHalaman {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  /* Bilah Batal / Simpan tetap di dasar layar */
+  .barAksi {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 25;
+    flex-wrap: nowrap;
+    gap: 12px;
+    width: auto;
+    padding: 19px max(16px, var(--safe-right)) max(20px, var(--safe-bottom)) max(16px, var(--safe-left));
+    border-top: 1px solid var(--color-border);
+    background: #fff;
+  }
+  .barAksi > .btn { border-width: 2px; }
+  .barAksi > :first-child { flex: 13 1 0; }
+  .barAksi > :last-child { flex: 20 1 0; }
+
+  .banner {
+    min-height: 51px;
+    margin-top: 18px;
+    padding: 0 16px 0 24px;
+    gap: 12px;
+    border-color: #FECDCA;
+    border-radius: 18px;
+    font-size: 14px;
+  }
+  .banner svg { width: 20px; height: 20px; }
+
+  .grid { gap: 18px; margin-top: 18px; }
+  .card { padding: 13px 16px 14px; border-radius: 24px; }
+  .cardTitle { margin: 0 0 20px; font-size: 17px; font-weight: 800; line-height: 26px; }
+
+  /* Setiap kolom menyisakan tempat pesan error supaya tata letak tidak bergeser */
+  .field { position: relative; padding-bottom: 22px; }
+  .field + .field { margin-top: 19px; }
+  .field > .fieldError,
+  .field > .hitung { position: absolute; right: 0; bottom: 0; left: 0; margin: 0; }
+  .cardGambar > .fieldError { margin-top: 14px; }
+  .label { margin-bottom: 7px; font-size: 12.5px; }
+
+  .input { height: 48px; border-radius: 14px; padding: 0 16px; }
+  .input.inputError { padding-right: 46px; }
+  .inputIcon { top: 15px; }
+
+  .editor { border-radius: 16px; }
+  .toolbar { flex-wrap: nowrap; gap: 4px; height: 44px; padding: 0 8px; }
+  .toolBtn { width: 38px; height: 38px; }
+  .toolSep { display: none; }
+  .textarea { min-height: 152px; padding: 16px; }
+
+  /* Kartu gambar setinggi desain (294 px) */
+  .cardGambar { min-height: 294px; }
+  .cardGambar .cardTitle { margin-bottom: 11px; }
+  .dropzone { min-height: 149px; padding: 16px 12px; border-radius: 16px; gap: 4px; }
+  .teksDesktop { display: none; }
+  .teksPonsel { display: inline; }
+  .previewBox { aspect-ratio: auto; height: 150px; border-radius: 14px; }
+  .fileMeta { margin-top: 10px; font-size: 12px; }
+  .previewAksi { flex-direction: row; flex-wrap: nowrap; gap: 12px; margin-top: 10px; }
+  .previewAksi > :first-child { flex: 176 1 0; width: auto; min-width: 0; }
+  .previewAksi > :last-child { flex: 138 1 0; width: auto; min-width: 0; }
 }

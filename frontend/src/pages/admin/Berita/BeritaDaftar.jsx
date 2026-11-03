@@ -309,7 +309,10 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
                         <td><Thumb key={item.id} src={resolveImage(item.cover_url)} /></td>
                         <td className={styles.selJudul}>
                           <span className={styles.judul} title={item.title}>{item.title}</span>
-                          <span className={styles.tanggalKecil}>{tanggal}</span>
+                          <span className={styles.tanggalKecil}>
+                            <Calendar className={styles.tanggalIkon} size={15} strokeWidth={1.9} aria-hidden="true" />
+                            {tanggal}
+                          </span>
                         </td>
                         <td className={styles.kolTanggal}>
                           <span className={styles.tanggal}>

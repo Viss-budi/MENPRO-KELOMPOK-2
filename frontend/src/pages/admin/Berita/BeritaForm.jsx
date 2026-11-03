@@ -443,15 +443,17 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
   const sibuk = menyimpan || mengunggahEditor
 
   return (
-    <form className={base.page} onSubmit={simpan} noValidate>
-      <header className={base.head}>
+    <form className={`${base.page} ${styles.formPage}`} onSubmit={simpan} noValidate>
+      <header className={`${base.head} ${styles.head}`}>
         <div>
-          <h1 className={base.title}>{edit ? 'Edit Berita' : 'Tambah Berita'}</h1>
-          <p className={base.subtitle}>
+          {/* Di ponsel judul tampil di bilah atas; h1 tetap ada untuk pembaca layar */}
+          <h1 className={`${base.title} ${styles.judulHalaman}`}>{edit ? 'Edit Berita' : 'Tambah Berita'}</h1>
+          <p className={`${base.subtitle} ${styles.subjudul}`}>
             {edit ? 'Ubah data berita lalu tekan Simpan.' : 'Isi form berikut lalu tekan Simpan.'}
           </p>
         </div>
-        <div className={base.actions}>
+        {/* Di ponsel menjadi bilah tetap di bawah layar (desain 05 mobile) */}
+        <div className={`${base.actions} ${styles.barAksi}`}>
           <button
             type="button"
             className={`${base.btn} ${base.outline}`}
@@ -553,7 +555,7 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
         </section>
 
         {/* ── Kanan: gambar ───────────────────────────────── */}
-        <aside className={styles.card} aria-label="Gambar berita">
+        <aside className={`${styles.card} ${styles.cardGambar}`} aria-label="Gambar berita">
           <h2 className={styles.cardTitle}>Gambar Berita</h2>
 
           {gambar ? (
@@ -608,7 +610,10 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
               onDrop={lepasFile}
             >
               <Upload size={30} strokeWidth={1.8} aria-hidden="true" />
-              <strong>Klik atau seret gambar ke sini</strong>
+              <strong>
+                <span className={styles.teksDesktop}>Klik atau seret gambar ke sini</span>
+                <span className={styles.teksPonsel}>Ketuk untuk memilih gambar</span>
+              </strong>
               <small>PNG / JPG / WEBP, maks. 2 MB</small>
               <input
                 ref={fileRef}

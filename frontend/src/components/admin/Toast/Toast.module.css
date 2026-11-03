@@ -94,10 +94,11 @@
 
 @media (max-width: 480px) {
   .region {
-    right: 14px;
-    left: 14px;
-    bottom: max(14px, var(--safe-bottom));
+    right: 16px;
+    left: 16px;
+    bottom: max(24px, var(--safe-bottom));
     width: auto;
     max-width: 100%;
   }
+  .toast { border-radius: 18px; }
 }

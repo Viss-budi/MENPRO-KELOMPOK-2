@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Bell, ChevronDown, LogOut, Menu as MenuIcon, Search, User, X } from 'lucide-react'
+import { ArrowLeft, Bell, ChevronDown, LogOut, Menu as MenuIcon, Search, User, X } from 'lucide-react'
 import logo from '../../../assets/images/logo-himafor.webp'
 import { GRUP_MENU, MENU, bolehAkses, cariMenu } from './menu'
 import styles from './AdminLayout.module.css'
@@ -130,7 +130,19 @@ function AdminLayout({ user, activePath, currentPath, subLabel, onNavigate, onLo
       {drawerOpen && <div className={styles.scrim} onClick={() => setDrawerOpen(false)} aria-hidden="true" />}
 
       <div className={styles.body}>
-        <header className={styles.topbar}>
+        <header className={`${styles.topbar} ${subLabel ? styles.topbarSub : ''}`}>
+          {/* Layar ponsel, sub-halaman (form): tombol kembali + judul di tengah (lihat CSS) */}
+          {subLabel && (
+            <a
+              href={activePath}
+              className={styles.back}
+              aria-label={`Kembali ke ${aktif?.label ?? 'daftar'}`}
+              onClick={(e) => pergi(e, activePath)}
+            >
+              <ArrowLeft size={20} strokeWidth={2} aria-hidden="true" />
+            </a>
+          )}
+
           <button
             type="button"
             className={styles.burger}
@@ -141,6 +153,17 @@ function AdminLayout({ user, activePath, currentPath, subLabel, onNavigate, onLo
           >
             <MenuIcon size={22} strokeWidth={2} aria-hidden="true" />
           </button>
+
+          {/* Layar ponsel, halaman utama: merek HIMAFOR di bilah atas (desain mobile) */}
+          <div className={styles.mobileBrand} aria-hidden="true">
+            <span className={styles.mobileLogo}>
+              <img src={logo} alt="" width="30" height="31" />
+            </span>
+            <span className={styles.brandText}>
+              <span className={styles.mobileBrandName}>HIMAFOR</span>
+              <span className={styles.mobileBrandSub}>Admin Panel</span>
+            </span>
+          </div>
 
           <nav className={styles.crumbs} aria-label="Lokasi halaman">
             <span className={styles.crumbRoot}>Admin</span>

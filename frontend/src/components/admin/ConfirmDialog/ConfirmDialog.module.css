@@ -103,8 +103,15 @@
 .ya:hover:not(:disabled) { background: #B42318; }
 .ya:disabled { background: #E9A29C; }
 
+/* Ponsel (desain 03 mobile): kartu 326 px, dua tombol berdampingan */
 @media (max-width: 480px) {
-  .dialog { padding: 26px 18px 22px; border-radius: 20px; }
-  .actions { width: 100%; gap: 10px; flex-direction: column-reverse; }
-  .btn { width: 100%; }
+  .scrim { padding: 32px; background: rgba(11, 34, 71, 0.56); }
+  .dialog { padding: 30px 20px 28px; border-radius: 28px; }
+  .icon { width: 60px; height: 60px; }
+  .icon svg { width: 26px; height: 26px; }
+  .title { margin-top: 18px; font-size: 20px; font-weight: 800; line-height: 26px; }
+  .text { max-width: none; margin-top: 8px; font-size: 13.5px; line-height: 20px; }
+  .actions { width: 100%; gap: 12px; margin-top: 44px; }
+  .error + .actions { margin-top: 16px; }
+  .btn { flex: 1 1 0; width: auto; min-width: 0; height: 46px; }
 }

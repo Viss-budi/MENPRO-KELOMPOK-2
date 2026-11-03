@@ -171,6 +171,7 @@
   white-space: nowrap;
 }
 .tanggalKecil { display: none; }
+.tanggalIkon { display: none; }
 
 .tanggal {
   display: inline-flex;
@@ -279,4 +280,86 @@ div.kosong { padding: 80px 24px; gap: 10px; }
   .colAksi { width: 84px; }
   .btnAksi { width: 34px; height: 34px; }
   .aksi { gap: 6px; }
+}
+
+/* ── Ponsel (desain 01 / 02 / 04 / 09 / 12 mobile): tabel menjadi daftar kartu ──
+   Struktur tabel tetap dipakai; baris digeser menjadi kartu dengan CSS grid. */
+@media (max-width: 640px) {
+  .metaBar { flex-wrap: nowrap; margin: 20px 0 12px; }
+  .meta { font-size: 13px; }
+  .urutBtn { height: 30px; gap: 8px; padding: 0 15px; font-size: 13px; }
+  .urutBtn svg { width: 14px; height: 14px; }
+
+  .card { overflow: visible; border-radius: 0; background: transparent; box-shadow: none; }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td { display: block; }
+  .table thead { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+  .table caption { display: none; }
+  .table colgroup { display: none; }
+
+  .table tbody { display: flex; flex-direction: column; gap: 14px; }
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    column-gap: 14px;
+    padding: 13px 14px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.06);
+  }
+  .table tbody tr:hover { background: #fff; }
+
+  .table td,
+  .table td:first-child,
+  .table td:last-child,
+  .table td.selJudul { height: auto; padding: 0; border: 0; }
+
+  .table td.kolTanggal { display: none; }
+  .thumb,
+  .thumbKosong { width: 72px; height: 72px; border-radius: 10px; }
+
+  .table td.selJudul {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+    height: 72px;
+  }
+  .judul {
+    padding-top: 3px;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 19px;
+  }
+  .tanggalKecil {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .tanggalIkon { display: block; flex: none; }
+
+  .table td:last-child { grid-column: 1 / -1; margin-top: 12px; }
+  .aksi { gap: 10px; }
+  .btnAksi { flex: 1; width: auto; height: 38px; padding: 0 12px; border-width: 2px; }
+  .labelAksi { display: inline; }
+
+  .skelThumb { width: 72px; height: 72px; border-radius: 10px; }
+  .skelJudul { width: 70%; }
+  .skelAksi { width: 100%; height: 38px; }
+
+  /* Keadaan kosong (desain 02) */
+  div.kosong { gap: 8px; padding: 39px 20px 57px; }
+  .kosongHalo { width: 112px; height: 112px; margin-bottom: 17px; }
+  .kosongIcon { width: 88px; height: 88px; }
+  div.kosong h2 { font-size: 20px; font-weight: 800; line-height: 26px; }
+  div.kosong p { max-width: 240px; font-size: 14px; line-height: 20px; }
+  div.kosong a { width: 200px; margin-top: 17px; }
+
+  .pager { margin-top: 16px; }
 }
