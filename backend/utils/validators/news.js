@@ -19,7 +19,7 @@ module.exports = function validateNews(data) {
 
   if (has('title')) {
     if (typeof data.title !== 'string') add('title', 'Judul harus berupa teks');
-    else if (data.title.length > 250) add('title', 'Judul maksimal 250 karakter');
+    else if (data.title.length > 100) add('title', 'Judul maksimal 100 karakter');
   }
   if (has('category') && !CATEGORIES.includes(data.category)) {
     add('category', `Kategori harus salah satu dari: ${CATEGORIES.join(', ')}`);
@@ -30,6 +30,8 @@ module.exports = function validateNews(data) {
   }
   if (has('content') && data.content !== null && typeof data.content !== 'string') {
     add('content', 'Isi berita harus berupa teks');
+  } else if (typeof data.content === 'string' && data.content.length > 50000) {
+    add('content', 'Isi berita maksimal 50.000 karakter');
   }
   if (has('cover_url') && data.cover_url !== null && data.cover_url !== '') {
     if (typeof data.cover_url !== 'string') add('cover_url', 'cover_url harus berupa teks');

@@ -24,7 +24,7 @@ const notFound = (res) => res.status(404).json({ success: false, message: 'Data 
 
 // Pabrik CRUD admin: dipakai hero_slides, events, news, members
 const makeCrud = ({
-  table, fields, required = [], slugFrom, ownerField,
+  table, fields, required = [], slugFrom, slugMax, ownerField,
   searchFields = [], filterFields = [], orderBy = 'id DESC', validate,
 }) => ({
   // GET /admin/all?page=1&per_page=10&q=kata&category=...
@@ -73,7 +73,11 @@ const makeCrud = ({
     if (problems.length) return badFields(res, problems);
 
     if (slugFrom) {
-      data.slug = `${slugify(String(data[slugFrom]), { lower: true, strict: true })}-${Date.now().toString(36)}`;
+      const suffix = `-${Date.now().toString(36)}`; // akhiran unik
+      let base = slugify(String(data[slugFrom]), { lower: true, strict: true });
+      // slugMax: batas panjang slug total (termasuk akhiran). Bagian judul dipotong, bukan akhirannya.
+      if (slugMax) base = base.slice(0, Math.max(1, slugMax - suffix.length)).replace(/-+$/, '');
+      data.slug = `${base}${suffix}`;
     }
     if (ownerField && hasColumn(table, ownerField)) data[ownerField] = req.user.id; // dicatat dari sesi login, bukan dari input client
 
