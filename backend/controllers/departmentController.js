@@ -86,7 +86,8 @@ const create = async (req, res) => {
   data.slug = slugify(data.name, { lower: true, strict: true });
   if (!data.slug) return badFields(res, [{ field: 'name', message: 'Nama departemen harus memuat huruf atau angka' }]);
 
-  const [[dup]] = await db.query('SELECT id FROM departments WHERE period = ? AND (slug = ? OR name = ?) LIMIT 1', [data.period, data.slug, data.name]);
+  // LOWER(): perbandingan nama tidak boleh bergantung pada collation database (TiDB case-sensitive, MariaDB tidak)
+  const [[dup]] = await db.query('SELECT id FROM departments WHERE period = ? AND (slug = ? OR LOWER(name) = LOWER(?)) LIMIT 1', [data.period, data.slug, data.name]);
   if (dup) return conflict(res, 'Departemen dengan nama itu sudah ada di periode ini');
 
   const [r] = await db.query('INSERT INTO departments SET ?', [data]);
@@ -106,7 +107,12 @@ const update = async (req, res) => {
   if (problems.length) return badFields(res, problems);
 
   if ('name' in data) {
-    const [[dup]] = await db.query('SELECT id FROM departments WHERE period = ? AND name = ? AND id <> ? LIMIT 1', [row.period, data.name, row.id]);
+    // bentrok jika nama sama (tanpa membedakan huruf besar atau kecil) atau slug dari nama baru sama dengan slug departemen lain
+    const newSlug = slugify(data.name, { lower: true, strict: true });
+    const [[dup]] = await db.query(
+      'SELECT id FROM departments WHERE period = ? AND id <> ? AND (LOWER(name) = LOWER(?) OR slug = ?) LIMIT 1',
+      [row.period, row.id, data.name, newSlug]
+    );
     if (dup) return conflict(res, 'Departemen dengan nama itu sudah ada di periode ini');
   }
   await db.query('UPDATE departments SET ? WHERE id = ?', [data, req.params.id]);
