@@ -10,6 +10,7 @@ const crud = makeCrud({
   fields: ['title', 'category', 'excerpt', 'content', 'cover_url', 'published_at', 'is_published'],
   required: ['title'],
   slugFrom: 'title',
+  slugMax: 100,
   ownerField: 'author_id',
   validate: validateNews,
   searchFields: ['title', 'excerpt'],
