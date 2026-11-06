@@ -32,7 +32,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      'img-src': ["'self'", 'data:', 'https:'],
+      'img-src': ["'self'", 'data:','blob:', 'https:'],
     },
   },
 }));

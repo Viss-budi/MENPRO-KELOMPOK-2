@@ -17,6 +17,7 @@ const crud = makeCrud({
   filterFields: ['category', 'is_published'],
 });
 
+// id DESC = pemutus urutan saat published_at sama, supaya paginasi tidak menggandakan atau melewatkan berita
 // Landing: ?per_page=3 | Halaman "Lihat Semua": ?page=1&per_page=9
 const getNews = async (req, res) => {
   const page = clamp(req.query.page, 1, 100000);
@@ -25,7 +26,7 @@ const getNews = async (req, res) => {
   const [[{ total }]] = await db.query(`SELECT COUNT(*) AS total FROM news WHERE ${PUBLIC}`);
   const [rows] = await db.query(
     `SELECT id, title, slug, category, excerpt, cover_url, published_at
-     FROM news WHERE ${PUBLIC} ORDER BY published_at DESC LIMIT ? OFFSET ?`,
+     FROM news WHERE ${PUBLIC} ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?`,
     [perPage, (page - 1) * perPage]
   );
   res.json({ success: true, data: rows, meta: { page, per_page: perPage, total } });
