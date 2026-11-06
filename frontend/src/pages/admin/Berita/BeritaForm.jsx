@@ -19,6 +19,7 @@ import { klikBiasa } from '../../../utils/nav'
 import { pesanGagal } from '../../../utils/pesanGagal'
 import {
   MAKS_JUDUL,
+  MAKS_ISI, 
   formatUkuran,
   namaFile,
   ringkas,
@@ -532,6 +533,11 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
                   </button>
                 ))}
                 <span className={styles.toolSep} aria-hidden="true" />
+              {!errIsi && isi.length > MAKS_ISI - 5000 && (
+                <p className={styles.hitung}>
+                  {isi.length.toLocaleString('id-ID')} / {MAKS_ISI.toLocaleString('id-ID')} karakter
+                </p>
+              )}
               </div>
               <textarea
                 ref={isiRef}
