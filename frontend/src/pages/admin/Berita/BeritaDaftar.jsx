@@ -172,7 +172,7 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
   const tombolTambah = (
     <a
       href={PATH_TAMBAH_BERITA}
-      className={`${base.btn} ${base.primary}`}
+      className={`${base.btn} ${base.primary} ${styles.btnTambah}`}
       onClick={(e) => pergi(e, PATH_TAMBAH_BERITA)}
     >
       <Plus size={16} strokeWidth={2.4} aria-hidden="true" />
@@ -321,7 +321,7 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
                           <div className={styles.aksi}>
                             <a
                               href={pathUbahBerita(item.id)}
-                              className={`${base.btn} ${base.outline} ${base.sm} ${styles.btnAksi}`}
+                              className={`${base.btn} ${base.outline} ${base.sm} ${styles.btnAksi} ${styles.btnEdit}`}
                               aria-label={`Edit berita ${item.title}`}
                               onClick={(e) => pergi(e, pathUbahBerita(item.id))}
                             >
@@ -330,7 +330,7 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
                             </a>
                             <button
                               type="button"
-                              className={`${base.btn} ${base.danger} ${base.sm} ${styles.btnAksi}`}
+                              className={`${base.btn} ${base.danger} ${base.sm} ${styles.btnAksi} ${styles.btnHapus}`}
                               aria-label={`Hapus berita ${item.title}`}
                               onClick={() => bukaHapus(item)}
                             >

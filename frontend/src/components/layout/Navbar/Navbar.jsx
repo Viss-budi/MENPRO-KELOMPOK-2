@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Menu, Search, X } from 'lucide-react'
 import Button from '../../common/Button/Button'
 import { NAV_ITEMS, NAV_CTA } from '../../../constants/navigation'
 import logo from '../../../assets/images/logo-himafor.webp'
 import styles from './Navbar.module.css'
+
+// Pop-up dimuat saat pertama dibuka supaya tidak membebani halaman awal.
+const HubungiKamiModal = lazy(() => import('./HubungiKamiModal'))
+const PencarianOverlay = lazy(() => import('./PencarianOverlay'))
 
 // Menu yang sedang aktif: hash di URL, atau path halaman. Tanpa hash di "/" = Beranda.
 function currentKey() {
@@ -16,6 +20,7 @@ function currentKey() {
 function Navbar() {
   const [active, setActive] = useState(currentKey)
   const [open, setOpen] = useState(false)
+  const [dialog, setDialog] = useState(null) // null | 'kontak' | 'cari'
 
   useEffect(() => {
     const sync = () => setActive(currentKey())
@@ -31,6 +36,10 @@ function Navbar() {
   }, [])
 
   const closeMenu = () => setOpen(false)
+  const bukaDialog = (nama) => {
+    setOpen(false)
+    setDialog(nama)
+  }
 
   return (
     <header className={styles.header}>
@@ -66,17 +75,22 @@ function Navbar() {
               </li>
             ))}
           </ul>
-          <Button href={NAV_CTA.href} className={`${styles.cta} ${styles.ctaMobile}`}>
+          <Button onClick={() => bukaDialog('kontak')} className={`${styles.cta} ${styles.ctaMobile}`}>
             {NAV_CTA.label}
           </Button>
         </nav>
 
         <div className={styles.actions}>
-          {/* TODO: fitur pencarian belum ada, tombol ini hanya mengikuti desain */}
-          <button type="button" className={styles.iconBtn} aria-label="Cari">
+          <button
+            type="button"
+            className={styles.iconBtn}
+            aria-label="Cari"
+            aria-haspopup="dialog"
+            onClick={() => bukaDialog('cari')}
+          >
             <Search size={17.6} strokeWidth={2.5} />
           </button>
-          <Button href={NAV_CTA.href} className={`${styles.cta} ${styles.ctaDesktop}`}>
+          <Button onClick={() => bukaDialog('kontak')} className={`${styles.cta} ${styles.ctaDesktop}`}>
             {NAV_CTA.label}
           </Button>
           <button
@@ -91,6 +105,10 @@ function Navbar() {
           </button>
         </div>
       </div>
+      <Suspense fallback={null}>
+        {dialog === 'kontak' && <HubungiKamiModal onTutup={() => setDialog(null)} />}
+        {dialog === 'cari' && <PencarianOverlay onTutup={() => setDialog(null)} />}
+      </Suspense>
     </header>
   )
 }
