@@ -25,7 +25,7 @@ module.exports = async (req, res, next) => {
   const cek = SIGNATURES[req.file.mimetype];
   if (!cek || !cek(head)) {
     if (req.file.path) await fs.promises.unlink(req.file.path).catch(() => {});
-    return res.status(400).json({ success: false, message: 'File harus jpg/png/webp, maks 5MB' });
+    return res.status(400).json({ success: false, message: 'File harus jpg/jpeg/png/webp, maks 2MB' });
   }
   next();
 };

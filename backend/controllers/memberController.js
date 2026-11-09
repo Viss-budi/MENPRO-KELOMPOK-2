@@ -2,6 +2,8 @@ const db = require('../config/db');
 const { cleanBody, clamp, escapeLike } = require('../utils/crud');
 const validateMember = require('../utils/validators/member');
 const { isPeriod, PERIOD_MSG } = require('../utils/validators/common');
+const { PLACEHOLDER_NAME } = require('../utils/period');
+const { scheduleCleanup } = require('../utils/imageCleanup');
 
 const FIELDS = ['name', 'position', 'group_name', 'department_id', 'photo_url', 'period', 'sort_order', 'is_active'];
 const REQUIRED = ['name', 'position', 'period'];
@@ -131,15 +133,24 @@ const update = async (req, res) => {
     if (rel.length) return badFields(res, rel);
   }
 
+  // Slot BPH baru dibuat nonaktif dengan nama placeholder. Begitu nama asli diisi, slot otomatis aktif
+  // (kecuali admin mengirim is_active secara eksplisit).
+  if (row.is_core && row.name === PLACEHOLDER_NAME && typeof data.name === 'string'
+      && data.name !== PLACEHOLDER_NAME && data.is_active === undefined) {
+    data.is_active = 1;
+  }
+
   await db.query('UPDATE members SET ? WHERE id = ?', [data, req.params.id]);
+  if ('photo_url' in data && row.photo_url && row.photo_url !== data.photo_url) scheduleCleanup([row.photo_url]); // foto lama
   res.json({ success: true, message: 'Berhasil diperbarui' });
 };
 
 const remove = async (req, res) => {
-  const [[row]] = await db.query('SELECT id, is_core FROM members WHERE id = ?', [req.params.id]);
+  const [[row]] = await db.query('SELECT id, is_core, photo_url FROM members WHERE id = ?', [req.params.id]);
   if (!row) return notFound(res);
   if (row.is_core) return conflict(res, 'Posisi utama BPH tidak bisa dihapus');
   await db.query('DELETE FROM members WHERE id = ?', [req.params.id]);
+  scheduleCleanup([row.photo_url]);
   res.json({ success: true, message: 'Berhasil dihapus' });
 };
 
