@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { scheduleCleanup, extractCloudUrls } = require('./imageCleanup');
 const slugify = require('slugify');
 const { hasColumn } = require('./schema');
 
@@ -24,7 +25,7 @@ const notFound = (res) => res.status(404).json({ success: false, message: 'Data 
 
 // Pabrik CRUD admin: dipakai hero_slides, events, news, members
 const makeCrud = ({
-  table, fields, required = [], slugFrom, slugMax, ownerField,
+  table, fields, required = [], slugFrom, slugMax, ownerField, imageFields = [], textImageFields = [],
   searchFields = [], filterFields = [], orderBy = 'id DESC', validate,
 }) => ({
   // GET /admin/all?page=1&per_page=10&q=kata&category=...
@@ -95,14 +96,33 @@ const makeCrud = ({
     const problems = validate ? validate(data) : [];
     if (problems.length) return badFields(res, problems);
 
+    // gambar lama dicatat dulu supaya bisa dihapus dari Cloudinary jika diganti atau dibuang dari isi
+    const changing = imageFields.filter((f) => f in data);
+    const changingText = textImageFields.filter((f) => f in data);
+    const cols = [...changing, ...changingText];
+    let before = null;
+    if (cols.length) [[before]] = await db.query(`SELECT ${cols.join(', ')} FROM ${table} WHERE id = ?`, [req.params.id]);
+
     const [r] = await db.query(`UPDATE ${table} SET ? WHERE id = ?`, [data, req.params.id]);
     if (!r.affectedRows) return notFound(res);
+    if (before) {
+      const old = changing.filter((f) => before[f] && before[f] !== data[f]).map((f) => before[f]);
+      for (const f of changingText) {
+        const masihAda = new Set(extractCloudUrls(data[f]));
+        old.push(...extractCloudUrls(before[f]).filter((u) => !masihAda.has(u)));
+      }
+      scheduleCleanup(old);
+    }
     res.json({ success: true, message: 'Berhasil diperbarui' });
   },
 
   remove: async (req, res) => {
+    let before = null;
+    const cols = [...imageFields, ...textImageFields];
+    if (cols.length) [[before]] = await db.query(`SELECT ${cols.join(', ')} FROM ${table} WHERE id = ?`, [req.params.id]);
     const [r] = await db.query(`DELETE FROM ${table} WHERE id = ?`, [req.params.id]);
     if (!r.affectedRows) return notFound(res);
+    if (before) scheduleCleanup([...imageFields.map((f) => before[f]), ...textImageFields.flatMap((f) => extractCloudUrls(before[f]))]);
     res.json({ success: true, message: 'Berhasil dihapus' });
   },
 });

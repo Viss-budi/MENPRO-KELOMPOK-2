@@ -5,11 +5,12 @@ const crypto = require('crypto');
 const { USE_CLOUD } = require('../utils/imageStorage');
 
 // Ekstensi ditentukan SERVER dari tipe yang diizinkan, bukan dari nama file kiriman klien
+// jpg dan jpeg adalah format yang sama (image/jpeg): file .jpg maupun .jpeg diterima, disimpan dengan ekstensi .jpg
 const EXT = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
 
 let storage;
 if (USE_CLOUD) {
-  // Cloudinary: file ditahan di memori (maks 5 MB), tidak ditulis ke disk server
+  // Cloudinary: file ditahan di memori (maks 2 MB), tidak ditulis ke disk server
   storage = multer.memoryStorage();
 } else {
   // Lokal: simpan di folder uploads
@@ -24,6 +25,6 @@ if (USE_CLOUD) {
 
 module.exports = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+  limits: { fileSize: 2 * 1024 * 1024, files: 1 },
   fileFilter: (req, file, cb) => (EXT[file.mimetype] ? cb(null, true) : cb(new Error('INVALID_FILE'))),
 });

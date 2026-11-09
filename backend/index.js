@@ -32,7 +32,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      'img-src': ["'self'", 'data:','blob:', 'https:'],
+      'img-src': ["'self'", 'data:', 'https:'],
     },
   },
 }));
@@ -42,7 +42,7 @@ const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173').spli
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '100kb' }));
 app.use(cookieParser());
-// /uploads hanya menyajikan gambar (jpg, png, webp), tanpa eksekusi skrip
+// /uploads hanya menyajikan gambar (jpg/jpeg, png, webp), tanpa eksekusi skrip
 app.use('/uploads',
   (req, res, next) => (/\.(jpe?g|png|webp)$/i.test(req.path) ? next() : res.status(404).json({ success: false, message: 'Endpoint tidak ditemukan' })),
   express.static(path.join(__dirname, 'uploads'), {
@@ -109,7 +109,7 @@ app.use((err, req, res, next) => {
     return res.status(503).json({ success: false, message: 'Fitur belum siap: struktur database belum diperbarui' });
   }
   if (err.name === 'MulterError' || err.message === 'INVALID_FILE')
-    return res.status(400).json({ success: false, message: 'File harus jpg/png/webp, maks 5MB' });
+    return res.status(400).json({ success: false, message: 'File harus jpg/jpeg/png/webp, maks 2MB' });
 
   console.error(err);
   res.status(500).json({ success: false, message: 'Terjadi kesalahan server' });

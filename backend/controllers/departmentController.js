@@ -4,6 +4,7 @@ const { cleanBody, clamp, escapeLike } = require('../utils/crud');
 const validateDepartment = require('../utils/validators/department');
 const { isPeriod, PERIOD_MSG } = require('../utils/validators/common');
 const { getActivePeriod } = require('../utils/period');
+const { scheduleCleanup } = require('../utils/imageCleanup');
 
 const CREATE_FIELDS = ['period', 'name', 'description', 'logo_url', 'sort_order', 'is_active'];
 const UPDATE_FIELDS = ['name', 'description', 'logo_url', 'sort_order', 'is_active']; // period dan slug tidak bisa diubah
@@ -95,7 +96,7 @@ const create = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const [[row]] = await db.query('SELECT id, period FROM departments WHERE id = ?', [req.params.id]);
+  const [[row]] = await db.query('SELECT id, period, logo_url FROM departments WHERE id = ?', [req.params.id]);
   if (!row) return notFound(res);
 
   const { data, invalid } = cleanBody(req.body, UPDATE_FIELDS);
@@ -116,21 +117,41 @@ const update = async (req, res) => {
     if (dup) return conflict(res, 'Departemen dengan nama itu sudah ada di periode ini');
   }
   await db.query('UPDATE departments SET ? WHERE id = ?', [data, req.params.id]);
+  if ('logo_url' in data && row.logo_url && row.logo_url !== data.logo_url) scheduleCleanup([row.logo_url]); // logo lama
   res.json({ success: true, message: 'Berhasil diperbarui' });
 };
 
+// DELETE /departments/:id            -> ditolak 409 jika masih punya anggota
+// DELETE /departments/:id?with_members=1 -> departemen dan SEMUA anggotanya dihapus dalam satu transaksi
 const remove = async (req, res) => {
-  const [[row]] = await db.query('SELECT id FROM departments WHERE id = ?', [req.params.id]);
+  const withMembers = ['1', 'true'].includes(String(req.query.with_members ?? '').toLowerCase());
+  const [[row]] = await db.query('SELECT id, logo_url FROM departments WHERE id = ?', [req.params.id]);
   if (!row) return notFound(res);
   const [[{ n }]] = await db.query('SELECT COUNT(*) AS n FROM members WHERE department_id = ?', [row.id]);
-  if (n > 0) return conflict(res, HAS_MEMBERS);
+  if (n > 0 && !withMembers) return conflict(res, HAS_MEMBERS);
+
+  let membersDeleted = 0;
+  const urls = [row.logo_url];
+  const conn = await db.getConnection();
   try {
-    await db.query('DELETE FROM departments WHERE id = ?', [row.id]);
+    await conn.beginTransaction();
+    if (n > 0) {
+      const [photos] = await conn.query('SELECT photo_url FROM members WHERE department_id = ?', [row.id]);
+      const [d] = await conn.query('DELETE FROM members WHERE department_id = ?', [row.id]);
+      membersDeleted = d.affectedRows;
+      urls.push(...photos.map((p) => p.photo_url));
+    }
+    await conn.query('DELETE FROM departments WHERE id = ?', [row.id]);
+    await conn.commit();
   } catch (err) {
+    await conn.rollback();
     if (err.errno === 1451) return conflict(res, HAS_MEMBERS); // ada anggota baru masuk di antara dua query
     throw err;
+  } finally {
+    conn.release();
   }
-  res.json({ success: true, message: 'Berhasil dihapus' });
+  scheduleCleanup(urls); // logo dan foto anggota dihapus dari Cloudinary (jika tidak dipakai baris lain)
+  res.json({ success: true, message: 'Berhasil dihapus', data: { members_deleted: membersDeleted } });
 };
 
 module.exports = { getBySlug, listAll, getById, create, update, remove };

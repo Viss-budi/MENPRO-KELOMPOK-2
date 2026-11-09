@@ -12,6 +12,8 @@ const crud = makeCrud({
   slugFrom: 'title',
   slugMax: 100,
   ownerField: 'author_id',
+  imageFields: ['cover_url'],
+  textImageFields: ['content'], // gambar yang disisipkan di isi (Markdown)
   validate: validateNews,
   searchFields: ['title', 'excerpt'],
   filterFields: ['category', 'is_published'],

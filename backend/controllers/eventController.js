@@ -11,6 +11,7 @@ const crud = makeCrud({
   required: ['title', 'start_at'],
   slugFrom: 'title',
   ownerField: 'created_by',
+  imageFields: ['thumbnail_url'],
   searchFields: ['title', 'location'],
   filterFields: ['category', 'is_published', 'is_featured'],
 });
