@@ -11,8 +11,9 @@ const BASE_URL = (import.meta.env.VITE_API_URL || '/api/v1').replace(/\/$/, '')
 // - POST/PUT/DELETE wajib header X-Requested-With (kontrak 1.1 dan 7.1).
 // - admin: true = endpoint dashboard; 401 berarti sesi habis -> kirim SESI_BERAKHIR_EVENT.
 // - Publik: 503 berarti pemeliharaan -> kirim MAINTENANCE_EVENT.
+// - senyap: true = jangan kirim MAINTENANCE_EVENT (untuk fitur kecil seperti form kontak; errornya ditangani pemanggil).
 // - body berupa FormData (upload) dikirim apa adanya; Content-Type diatur browser (kontrak 7.1).
-async function request(method, path, { body, signal, admin = false } = {}) {
+async function request(method, path, { body, signal, admin = false, senyap = false } = {}) {
   const headers = {}
   const isForm = typeof FormData !== 'undefined' && body instanceof FormData
   if (method !== 'GET') headers['X-Requested-With'] = 'himafor'
@@ -27,7 +28,7 @@ async function request(method, path, { body, signal, admin = false } = {}) {
   })
   const json = await res.json().catch(() => ({}))
 
-  if (res.status === 503 && !admin) {
+  if (res.status === 503 && !admin && !senyap) {
     window.dispatchEvent(
       new CustomEvent(MAINTENANCE_EVENT, { detail: { estimatedEnd: json.estimated_end ?? null } })
     )
@@ -180,6 +181,23 @@ export const getEventsByDate = (date, signal) => get(`/events?date=${date}`, sig
 export const getCalendar = (year, month, signal) => get(`/calendar?year=${year}&month=${month}`, signal)
 export const getNews = (perPage = 3, signal) => get(`/news?per_page=${perPage}`, signal)
 export const getSettings = (signal) => get('/settings', signal)
+
+// Bahan pencarian di navbar. Kontrak belum punya endpoint pencarian, jadi data diambil
+// sekali lalu disaring di browser (maks 50 per jenis, batas limit dan per_page di kontrak 2.1 dan 2.4).
+export const getAllEvents = (signal) => get('/events?limit=50', signal)
+export const getAllNews = (signal) => get('/news?per_page=50', signal)
+
+// Form Hubungi Kami. POST /contact masih RENCANA di kontrak (bagian 10.2), backend belum ada.
+// Isi body (name, email, subject, message) adalah usulan frontend; sesuaikan bila kontraknya sudah final.
+// Selama backend belum siap, isi VITE_CONTACT_MOCK=1 di .env.local untuk mensimulasikan pengiriman berhasil.
+export async function kirimPesan(body, signal) {
+  if (import.meta.env.VITE_CONTACT_MOCK === '1') {
+    await new Promise((resolve) => setTimeout(resolve, 900))
+    return { id: 0 }
+  }
+  const json = await request('POST', '/contact', { body, signal, senyap: true })
+  return json.data
+}
 // GET /structure?period= -> { period, inti: [{ group, members }], departments }
 // Tanpa period = periode aktif. Hanya pengurus is_active=1 (publik).
 export const getStructure = (period, signal) =>

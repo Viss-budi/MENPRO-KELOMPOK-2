@@ -101,8 +101,36 @@
   white-space: nowrap;
 }
 
-.primaryBtn:hover {
-  background-color: var(--color-primary-dark) !important;
+/* Animasi hover: isian putih menyapu masuk dari kiri, teks dan ikon jadi biru;
+   saat kursor pergi, putih surut ke kiri. Sama dengan tombol biru lain (Tambah Berita, Lihat Kesempatan). */
+.primaryBtn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1.5px solid var(--color-primary);
+  transition: color 0.3s ease;
+}
+.primaryBtn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background-color: #fff;
+  transform: translateX(-101%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.primaryBtn:hover,
+.primaryBtn:focus-visible {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+}
+.primaryBtn:hover::before,
+.primaryBtn:focus-visible::before { transform: translateX(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryBtn, .primaryBtn::before { transition: none; }
 }
 
 /* Tombol Kedua (Tentang HIMAFOR) - Outline */
