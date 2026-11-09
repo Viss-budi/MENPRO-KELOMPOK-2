@@ -190,6 +190,65 @@
 }
 .btnAksi { padding: 0 18px; }
 
+/* Animasi hover tombol Edit dan Hapus (desain UI/UX: animasi_edithapus).
+   Warna terisi menyapu masuk lewat ::before. Edit dari kiri, Hapus dari kanan;
+   saat kursor pergi, isian surut ke sisi asalnya. Teks dan ikon berubah putih. */
+.btnAksi {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+.btnAksi::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.btnEdit::before { background: var(--color-primary); transform: translateX(-101%); }
+.btnHapus::before { background: #E03238; transform: translateX(101%); }
+
+/* Latar bawaan tombol dasar dipertahankan putih; yang berubah hanya isian ::before. */
+.aksi .btnEdit.btnAksi:hover:not(:disabled),
+.aksi .btnEdit.btnAksi:focus-visible { background: #fff; color: #fff; }
+.aksi .btnHapus.btnAksi:hover:not(:disabled),
+.aksi .btnHapus.btnAksi:focus-visible { background: #fff; color: #fff; }
+.aksi .btnHapus.btnAksi:hover:not(:disabled) { border-color: #E03238; }
+.btnAksi:hover::before,
+.btnAksi:focus-visible::before { transform: translateX(0); }
+
+/* Tombol Tambah Berita (desain UI/UX: btn_tambahberita). Biru saat diam; saat hover isian putih
+   menyapu masuk dari kiri dan teks jadi biru. Saat kursor pergi, putih surut ke kiri. */
+.btnTambah {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: var(--color-primary);
+  transition: color 0.3s ease;
+}
+.btnTambah::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: #fff;
+  transform: translateX(-101%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.btnTambah:hover:not(:disabled),
+.btnTambah:focus-visible { background: var(--color-primary); color: var(--color-primary); }
+.btnTambah:hover::before,
+.btnTambah:focus-visible::before { transform: translateX(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .btnAksi, .btnAksi::before, .btnTambah, .btnTambah::before { transition: none; }
+}
+
 /* ── Keadaan kosong ────────────────────────────────────── */
 div.kosong { padding: 80px 24px; gap: 10px; }
 .kosongHalo {

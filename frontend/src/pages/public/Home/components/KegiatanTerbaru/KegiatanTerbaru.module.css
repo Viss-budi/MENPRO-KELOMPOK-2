@@ -119,6 +119,46 @@
   color: var(--color-primary-dark);
 }
 
+/* Animasi hover kartu kegiatan (desain UI/UX: animasi_landingpage).
+   Isian biru naik dari bawah memenuhi bagian teks kartu; saat kursor pergi, biru turun kembali.
+   Judul, meta, tautan jadi putih; label kategori jadi biru muda supaya tetap terbaca. */
+.cardContent {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.cardContent::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--color-primary);
+  transform: translateY(101%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.cardTitle,
+.metaItem,
+.detailLink,
+.tag {
+  transition: color 0.35s ease, background-color 0.35s ease;
+}
+.card:hover .cardContent::before,
+.card:focus-within .cardContent::before {
+  transform: translateY(0);
+}
+.card:hover .cardTitle,
+.card:focus-within .cardTitle,
+.card:hover .detailLink,
+.card:focus-within .detailLink { color: #fff; }
+.card:hover .metaItem,
+.card:focus-within .metaItem { color: rgba(255, 255, 255, 0.92); }
+.card:hover .tag,
+.card:focus-within .tag {
+  background-color: var(--color-surface-badge);
+  color: var(--color-primary);
+}
+
 /* Calendar Widget */
 .calendarWidget {
   background-color: var(--color-surface-panel);
@@ -297,8 +337,35 @@
   min-height: 44px;
   transition: background-color 0.15s ease;
 }
-.ctaButton:hover {
-  background-color: var(--color-primary-dark);
+/* Animasi hover tombol Lihat Kesempatan: isian putih menyapu masuk dari kiri, teks jadi biru;
+   saat kursor pergi, putih surut ke kiri dan biru muncul lagi dari kanan. */
+.ctaButton {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1.5px solid var(--color-primary);
+  transition: color 0.3s ease;
+}
+.ctaButton::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background-color: #fff;
+  transform: translateX(-101%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+.ctaButton:hover,
+.ctaButton:focus-visible { color: var(--color-primary); }
+.ctaButton:hover::before,
+.ctaButton:focus-visible::before { transform: translateX(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cardContent::before,
+  .cardTitle, .metaItem, .detailLink, .tag,
+  .ctaButton, .ctaButton::before { transition: none; }
 }
 .ctaBenefits {
   flex: 1;
