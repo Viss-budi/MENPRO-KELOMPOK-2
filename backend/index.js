@@ -9,7 +9,7 @@ const csrfGuard = require('./middleware/csrf');
 const db = require('./config/db');
 const schema = require('./utils/schema');
 
-const VERSION = '1.3.0-sprint3'; // naikkan setiap rilis; dipakai untuk memastikan backend yang jalan adalah versi terbaru
+const VERSION = '1.4.0-sprint4'; // naikkan setiap rilis; dipakai untuk memastikan backend yang jalan adalah versi terbaru
 
 if (!process.env.JWT_SECRET) {
   console.error('JWT_SECRET belum diisi di .env');
