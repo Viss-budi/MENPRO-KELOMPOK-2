@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { CircleAlert, Plus, RefreshCw, Users } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { CircleAlert, Plus, RefreshCw, SearchX, Users } from 'lucide-react'
+import AlatTabel, { ChipFilterAktif } from '../../../components/admin/AlatTabel/AlatTabel'
 import AvatarPengurus from '../../../components/common/AvatarPengurus/AvatarPengurus'
 import { useApi } from '../../../hooks/useApi'
 import { getAdminStruktur } from '../../../services/api'
@@ -7,7 +8,7 @@ import { resolveImage } from '../../../utils/image'
 import { klikBiasa } from '../../../utils/nav'
 import { pesanGagal } from '../../../utils/pesanGagal'
 import { PATH_TAMBAH_PENGURUS } from './rute'
-import { NAMA_BELUM_DIISI } from './strukturUtils'
+import { NAMA_BELUM_DIISI, opsiDepartment, saringPengurus } from './strukturUtils'
 import base from '../Berita/Berita.module.css'
 import styles from './StrukturDaftar.module.css'
 
@@ -29,12 +30,46 @@ function LabelDepartment({ item }) {
 // onNavigate : (path) => void
 function StrukturDaftar({ baruId, onNavigate }) {
   const [muatUlang, setMuatUlang] = useState(0)
+  const [kata, setKata] = useState('')
+  const [department, setDepartment] = useState('')
 
   const { data, loading, error } = useApi((signal) => getAdminStruktur(signal), `struktur-${muatUlang}`)
 
-  const items = data?.items ?? []
-  const kosong = !loading && !error && items.length === 0
+  const semua = useMemo(() => data?.items ?? [], [data])
+  const items = useMemo(() => saringPengurus(semua, { q: kata, department }), [semua, kata, department])
+  const grupFilter = useMemo(
+    () => [{ key: 'department', label: 'Department', opsi: opsiDepartment(semua) }],
+    [semua]
+  )
+  const nilaiFilter = { department }
+  const disaring = kata.trim() !== '' || department !== ''
+
+  const kosong = !loading && !error && semua.length === 0
   const adaData = !loading && !error && items.length > 0
+  const tidakCocok = !loading && !error && semua.length > 0 && items.length === 0
+  const alatSiap = !loading && !error && semua.length > 0
+
+  function ubahFilter(key, nilai) {
+    if (key === 'department') setDepartment(nilai)
+  }
+  function resetSemua() {
+    setKata('')
+    setDepartment('')
+  }
+
+  const alat = (variant) => (
+    <AlatTabel
+      variant={variant}
+      label="pengurus"
+      placeholder="Cari nama atau jabatan..."
+      query={kata}
+      onQuery={setKata}
+      grup={grupFilter}
+      nilai={nilaiFilter}
+      onUbah={ubahFilter}
+      onReset={() => setDepartment('')}
+    />
+  )
 
   function ke(e, path) {
     if (!klikBiasa(e)) return
@@ -98,9 +133,23 @@ function StrukturDaftar({ baruId, onNavigate }) {
 
       {!error && !kosong && (
         <>
-          <p className={styles.meta} role="status" aria-live="polite">
-            {loading ? <span className={`${base.skel} ${styles.skelMeta}`} aria-label="Memuat data" /> : `Menampilkan ${items.length} pengurus`}
-          </p>
+          <div className={styles.metaBar}>
+            <p className={styles.meta} role="status" aria-live="polite">
+              {loading ? (
+                <span className={`${base.skel} ${styles.skelMeta}`} aria-label="Memuat data" />
+              ) : disaring ? (
+                `Menampilkan ${items.length} dari ${semua.length} pengurus`
+              ) : (
+                `Menampilkan ${semua.length} pengurus`
+              )}
+            </p>
+            {alatSiap && <div className={styles.alatHp}>{alat('bar')}</div>}
+          </div>
+          {alatSiap && (
+            <div className={styles.chipBaris}>
+              <ChipFilterAktif grup={grupFilter} nilai={nilaiFilter} onUbah={ubahFilter} onReset={() => setDepartment('')} />
+            </div>
+          )}
 
           <div className={styles.card} aria-busy={loading}>
             <table className={styles.table}>
@@ -114,7 +163,10 @@ function StrukturDaftar({ baruId, onNavigate }) {
                 <tr>
                   <th scope="col">Pengurus</th>
                   <th scope="col">Jabatan</th>
-                  <th scope="col">Department</th>
+                  <th scope="col" className={styles.thAlat}>
+                    <span className={styles.thLabel}>Department</span>
+                    {alatSiap && alat('header')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -134,6 +186,28 @@ function StrukturDaftar({ baruId, onNavigate }) {
                       <td data-label="Department"><span className={`${base.skel} ${styles.skelBadge}`} /></td>
                     </tr>
                   ))}
+
+                {tidakCocok && (
+                  <tr className={styles.barisKosong}>
+                    <td colSpan={3}>
+                      <div className={styles.tidakCocok} role="status">
+                        <span className={styles.tidakCocokIkon} aria-hidden="true">
+                          <SearchX size={26} strokeWidth={1.8} />
+                        </span>
+                        <p className={styles.tidakCocokJudul}>Tidak ada pengurus yang cocok</p>
+                        <p className={styles.tidakCocokTeks}>
+                          {kata.trim()
+                            ? `Tidak ada hasil untuk "${kata.trim()}"${department ? ' dengan filter yang dipilih' : ''}.`
+                            : 'Tidak ada pengurus pada filter yang dipilih.'}{' '}
+                          Coba kata lain atau atur ulang pencarian.
+                        </p>
+                        <button type="button" className={`${base.btn} ${base.outline} ${base.sm}`} onClick={resetSemua}>
+                          Reset pencarian
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
 
                 {adaData &&
                   items.map((item) => (

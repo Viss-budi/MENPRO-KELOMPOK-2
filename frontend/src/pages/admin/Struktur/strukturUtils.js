@@ -47,3 +47,52 @@ export function formatUkuran(bytes) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1).replace('.', ',')} MB`
 }
+
+// ── Pencarian dan filter daftar pengurus (dilakukan di browser; daftar admin memuat semua pengurus periode aktif) ──
+
+// Huruf kecil tanpa tanda aksen dan tanda baca pembuka, supaya "Arif" cocok dengan "‘Arif" dan "Rifa'ah" dengan "rifaah".
+export function normalisasiKata(teks) {
+  return String(teks ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[\u2018\u2019\u02bc'`"]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+export const FILTER_INTI = 'inti'
+
+// Nilai filter Department untuk satu pengurus: 'inti' (tanpa departemen) atau id departemen.
+export function nilaiDepartment(item) {
+  return item.department_id ? String(item.department_id) : FILTER_INTI
+}
+
+// Teks label kolom Department, juga dipakai sebagai bahan pencarian.
+export function labelDepartment(item) {
+  return item.department_id ? `Department ${item.department_name || ''}`.trim() : 'Pengurus Inti'
+}
+
+// Pilihan filter Department dari data yang ada: Semua, Pengurus Inti (bila ada), lalu tiap departemen.
+export function opsiDepartment(items) {
+  const opsi = [{ value: '', label: 'Semua' }]
+  if (items.some((i) => !i.department_id)) opsi.push({ value: FILTER_INTI, label: 'Pengurus Inti' })
+  const lihat = new Set()
+  for (const i of items) {
+    if (!i.department_id || lihat.has(i.department_id)) continue
+    lihat.add(i.department_id)
+    opsi.push({ value: String(i.department_id), label: i.department_name || `Department ${i.department_id}` })
+  }
+  return opsi
+}
+
+// q: kata pencarian (tiap kata harus ada di nama, jabatan, atau department) ; department: '' | 'inti' | id
+export function saringPengurus(items, { q = '', department = '' } = {}) {
+  const kata = normalisasiKata(q).split(' ').filter(Boolean)
+  return items.filter((item) => {
+    if (department && nilaiDepartment(item) !== department) return false
+    if (kata.length === 0) return true
+    const bahan = normalisasiKata(`${item.name} ${item.position} ${labelDepartment(item)}`)
+    return kata.every((k) => bahan.includes(k))
+  })
+}

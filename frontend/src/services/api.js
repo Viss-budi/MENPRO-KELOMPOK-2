@@ -98,12 +98,18 @@ export async function getAdminSummary(signal) {
 
 // ── Kelola berita (kontrak 5.2 dan 5.4) ──────────────────────────────────────
 // Daftar berpaginasi, termasuk berita yang belum dipublikasikan.
+// Pencarian dan filter dilakukan server (kontrak 5.2.1):
+//   q            -> kata kunci (maks 100 karakter), dicari di judul dan ringkasan
+//   category     -> Berita | Kegiatan | Prestasi | Pengumuman
+//   isPublished  -> 1 (terbit) | 0 (draf)
 // Mengembalikan { items, meta: { page, per_page, total, total_pages } }
-export async function getAdminNews({ page = 1, perPage = 10 } = {}, signal) {
-  const json = await request('GET', `/news/admin/all?page=${page}&per_page=${perPage}`, {
-    signal,
-    admin: true,
-  })
+export async function getAdminNews({ page = 1, perPage = 10, q = '', category = '', isPublished = '' } = {}, signal) {
+  const params = new URLSearchParams({ page: String(page), per_page: String(perPage) })
+  const kata = String(q).trim().slice(0, 100)
+  if (kata) params.set('q', kata)
+  if (category) params.set('category', category)
+  if (isPublished !== '' && isPublished != null) params.set('is_published', String(isPublished))
+  const json = await request('GET', `/news/admin/all?${params}`, { signal, admin: true })
   return { items: json.data ?? [], meta: json.meta ?? {} }
 }
 
@@ -157,6 +163,16 @@ export async function getAdminStruktur(signal) {
   const q = new URLSearchParams({ period: active, per_page: '100' })
   const json = await request('GET', `/members/admin/all?${q}`, { signal, admin: true })
   return { period: active, items: json.data ?? [] }
+}
+
+// Pencarian pengurus untuk kolom "Cari di admin" (kontrak 5.2.1: q dicari di nama, jabatan, nama departemen).
+// Khusus admin. Mengembalikan data[] (maks `batas` pengurus) pada periode aktif.
+export async function cariPengurus(q, batas = 5, signal) {
+  const { active } = await getPeriods(signal)
+  const params = new URLSearchParams({ per_page: String(batas), q: String(q).trim().slice(0, 100) })
+  if (active) params.set('period', active)
+  const json = await request('GET', `/members/admin/all?${params}`, { signal, admin: true })
+  return json.data ?? []
 }
 
 // Departemen aktif pada satu periode, untuk pilihan dropdown di form.

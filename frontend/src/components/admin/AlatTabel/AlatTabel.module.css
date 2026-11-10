@@ -1,0 +1,270 @@
+/* Ikon cari + filter di kepala tabel admin (desain "01 Daftar default"). */
+
+.alat {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  font-family: var(--font-sans);
+}
+
+/* Varian kepala tabel: menempel di sisi kanan sel kepala (sel harus position: relative).
+   Kolom cari melebar ke kiri dan menutupi teks kepala selama dibuka. */
+.header {
+  position: absolute;
+  top: 50%;
+  right: var(--alat-kanan, 20px);
+  transform: translateY(-50%);
+}
+
+/* ── Ikon ─────────────────────────────────────────────── */
+.ikon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.ikon:hover { background: var(--color-surface-icon); color: var(--color-primary); }
+.ikon:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.ikonAktif { color: var(--color-primary); }
+
+.titik {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--color-surface-panel);
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+/* ── Kolom cari yang melebar dari ikon ────────────────── */
+.cari {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 0;
+  height: 36px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--color-deco);
+  opacity: 0;
+  visibility: hidden;
+  transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, padding 0.26s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0s linear 0.26s;
+}
+.cariBuka {
+  width: 260px;
+  padding: 0 6px 0 12px;
+  opacity: 1;
+  visibility: visible;
+  transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, padding 0.26s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0s;
+}
+.cari:focus-within { box-shadow: inset 0 0 0 2px var(--color-primary); }
+
+.cariIkon { display: none; flex: none; color: var(--color-text-muted); }
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--color-heading);
+}
+.input::placeholder { color: var(--color-text-muted); opacity: 1; font-weight: 400; }
+.input::-webkit-search-cancel-button { display: none; }
+
+.hapusKata {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface-panel);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.hapusKata:hover { background: var(--color-surface-icon); color: var(--color-primary); }
+.hapusKata:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+
+/* ── Varian baris alat (HP): kolom cari selebar baris ─── */
+.bar { width: 100%; justify-content: flex-end; }
+.bar .ikon { background: #fff; box-shadow: 0 2px 8px rgba(var(--color-shadow), 0.08); }
+.bar .ikon:hover { background: var(--color-surface-icon); }
+.bar .cari { background: #fff; }
+.bar .cariBuka { flex: 1; width: auto; }
+.bar .cariIkon { display: block; }
+
+/* ── Panel filter ─────────────────────────────────────── */
+.panel {
+  position: fixed;
+  z-index: 1000;
+  width: min(320px, calc(100vw - 24px));
+  padding: 16px 16px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(var(--color-shadow), 0.16);
+  font-family: var(--font-sans);
+  transform-origin: top right;
+  animation: panelMasuk 0.16s ease-out;
+}
+@keyframes panelMasuk {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.grup { margin: 0 0 14px; padding: 0; border: 0; min-width: 0; }
+.grupJudul {
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.opsi { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  height: 32px;
+  padding: 0 14px;
+  overflow: hidden;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.chip:hover { border-color: var(--color-deco); background: var(--color-surface-panel); }
+.chip:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.chipAktif,
+.chipAktif:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.kaki {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+.reset {
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+.reset:hover:not(:disabled) { text-decoration: underline; }
+.reset:disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+.reset:focus-visible,
+.selesai:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: 6px; }
+.selesai {
+  height: 34px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+.selesai:hover { background: var(--color-primary-dark); }
+
+/* ── Chip filter aktif ────────────────────────────────── */
+.chipDaftar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chipAktifLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 6px 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  font-size: 12.5px;
+  color: var(--color-primary);
+}
+.chipAktifLabel strong { font-weight: 700; }
+.chipLepas {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+.chipLepas:hover { background: rgba(26, 92, 176, 0.15); }
+.chipLepas:focus-visible { outline: 2px solid var(--color-primary); }
+.resetTeks {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+.resetTeks:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+  .cariBuka { width: 200px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cari, .cariBuka, .panel, .ikon, .chip { transition: none; animation: none; }
+}

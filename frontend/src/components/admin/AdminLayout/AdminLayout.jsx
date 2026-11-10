@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Bell, ChevronDown, LogOut, Menu as MenuIcon, Search, User, X } from 'lucide-react'
+import { LogOut, Menu as MenuIcon, User, X } from 'lucide-react'
 import logo from '../../../assets/images/logo-himafor.webp'
 import { GRUP_MENU, MENU, bolehAkses, cariMenu } from './menu'
+import CariAdmin from './CariAdmin'
+import { Akun, Notifikasi } from './TopbarMenu'
 import styles from './AdminLayout.module.css'
 
 const NAMA_ROLE = { admin: 'Administrator', editor: 'Editor' }
@@ -17,7 +19,9 @@ function klikBiasa(e) {
 //               Bila tidak diisi dianggap sama dengan activePath.
 // subLabel    : nama sub-halaman untuk breadcrumb ("Tambah Berita"), opsional
 // onNavigate  : (path) => void ; onLogout : () => void
-function AdminLayout({ user, activePath, currentPath, subLabel, onNavigate, onLogout, children }) {
+// notifikasi  : [{ id, judul, pesan, waktu, path, dibaca }] untuk lonceng (kontrak belum punya endpoint, default kosong)
+// pesanBaru   : jumlah Pesan Masuk belum dibaca untuk lencana di menu (0 = lencana tidak tampil)
+function AdminLayout({ user, activePath, currentPath, subLabel, onNavigate, onLogout, notifikasi = [], pesanBaru = 0, children }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const aktif = cariMenu(activePath)
   const role = user?.role
@@ -48,6 +52,12 @@ function AdminLayout({ user, activePath, currentPath, subLabel, onNavigate, onLo
   function pergi(e, path) {
     if (!klikBiasa(e)) return
     e.preventDefault()
+    setDrawerOpen(false)
+    if (path !== lokasiSaatIni) onNavigate(path)
+  }
+
+  // Berpindah dari bilah atas (hasil pencarian, notifikasi): sama seperti klik menu, tanpa menumpuk riwayat.
+  function keHalaman(path) {
     setDrawerOpen(false)
     if (path !== lokasiSaatIni) onNavigate(path)
   }
@@ -100,6 +110,11 @@ function AdminLayout({ user, activePath, currentPath, subLabel, onNavigate, onLo
                         >
                           <Icon size={20} strokeWidth={1.8} aria-hidden="true" />
                           <span>{item.label}</span>
+                          {item.key === 'pesan' && pesanBaru > 0 && (
+                            <span className={styles.badge} aria-label={`${pesanBaru} pesan belum dibaca`}>
+                              {pesanBaru > 99 ? '99+' : pesanBaru}
+                            </span>
+                          )}
                         </a>
                       </li>
                     )
@@ -163,21 +178,9 @@ function AdminLayout({ user, activePath, currentPath, subLabel, onNavigate, onLo
           </nav>
 
           <div className={styles.tools}>
-            {/* Pencarian, notifikasi, dan menu akun ada di desain tetapi belum punya endpoint di kontrak v1.1 */}
-            <label className={styles.search}>
-              <Search size={16} strokeWidth={2} aria-hidden="true" />
-              <input type="search" placeholder="Cari di admin..." disabled aria-label="Cari di admin (segera hadir)" />
-            </label>
-            <button type="button" className={styles.bell} disabled aria-label="Notifikasi (segera hadir)">
-              <Bell size={18} strokeWidth={1.9} aria-hidden="true" />
-            </button>
-            <div className={styles.account}>
-              <span className={styles.accountAvatar}>
-                <User size={18} strokeWidth={1.9} aria-hidden="true" />
-              </span>
-              <span className={styles.accountName}>{nama}</span>
-              <ChevronDown className={styles.accountChevron} size={16} strokeWidth={2} aria-hidden="true" />
-            </div>
+            <CariAdmin role={role} onPergi={keHalaman} />
+            <Notifikasi daftar={notifikasi} onPergi={keHalaman} />
+            <Akun nama={nama} email={user?.email} peran={NAMA_ROLE[role]} onLogout={onLogout} />
           </div>
         </header>
 

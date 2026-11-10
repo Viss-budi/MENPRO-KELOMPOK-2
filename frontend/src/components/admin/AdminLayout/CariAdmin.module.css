@@ -1,0 +1,210 @@
+/* Kolom "Cari di admin" di bilah atas + panel hasil (desain: pil 280x40, latar surface-panel). */
+
+.wadah { position: relative; margin-right: 3px; }
+
+.kolom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 280px;
+  height: 40px;
+  padding: 0 14px 0 17px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-panel);
+  color: var(--color-text-muted);
+  transition: box-shadow 0.15s, background-color 0.15s;
+}
+.kolom:focus-within { background: #fff; box-shadow: inset 0 0 0 2px var(--color-primary); }
+.ikonCari { flex: none; }
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--color-text);
+}
+.input::placeholder { color: var(--color-text-muted); opacity: 1; }
+
+.kbd {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid var(--color-deco);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.hapus {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface-icon);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.hapus:hover { color: var(--color-primary); }
+.hapus:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.putar { flex: none; color: var(--color-primary); animation: putar 0.8s linear infinite; }
+@keyframes putar { to { transform: rotate(360deg); } }
+
+.tombolHp {
+  display: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface-panel);
+  color: var(--color-heading);
+  cursor: pointer;
+}
+.tombolHp:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+/* ── Panel hasil ──────────────────────────────────────── */
+.panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 60;
+  width: min(440px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(var(--color-shadow), 0.18);
+  transform-origin: top right;
+  animation: masuk 0.16s ease-out;
+}
+@keyframes masuk {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.daftar { max-height: min(420px, calc(100vh - 160px)); padding: 8px; overflow-y: auto; overscroll-behavior: contain; }
+
+.grup {
+  margin: 0;
+  padding: 10px 10px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.daftar > .grup:first-child { padding-top: 4px; }
+
+.opsi {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.opsiAktif { background: var(--color-surface-panel); }
+.opsiIkon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--color-surface-icon);
+  color: var(--color-primary);
+}
+.opsiTeks { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.opsiJudul {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--color-heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.opsiSub {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.enter { flex: none; color: var(--color-text-muted); }
+.sorot { padding: 0; border-radius: 3px; background: #FFE9A8; color: inherit; }
+
+.info,
+.kosong { margin: 0; padding: 18px 12px; font-size: 13.5px; color: var(--color-text-body); text-align: center; }
+.kosong { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--color-text-muted); }
+.kosong p { margin: 0; overflow-wrap: anywhere; }
+
+.kaki {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 10px 18px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-hero);
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+}
+.kaki kbd {
+  display: inline-block;
+  min-width: 18px;
+  margin-right: 3px;
+  padding: 1px 5px;
+  border: 1px solid var(--color-deco);
+  border-radius: 5px;
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  text-align: center;
+}
+
+/* ── Layar kecil: ikon saja; saat dibuka, kolom cari turun sebagai baris penuh di bawah bilah atas ── */
+@media (max-width: 900px) {
+  .wadah { margin-right: 0; }
+  .tombolHp { display: grid; }
+  .kolom { display: none; }
+  .hpBuka .kolom {
+    position: fixed;
+    top: 64px;
+    left: 12px;
+    right: 12px;
+    z-index: 61;
+    display: flex;
+    width: auto;
+    background: #fff;
+    box-shadow: 0 0 0 2px var(--color-primary), 0 10px 28px rgba(var(--color-shadow), 0.16);
+  }
+  .hpBuka .panel {
+    position: fixed;
+    top: 112px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    transform-origin: top center;
+  }
+  .kbd { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel, .putar { animation: none; }
+  .kolom { transition: none; }
+}

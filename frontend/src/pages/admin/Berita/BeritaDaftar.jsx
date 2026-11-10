@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowDownAZ,
   ArrowUpAZ,
@@ -14,10 +14,13 @@ import {
   Pencil,
   Plus,
   RefreshCw,
+  SearchX,
   Trash2,
 } from 'lucide-react'
+import AlatTabel, { ChipFilterAktif } from '../../../components/admin/AlatTabel/AlatTabel'
 import ConfirmDialog from '../../../components/admin/ConfirmDialog/ConfirmDialog'
 import { useApi } from '../../../hooks/useApi'
+import { useDebounce } from '../../../hooks/useDebounce'
 import { deleteNews, getAdminNews } from '../../../services/api'
 import { formatTanggalSingkat } from '../../../utils/format'
 import { resolveImage } from '../../../utils/image'
@@ -29,6 +32,30 @@ import styles from './BeritaDaftar.module.css'
 
 const PER_HALAMAN = 10
 const BARIS_SKELETON = [0, 1, 2, 3, 4]
+
+// Filter daftar (kontrak 5.2.1: category dan is_published dicocokkan persis oleh server)
+const GRUP_FILTER = [
+  {
+    key: 'kategori',
+    label: 'Kategori',
+    opsi: [
+      { value: '', label: 'Semua' },
+      { value: 'Berita', label: 'Berita' },
+      { value: 'Kegiatan', label: 'Kegiatan' },
+      { value: 'Prestasi', label: 'Prestasi' },
+      { value: 'Pengumuman', label: 'Pengumuman' },
+    ],
+  },
+  {
+    key: 'status',
+    label: 'Status',
+    opsi: [
+      { value: '', label: 'Semua' },
+      { value: '1', label: 'Terbit' },
+      { value: '0', label: 'Draf' },
+    ],
+  },
+]
 
 // Opsi urutan
 const OPSI_URUT = [
@@ -70,8 +97,9 @@ function Thumb({ src }) {
 }
 
 // page / onPage : halaman daftar disimpan di induk supaya tidak hilang saat pindah ke form
+// saring / onSaring : { q, kategori, status } disimpan di induk juga; onSaring(patch) sekaligus kembali ke halaman 1
 // onNavigate    : (path) => void ; onSukses : ({ judul, pesan }) => void (menampilkan toast)
-function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
+function BeritaDaftar({ page, onPage, saring, onSaring, onNavigate, onSukses }) {
   const [muatUlang, setMuatUlang] = useState(0)
   const [target, setTarget] = useState(null) // berita yang akan dihapus (membuka dialog)
   const [menghapus, setMenghapus] = useState(false)
@@ -81,9 +109,14 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
   const dropdownRef = useRef(null)
 
   // Setiap daftar dibuka (termasuk setelah tambah/ubah) dan setiap halaman/muatUlang berubah, data diambil ulang.
+  // Kolom cari menampilkan ketikan langsung; permintaan ke server menunggu jeda mengetik.
+  const kata = useDebounce(saring.q, 350).trim()
+  const { kategori, status } = saring
+  const adaSaringan = kata !== '' || kategori !== '' || status !== ''
+
   const { data, loading, error } = useApi(
-    (signal) => getAdminNews({ page, perPage: PER_HALAMAN }, signal),
-    `berita-${page}-${muatUlang}`
+    (signal) => getAdminNews({ page, perPage: PER_HALAMAN, q: kata, category: kategori, isPublished: status }, signal),
+    `berita-${page}-${muatUlang}-${kata}-${kategori}-${status}`
   )
 
   const rawItems = data?.items ?? []
@@ -164,8 +197,12 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
     setDropdownTerbuka(false)
   }
 
-  const kosong = !loading && !error && total === 0 && items.length === 0 && page === 1
+  const kosong = !loading && !error && total === 0 && items.length === 0 && page === 1 && !adaSaringan
+  const tidakCocok = !loading && !error && total === 0 && items.length === 0 && adaSaringan
   const adaData = !loading && !error && items.length > 0
+  const nilaiFilter = useMemo(() => ({ kategori, status }), [kategori, status])
+  const resetFilter = () => onSaring({ kategori: '', status: '' })
+  const resetSemua = () => onSaring({ q: '', kategori: '', status: '' })
 
   const opsiAktif = OPSI_URUT.find((o) => o.key === urutan) ?? OPSI_URUT[0]
 
@@ -228,7 +265,9 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
             <p className={styles.meta} role="status" aria-live="polite">
               {loading
                 ? 'Memuat berita...'
-                : total > rawItems.length
+                : adaSaringan
+                  ? `Menampilkan ${rawItems.length} dari ${total} hasil`
+                  : total > rawItems.length
                   ? `Menampilkan ${rawItems.length} dari ${total} berita`
                   : `Menampilkan ${rawItems.length} berita`}
             </p>
@@ -273,6 +312,15 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
             </div>
           </div>
 
+          <div className={styles.chipBaris}>
+            <ChipFilterAktif
+              grup={GRUP_FILTER}
+              nilai={nilaiFilter}
+              onUbah={(key, nilai) => onSaring({ [key]: nilai })}
+              onReset={resetFilter}
+            />
+          </div>
+
           <div className={styles.card} aria-busy={loading}>
             <table className={styles.table}>
               <caption className={base.srOnly}>Daftar berita</caption>
@@ -287,7 +335,20 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
                   <th scope="col"><span className={base.srOnly}>Gambar</span></th>
                   <th scope="col">Judul Berita</th>
                   <th scope="col" className={styles.kolTanggal}>Tanggal</th>
-                  <th scope="col">Aksi</th>
+                  <th scope="col" className={styles.thAlat}>
+                    <span className={styles.thLabel}>Aksi</span>
+                    <AlatTabel
+                      variant="header"
+                      label="berita"
+                      placeholder="Cari judul berita..."
+                      query={saring.q}
+                      onQuery={(q) => onSaring({ q })}
+                      grup={GRUP_FILTER}
+                      nilai={nilaiFilter}
+                      onUbah={(key, nilai) => onSaring({ [key]: nilai })}
+                      onReset={resetFilter}
+                    />
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -300,6 +361,26 @@ function BeritaDaftar({ page, onPage, onNavigate, onSukses }) {
                       <td><span className={`${base.skel} ${styles.skelAksi}`} /></td>
                     </tr>
                   ))}
+
+                {tidakCocok && (
+                  <tr className={styles.barisKosong}>
+                    <td colSpan={4}>
+                      <div className={styles.tidakCocok} role="status">
+                        <span className={styles.tidakCocokIkon} aria-hidden="true">
+                          <SearchX size={26} strokeWidth={1.8} />
+                        </span>
+                        <p className={styles.tidakCocokJudul}>Tidak ada berita yang cocok</p>
+                        <p className={styles.tidakCocokTeks}>
+                          {kata ? `Tidak ada hasil untuk "${kata}".` : 'Tidak ada berita pada filter yang dipilih.'} Coba
+                          kata lain atau atur ulang pencarian.
+                        </p>
+                        <button type="button" className={`${base.btn} ${base.outline} ${base.sm}`} onClick={resetSemua}>
+                          Reset pencarian
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
 
                 {adaData &&
                   items.map((item) => {

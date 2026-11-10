@@ -13,6 +13,14 @@ function KelolaBerita({ pathname, onNavigate }) {
   const rute = bacaRuteBerita(pathname) ?? { mode: 'daftar' }
   const [toast, setToast] = useState(null)
   const [halaman, setHalaman] = useState(1)
+  // Kata pencarian dan filter daftar ikut disimpan di sini, supaya tidak hilang saat pindah ke form lalu kembali.
+  const [saring, setSaring] = useState({ q: '', kategori: '', status: '' })
+
+  // Setiap perubahan kata/filter kembali ke halaman 1 (hasil baru bisa lebih sedikit dari halaman sekarang).
+  const ubahSaring = useCallback((patch) => {
+    setSaring((s) => ({ ...s, ...patch }))
+    setHalaman(1)
+  }, [])
 
   const tampilkanToast = useCallback((isi) => setToast({ ...isi, id: Date.now() }), [])
   const tutupToast = useCallback(() => setToast(null), [])
@@ -48,6 +56,8 @@ function KelolaBerita({ pathname, onNavigate }) {
         <BeritaDaftar
           page={halaman}
           onPage={setHalaman}
+          saring={saring}
+          onSaring={ubahSaring}
           onNavigate={keluarDaftar}
           onSukses={tampilkanToast}
         />
