@@ -6,7 +6,7 @@ workspace:
 
 cloudResources:
   collections:
-    ../postman/collections/HIMAFOR API v1.5 (Sprint 4): c7215ef3-9896-419d-a171-18cf1baeeabf
+    ../postman/collections/HIMAFOR API v1.4 (Sprint 4): 16f5002d-70e5-4213-851b-b3e49d047891
 
 # All resources in the `postman/` folder are automatically registered in Local View.
 # Point to additional files outside the `postman/` folder to register them individually. Example:
