@@ -8,7 +8,7 @@ module.exports = function validateDepartment(data) {
 
   if (has('name')) {
     if (typeof data.name !== 'string') add('name', 'Nama departemen harus berupa teks');
-    else if (data.name.length > 150) add('name', 'Nama departemen maksimal 150 karakter');
+    else if (data.name.length > 75) add('name', 'Nama departemen maksimal 75 karakter');
   }
   if (has('description') && data.description !== null) {
     if (typeof data.description !== 'string') add('description', 'Deskripsi harus berupa teks');

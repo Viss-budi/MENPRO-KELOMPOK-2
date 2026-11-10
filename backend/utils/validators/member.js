@@ -11,7 +11,7 @@ module.exports = function validateMember(data) {
     else if (data[f].length > max) add(f, `${label} maksimal ${max} karakter`);
   };
 
-  text('name', 'Nama', 100);
+  text('name', 'Nama', 75);
   text('position', 'Jabatan', 100);
   text('group_name', 'group_name', 50, true);
   if (has('photo_url') && data.photo_url !== null) {
