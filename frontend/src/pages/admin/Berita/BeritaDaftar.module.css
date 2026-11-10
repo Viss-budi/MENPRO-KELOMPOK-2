@@ -130,6 +130,37 @@
 }
 .table th:first-child { padding-left: 30px; }
 
+/* Ikon cari + filter menempel di sisi kanan kepala tabel (desain "01 Daftar default") */
+.thAlat { position: relative; --alat-kanan: 14px; }
+.thLabel { transition: opacity 0.2s ease; }
+.thAlat:has([data-cari-buka]) .thLabel { opacity: 0; }
+.chipBaris { margin: 0 0 14px; }
+.chipBaris:empty { display: none; }
+
+/* Hasil pencarian kosong */
+.table tbody tr.barisKosong:hover { background: transparent; }
+.table tbody tr.barisKosong td { height: auto; padding: 56px 24px; border-bottom: 0; }
+.tidakCocok { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.tidakCocokIkon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: var(--color-surface-icon);
+  color: var(--color-primary);
+}
+.tidakCocokJudul { margin: 0; font-size: 18px; font-weight: 700; line-height: 26px; color: var(--color-heading); }
+.tidakCocokTeks {
+  max-width: 400px;
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--color-text-body);
+  overflow-wrap: anywhere;
+}
+
 .table td {
   height: 69px;
   padding: 0;

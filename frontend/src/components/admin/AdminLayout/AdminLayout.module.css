@@ -145,6 +145,22 @@
   font-weight: 700;
   color: #fff;
 }
+/* Lencana jumlah Pesan Masuk */
+.badge {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  margin-left: auto;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+
 .itemActive::before {
   content: '';
   position: absolute;
@@ -295,73 +311,6 @@
   margin-left: auto;
 }
 
-.search {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 280px;
-  height: 40px;
-  margin-right: 3px;
-  padding: 0 24px 0 17px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface-panel);
-  color: var(--color-text-muted);
-}
-.search svg { flex: none; }
-.search input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  font: inherit;
-  font-size: 13px;
-  color: var(--color-text);
-}
-.search input::placeholder { color: var(--color-text-muted); opacity: 1; }
-.search input:disabled { cursor: not-allowed; }
-
-.bell {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--color-surface-panel);
-  color: var(--color-heading);
-}
-.bell:disabled { cursor: not-allowed; }
-
-.account {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-.accountAvatar {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #D1E2F6;
-  color: var(--color-primary);
-}
-.accountName {
-  max-width: 180px;
-  overflow: hidden;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-heading);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.accountChevron { flex: none; margin-left: 10px; color: var(--color-text-muted); }
-
 .main {
   padding: 32px 40px 48px;
   outline: none;
@@ -387,15 +336,9 @@
   .main { padding: 24px 20px 40px; }
 }
 
-@media (max-width: 900px) {
-  .search { display: none; }
-}
-
 @media (max-width: 640px) {
   .crumbRoot,
   .crumbSep { display: none; }
-  .accountName,
-  .accountChevron { display: none; }
   .tools { gap: 10px; }
 }
 

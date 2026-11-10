@@ -1,10 +1,25 @@
 /* Daftar pengurus: desain 01 sampai 04 dan 12. */
 
+.metaBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 26px 0 24px;
+}
+.metaBar:has(+ .chipBaris:not(:empty)) { margin-bottom: 12px; }
+.chipBaris { margin: 0 0 20px; }
+.chipBaris:empty { display: none; }
+
+/* Alat cari/filter versi HP: hanya tampil saat kepala tabel disembunyikan (<=640px) */
+.alatHp { display: none; }
+
 .meta {
   display: flex;
   align-items: center;
   min-height: 20px;
-  margin: 26px 0 24px;
+  margin: 0;
   font-size: 14px;
   line-height: 20px;
   color: var(--color-text-muted);
@@ -37,6 +52,11 @@
   text-align: left;
   color: var(--color-text);
 }
+/* Ikon cari + filter menempel di sisi kanan kepala tabel (desain 01) */
+.thAlat { position: relative; --alat-kanan: 22px; }
+/* Selama kolom cari terbuka, teks kepala yang tertutup ikut memudar agar tidak terpotong */
+.thLabel { transition: opacity 0.2s ease; }
+.thAlat:has([data-cari-buka]) .thLabel { opacity: 0; }
 .table th:first-child,
 .table td:first-child { padding-left: 32px; }
 .table th:last-child,
@@ -130,6 +150,35 @@ div.kosong {
   color: var(--color-primary);
 }
 
+/* ── Hasil pencarian kosong ─────────────────────────────── */
+.table tbody tr.barisKosong td { height: auto; padding: 56px 24px; border-bottom: 0; }
+.tidakCocok {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.tidakCocokIkon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: var(--color-surface-icon);
+  color: var(--color-primary);
+}
+.tidakCocokJudul { margin: 0; font-size: 18px; font-weight: 700; line-height: 26px; color: var(--color-heading); }
+.tidakCocokTeks {
+  max-width: 400px;
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--color-text-body);
+  overflow-wrap: anywhere;
+}
+
 /* ── Kerangka saat memuat (desain 03) ───────────────────── */
 .skelMeta { width: 180px; height: 12px; border-radius: 999px; }
 .skelFoto { flex: none; width: 44px; height: 44px; border-radius: 50%; }
@@ -141,7 +190,9 @@ div.kosong {
 
 /* ── Layar kecil: tiap pengurus menjadi satu kartu ──────── */
 @media (max-width: 640px) {
-  .meta { margin: 20px 0 16px; }
+  .metaBar { margin: 20px 0 16px; }
+  .metaBar:has(+ .chipBaris:not(:empty)) { margin-bottom: 10px; }
+  .alatHp { display: block; flex: 1 1 auto; min-width: 0; }
 
   .card { overflow: visible; background: transparent; box-shadow: none; }
   .table,
@@ -172,6 +223,8 @@ div.kosong {
   .table td:first-child { grid-column: 1 / -1; }
   .barisBaru { background: #ECFDF3; }
   .barisBaru td { background: transparent; }
+  .table tbody tr.barisKosong { display: block; padding: 8px 0; }
+  .table tbody tr.barisKosong td { padding: 32px 16px; }
 
   .selPengurus { padding-right: 0; }
   .selJabatan { padding-right: 0; font-size: 14px; }
