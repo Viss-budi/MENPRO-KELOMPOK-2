@@ -1,15 +1,18 @@
 import { useMemo, useState } from 'react'
-import { CircleAlert, Plus, RefreshCw, SearchX, Users } from 'lucide-react'
+import { CircleAlert, Pencil, Plus, RefreshCw, SearchX, Trash2, Users } from 'lucide-react'
 import AlatTabel, { ChipFilterAktif } from '../../../components/admin/AlatTabel/AlatTabel'
+import ConfirmDialog from '../../../components/admin/ConfirmDialog/ConfirmDialog'
 import AvatarPengurus from '../../../components/common/AvatarPengurus/AvatarPengurus'
 import { useApi } from '../../../hooks/useApi'
-import { getAdminStruktur } from '../../../services/api'
+import { deleteMember, getAdminStruktur } from '../../../services/api'
 import { resolveImage } from '../../../utils/image'
 import { klikBiasa } from '../../../utils/nav'
 import { pesanGagal } from '../../../utils/pesanGagal'
-import { PATH_TAMBAH_PENGURUS } from './rute'
-import { NAMA_BELUM_DIISI, opsiDepartment, saringPengurus } from './strukturUtils'
+import { PATH_TAMBAH_PENGURUS, pathUbahPengurus } from './rute'
+import { NAMA_BELUM_DIISI, labelDepartment, opsiDepartment, saringPengurus } from './strukturUtils'
 import base from '../Berita/Berita.module.css'
+// Gaya tombol Edit/Hapus dan animasi hover-nya dipakai bersama tabel Berita (desain UI/UX: animasi_edithapus)
+import aksi from '../Berita/BeritaDaftar.module.css'
 import styles from './StrukturDaftar.module.css'
 
 const BARIS_SKELETON = [0, 1, 2, 3, 4, 5]
@@ -18,18 +21,21 @@ const BARIS_SKELETON = [0, 1, 2, 3, 4, 5]
 // pengurus departemen berlabel "Department <nama>".
 function LabelDepartment({ item }) {
   if (!item.department_id) return <span className={styles.badge}>Pengurus Inti</span>
-  const nama = item.department_name || '—'
+  const label = item.department_name ? labelDepartment(item) : 'Department —'
   return (
-    <span className={styles.badge} title={`Department ${nama}`}>
-      Department {nama}
+    <span className={styles.badge} title={label}>
+      <span className={styles.badgeTeks}>{label}</span>
     </span>
   )
 }
 
-// baruId     : id pengurus yang baru ditambahkan (barisnya diberi warna hijau muda)
-// onNavigate : (path) => void
-function StrukturDaftar({ baruId, onNavigate }) {
+// baruId     : id pengurus yang baru ditambahkan/diubah (barisnya diberi warna hijau muda)
+// onNavigate : (path) => void ; onSukses : ({ judul, pesan }) => void (menampilkan toast)
+function StrukturDaftar({ baruId, onNavigate, onSukses }) {
   const [muatUlang, setMuatUlang] = useState(0)
+  const [target, setTarget] = useState(null) // pengurus yang akan dihapus (membuka dialog)
+  const [menghapus, setMenghapus] = useState(false)
+  const [errorHapus, setErrorHapus] = useState('')
   const [kata, setKata] = useState('')
   const [department, setDepartment] = useState('')
 
@@ -70,6 +76,42 @@ function StrukturDaftar({ baruId, onNavigate }) {
       onReset={() => setDepartment('')}
     />
   )
+
+  function bukaHapus(item) {
+    setErrorHapus('')
+    setTarget(item)
+  }
+
+  function tutupHapus() {
+    if (menghapus) return
+    setTarget(null)
+    setErrorHapus('')
+  }
+
+  async function konfirmasiHapus() {
+    if (!target || menghapus) return
+    const nama = target.name
+    setMenghapus(true)
+    setErrorHapus('')
+    try {
+      await deleteMember(target.id)
+      setTarget(null)
+      setMuatUlang((n) => n + 1) // daftar diperbarui otomatis
+      onSukses({ judul: 'Pengurus berhasil dihapus', pesan: `"${nama}" sudah dihapus dari daftar.` })
+    } catch (err) {
+      if (err.status === 404) {
+        // Sudah dihapus pihak lain: tujuan pengguna tercapai
+        setTarget(null)
+        setMuatUlang((n) => n + 1)
+        onSukses({ judul: 'Pengurus sudah terhapus', pesan: `"${nama}" sudah dihapus sebelumnya. Daftar diperbarui.` })
+        return
+      }
+      // Dialog tetap terbuka dengan pesan dari server (mis. 409 posisi utama BPH tidak bisa dihapus)
+      setErrorHapus(pesanGagal(err, 'Pengurus gagal dihapus, silakan coba lagi'))
+    } finally {
+      setMenghapus(false)
+    }
+  }
 
   function ke(e, path) {
     if (!klikBiasa(e)) return
@@ -155,16 +197,18 @@ function StrukturDaftar({ baruId, onNavigate }) {
             <table className={styles.table}>
               <caption className={base.srOnly}>Daftar pengurus organisasi</caption>
               <colgroup>
-                <col className={styles.colNama} />
-                <col className={styles.colJabatan} />
                 <col />
+                <col className={styles.colJabatan} />
+                <col className={styles.colDept} />
+                <col className={styles.colAksi} />
               </colgroup>
               <thead>
                 <tr>
                   <th scope="col">Pengurus</th>
                   <th scope="col">Jabatan</th>
+                  <th scope="col">Department</th>
                   <th scope="col" className={styles.thAlat}>
-                    <span className={styles.thLabel}>Department</span>
+                    <span className={base.srOnly}>Aksi</span>
                     {alatSiap && alat('header')}
                   </th>
                 </tr>
@@ -184,12 +228,13 @@ function StrukturDaftar({ baruId, onNavigate }) {
                       </td>
                       <td data-label="Jabatan"><span className={`${base.skel} ${styles.skelJabatan}`} /></td>
                       <td data-label="Department"><span className={`${base.skel} ${styles.skelBadge}`} /></td>
+                      <td className={styles.selAksi}><span className={`${base.skel} ${styles.skelAksi}`} /></td>
                     </tr>
                   ))}
 
                 {tidakCocok && (
                   <tr className={styles.barisKosong}>
-                    <td colSpan={3}>
+                    <td colSpan={4}>
                       <div className={styles.tidakCocok} role="status">
                         <span className={styles.tidakCocokIkon} aria-hidden="true">
                           <SearchX size={26} strokeWidth={1.8} />
@@ -229,12 +274,49 @@ function StrukturDaftar({ baruId, onNavigate }) {
                       </td>
                       <td className={styles.selJabatan} data-label="Jabatan">{item.position}</td>
                       <td data-label="Department"><LabelDepartment item={item} /></td>
+                      <td className={styles.selAksi}>
+                        <div className={aksi.aksi}>
+                          <a
+                            href={pathUbahPengurus(item.id)}
+                            className={`${base.btn} ${base.outline} ${base.sm} ${aksi.btnAksi} ${aksi.btnEdit}`}
+                            aria-label={`Edit pengurus ${item.name}`}
+                            onClick={(e) => ke(e, pathUbahPengurus(item.id))}
+                          >
+                            <Pencil size={15} strokeWidth={2} aria-hidden="true" />
+                            <span className={aksi.labelAksi}>Edit</span>
+                          </a>
+                          {/* Posisi utama BPH tidak bisa dihapus (kontrak 5.5 dan 7.3), jadi tombol Hapus disembunyikan */}
+                          {item.is_core !== 1 && (
+                            <button
+                              type="button"
+                              className={`${base.btn} ${base.danger} ${base.sm} ${aksi.btnAksi} ${aksi.btnHapus}`}
+                              aria-label={`Hapus pengurus ${item.name}`}
+                              onClick={() => bukaHapus(item)}
+                            >
+                              <Trash2 size={15} strokeWidth={2} aria-hidden="true" />
+                              <span className={aksi.labelAksi}>Hapus</span>
+                            </button>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
               </tbody>
             </table>
           </div>
         </>
+      )}
+
+      {target && (
+        <ConfirmDialog
+          judul="Hapus pengurus ini?"
+          pesan={`Pengurus "${target.name}" akan dihapus permanen dan tidak dapat dikembalikan.`}
+          error={errorHapus}
+          loading={menghapus}
+          labelLoading="Menghapus..."
+          onConfirm={konfirmasiHapus}
+          onCancel={tutupHapus}
+        />
       )}
     </div>
   )

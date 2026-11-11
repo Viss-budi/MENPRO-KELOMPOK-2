@@ -8,6 +8,7 @@ import { PATH_STRUKTUR, bacaRuteStruktur } from './rute'
 // Memilih tampilan dari path:
 //   /admin/struktur         -> daftar pengurus
 //   /admin/struktur/tambah  -> form tambah pengurus
+//   /admin/struktur/7/ubah  -> form ubah pengurus id 7
 // pathname   : path halaman yang sedang tampil (dari App.jsx)
 // onNavigate : (path) => void
 function KelolaStruktur({ pathname, onNavigate }) {
@@ -28,24 +29,45 @@ function KelolaStruktur({ pathname, onNavigate }) {
 
   // Form berhasil disimpan: kembali ke daftar, tandai baris baru, lalu beri kabar.
   const selesaiSimpan = useCallback(
-    ({ id, nama }) => {
+    ({ id, nama, edit, tanpaPerubahan }) => {
       setBaruId(id ?? null)
       setToast({
         id: Date.now(),
-        judul: 'Pengurus berhasil ditambahkan',
-        pesan: `"${nama}" sudah tampil di daftar.`,
+        judul: tanpaPerubahan
+          ? 'Tidak ada perubahan'
+          : edit
+            ? 'Data pengurus berhasil diperbarui'
+            : 'Pengurus berhasil ditambahkan',
+        pesan: tanpaPerubahan
+          ? `Data "${nama}" tidak berubah.`
+          : edit
+            ? `Perubahan pada "${nama}" sudah tampil di daftar.`
+            : `"${nama}" sudah tampil di daftar.`,
       })
       onNavigate(PATH_STRUKTUR)
     },
     [onNavigate]
   )
 
+  // Toast dari daftar sendiri (mis. berhasil dihapus)
+  const tampilkanToast = useCallback((isi) => {
+    setBaruId(null)
+    setToast({ id: Date.now(), ...isi })
+  }, [])
+
   return (
     <>
       {rute.mode === 'daftar' ? (
-        <StrukturDaftar baruId={baruId} onNavigate={keluarDaftar} />
+        <StrukturDaftar baruId={baruId} onNavigate={keluarDaftar} onSukses={tampilkanToast} />
       ) : (
-        <StrukturForm onNavigate={onNavigate} onSukses={selesaiSimpan} />
+        // key: pindah antara tambah dan ubah (atau antar id) selalu memulai form dari awal
+        <StrukturForm
+          key={`${rute.mode}-${rute.id ?? ''}`}
+          mode={rute.mode}
+          id={rute.id}
+          onNavigate={onNavigate}
+          onSukses={selesaiSimpan}
+        />
       )}
       <Toast toast={toast} onClose={tutupToast} />
     </>

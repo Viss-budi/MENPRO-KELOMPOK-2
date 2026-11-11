@@ -1,8 +1,8 @@
 // Aturan validasi form tambah pengurus (sesuai batas backend dan desain UI/UX).
 
-export const MAKS_NAMA = 100
+export const MAKS_NAMA = 75 // kontrak v1.4 (sebelumnya 100)
 export const MAKS_JABATAN = 100
-// Batas 2 MB mengikuti desain UI/UX (backend menerima sampai 5 MB).
+// Batas unggah 2 MB (kontrak v1.4 bagian 5.7; sebelumnya 5 MB).
 export const MAKS_UKURAN_FOTO = 2 * 1024 * 1024
 // Desain: "JPG / PNG". Backend juga menerima WEBP, tetapi desain tidak menyebutnya.
 export const TIPE_FOTO = ['image/jpeg', 'image/png']
@@ -29,14 +29,16 @@ export function validasiFileFoto(file) {
 
 // Periksa seluruh form sebelum dikirim (foto diperiksa terpisah saat dipilih).
 // Mengembalikan { nama?, jabatan?, department? } (objek kosong = valid).
-export function validasiPengurus({ nama, jabatan, departmentId }) {
+// `awal` (mode ubah): nilai lama. Data lama yang melebihi batas baru tidak dipersoalkan selama
+// tidak diubah, karena hanya field yang berubah yang dikirim ke server.
+export function validasiPengurus({ nama, jabatan, departmentId, awal }) {
   const errors = {}
   const n = nama.trim()
   if (!n) errors.nama = PESAN.namaKosong
-  else if (n.length > MAKS_NAMA) errors.nama = PESAN.namaPanjang
+  else if (n.length > MAKS_NAMA && n !== awal?.name) errors.nama = PESAN.namaPanjang
   const j = jabatan.trim()
   if (!j) errors.jabatan = PESAN.jabatanKosong
-  else if (j.length > MAKS_JABATAN) errors.jabatan = PESAN.jabatanPanjang
+  else if (j.length > MAKS_JABATAN && j !== awal?.position) errors.jabatan = PESAN.jabatanPanjang
   if (!departmentId) errors.department = PESAN.departmentKosong
   return errors
 }
@@ -69,8 +71,11 @@ export function nilaiDepartment(item) {
 }
 
 // Teks label kolom Department, juga dipakai sebagai bahan pencarian.
+// Nama yang sudah diawali "Department" (mis. "Department of Information and Communications") dipakai apa adanya.
 export function labelDepartment(item) {
-  return item.department_id ? `Department ${item.department_name || ''}`.trim() : 'Pengurus Inti'
+  if (!item.department_id) return 'Pengurus Inti'
+  const nama = (item.department_name || '').trim()
+  return /^department\b/i.test(nama) ? nama : `Department ${nama}`.trim()
 }
 
 // Pilihan filter Department dari data yang ada: Semua, Pengurus Inti (bila ada), lalu tiap departemen.
