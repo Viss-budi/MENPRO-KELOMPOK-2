@@ -265,7 +265,41 @@
 }
 
 /* ── Alert ─────────────────────────────────────────────── */
-.alertBox { min-height: 0; }
+/* Tinggi tetap 103px (subjudul → label): pesan muncul tanpa menggeser form (sesuai desain) */
+.alertBox {
+  height: 103px;
+  padding-top: 21px;
+}
+
+/* Kotak pesan sesuai desain: error login = merah, sesi berakhir = info biru */
+.errorAlert,
+.infoAlert {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 57px;
+  padding: 0 17px;
+  border: 1.5px solid;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+.errorAlert svg,
+.infoAlert svg { flex: none; }
+
+.errorAlert {
+  border-color: #FECDCA;
+  background: #FEF3F2;
+  color: #B42318;
+}
+.errorAlert svg { color: #F04438; }
+
+.infoAlert {
+  border-color: var(--color-deco);
+  background: var(--color-surface-panel);
+  color: var(--color-primary);
+}
 
 .alertText {
   margin: 16px 0 0;
@@ -294,7 +328,7 @@
   display: flex;
   flex-direction: column;
   gap: 13px;
-  margin-top: 48px;
+  margin-top: 0; /* jarak atas disediakan .alertBox (103px) */
 }
 
 .field {
@@ -340,8 +374,8 @@
 
 .inputPassword { padding-right: 52px; }
 
-.input.inputError { border-color: #ef4444; }
-.input.inputError:focus { box-shadow: 0 0 0 3px #fee2e2; }
+.input.inputError { border-width: 2px; border-color: #F04438; }
+.input.inputError:focus { box-shadow: 0 0 0 3px #FEE4E2; }
 
 .input:disabled {
   background: var(--color-surface-panel);
@@ -358,6 +392,7 @@
   transition: color 0.15s;
 }
 .inputWrap:focus-within .iconLeft { color: var(--color-primary); }
+.inputWrap:has(.inputError) .iconLeft { color: #F04438; }
 
 .togglePassword {
   position: absolute;
@@ -379,10 +414,19 @@
 .togglePassword:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
 .togglePassword:disabled { cursor: not-allowed; opacity: 0.4; }
 
+/* Slot tetap 22px di bawah tiap kolom, supaya pesan kolom tidak menggeser tata letak.
+   margin -8px menghapus jarak 8px antar-anak .field */
+.errorSlot {
+  min-height: 22px;
+  margin-top: -8px;
+  padding-top: 4px;
+}
+
 .fieldError {
-  font-size: 0.8125rem;
-  line-height: 1.4;
-  color: #b91c1c;
+  display: block;
+  font-size: 12.2px;
+  line-height: 18px;
+  color: #B42318;
 }
 
 /* ── Ingat saya / Lupa password ────────────────────────── */
@@ -462,6 +506,7 @@
 .note {
   display: flex;
   align-items: center;
+  justify-content: center; /* teks ada di tengah (desain) */
   gap: 10px;
   margin: 32px 0 0;
   padding: 24px 2px 0;
@@ -517,8 +562,12 @@
     top: -4px;
     left: -2px;
   }
+  .alertBox {
+    height: 92px;
+    padding-top: 17px;
+  }
   .form {
-    margin-top: 36px;
+    margin-top: 0;
   }
   .submitButton {
     height: 48px;

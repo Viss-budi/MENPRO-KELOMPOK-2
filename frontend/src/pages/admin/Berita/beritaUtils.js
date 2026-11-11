@@ -1,8 +1,8 @@
-// Aturan form berita. Batas panjang mengikuti kontrak API v1.3 bagian 5.4.
+// Aturan form berita. Batas panjang mengikuti kontrak API v1.4 bagian 5.4 dan 7.3.
 export const MAKS_JUDUL = 100
-export const MAKS_ISI = 50000
 export const MAKS_RINGKASAN = 300
-// Batas 2 MB mengikuti teks desain UI/UX (backend sendiri menerima sampai 5 MB).
+export const MAKS_ISI = 50000
+// Batas unggah 2 MB (kontrak v1.4 bagian 5.7; sebelumnya 5 MB).
 export const MAKS_UKURAN_GAMBAR = 2 * 1024 * 1024
 export const TIPE_GAMBAR = ['image/jpeg', 'image/png', 'image/webp']
 
@@ -10,7 +10,7 @@ export const PESAN = {
   judulKosong: 'Judul wajib diisi',
   judulPanjang: `Judul maksimal ${MAKS_JUDUL} karakter`,
   isiKosong: 'Isi berita wajib diisi',
-  isiPanjang: `Isi berita maksimal ${MAKS_ISI.toLocaleString('id-ID')} karakter`,
+  isiPanjang: 'Isi berita maksimal 50.000 karakter',
   gambarKosong: 'Gambar wajib dipilih',
   gambarFormat: 'Format gambar harus PNG, JPG, atau WEBP',
   gambarBesar: 'Ukuran gambar maksimal 2 MB',
@@ -29,9 +29,8 @@ export function validasiBerita({ judul, isi, gambar }) {
   const j = judul.trim()
   if (!j) errors.judul = PESAN.judulKosong
   else if (j.length > MAKS_JUDUL) errors.judul = PESAN.judulPanjang
-  const i = isi.trim() // server memangkas spasi di tepi, jadi hitung dengan cara yang sama
-  if (!i) errors.isi = PESAN.isiKosong
-  else if (i.length > MAKS_ISI) errors.isi = PESAN.isiPanjang
+  if (!isi.trim()) errors.isi = PESAN.isiKosong
+  else if (isi.length > MAKS_ISI) errors.isi = PESAN.isiPanjang
   if (!gambar) errors.gambar = PESAN.gambarKosong
   return errors
 }

@@ -45,7 +45,7 @@ const SUB_RUTE = {
   },
   struktur: {
     baca: bacaRuteStruktur,
-    label: { daftar: 'Struktur Organisasi', tambah: 'Tambah Pengurus' },
+    label: { daftar: 'Struktur Organisasi', tambah: 'Tambah Pengurus', ubah: 'Ubah Pengurus' },
   },
 }
 

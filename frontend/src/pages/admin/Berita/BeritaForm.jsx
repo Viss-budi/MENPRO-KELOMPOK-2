@@ -19,7 +19,6 @@ import { klikBiasa } from '../../../utils/nav'
 import { pesanGagal } from '../../../utils/pesanGagal'
 import {
   MAKS_JUDUL,
-  MAKS_ISI, 
   formatUkuran,
   namaFile,
   ringkas,
@@ -31,6 +30,8 @@ import base from './Berita.module.css'
 import styles from './BeritaForm.module.css'
 
 const PESAN_GAGAL_SIMPAN = 'Berita gagal disimpan, silakan coba lagi'
+// Nama field di respons error backend -> nama kolom di form ini
+const KOLOM_ERROR = { title: 'judul', content: 'isi', cover_url: 'gambar' }
 
 const ALAT_EDITOR = [
   { key: 'tebal',  label: 'Tebal',          icon: Bold,      shortcut: 'Ctrl+B' },
@@ -357,7 +358,22 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
     } catch (err) {
       if (err.name === 'AbortError') return
       // Isi form TIDAK dihapus: seluruh state tetap, pengguna cukup menekan Simpan lagi.
-      setBanner({ pesan: pesanGagal(err, PESAN_GAGAL_SIMPAN), n: Date.now() })
+      // Kontrak 7.3: pesan validasi per field tampil di dekat field-nya; sisanya di kotak pesan.
+      const perField = {}
+      const sisa = []
+      for (const e of err.errors ?? []) {
+        const kolom = KOLOM_ERROR[e.field]
+        if (kolom && !perField[kolom]) perField[kolom] = e.message
+        else if (!kolom) sisa.push(e.message)
+      }
+      if (Object.keys(perField).length > 0) {
+        setErrors((prev) => ({ ...prev, ...perField }))
+        if (perField.judul) judulRef.current?.focus()
+        else if (perField.isi) isiRef.current?.focus()
+      }
+      if (Object.keys(perField).length === 0 || sisa.length > 0) {
+        setBanner({ pesan: sisa[0] ?? pesanGagal(err, PESAN_GAGAL_SIMPAN), n: Date.now() })
+      }
     } finally {
       setMenyimpan(false)
     }
@@ -533,11 +549,6 @@ function BeritaForm({ mode, id, onNavigate, onSukses }) {
                   </button>
                 ))}
                 <span className={styles.toolSep} aria-hidden="true" />
-              {!errIsi && isi.length > MAKS_ISI - 5000 && (
-                <p className={styles.hitung}>
-                  {isi.length.toLocaleString('id-ID')} / {MAKS_ISI.toLocaleString('id-ID')} karakter
-                </p>
-              )}
               </div>
               <textarea
                 ref={isiRef}

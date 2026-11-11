@@ -1,12 +1,21 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { ChevronDown, CircleAlert, Info, RefreshCw, Trash2, Upload } from 'lucide-react'
 import AvatarPengurus from '../../../components/common/AvatarPengurus/AvatarPengurus'
-import { createMember, getAdminDepartments, getPeriods, uploadImage } from '../../../services/api'
+import {
+  createMember,
+  getAdminDepartments,
+  getAdminMember,
+  getPeriods,
+  updateMember,
+  uploadImage,
+} from '../../../services/api'
+import { resolveImage } from '../../../utils/image'
 import { klikBiasa } from '../../../utils/nav'
 import { pesanGagal } from '../../../utils/pesanGagal'
 import {
   MAKS_JABATAN,
   MAKS_NAMA,
+  NAMA_BELUM_DIISI,
   formatUkuran,
   validasiFileFoto,
   validasiPengurus,
@@ -17,12 +26,21 @@ import styles from './StrukturForm.module.css'
 
 const PESAN_GAGAL_SIMPAN = 'Data pengurus gagal disimpan, silakan coba lagi'
 const PESAN_GAGAL_DEPARTMENT = 'Daftar department belum dapat dimuat. Silakan coba lagi.'
+// Nama field di respons error backend -> nama kolom di form ini
+const KOLOM_ERROR = {
+  name: 'nama',
+  position: 'jabatan',
+  department_id: 'department',
+  photo_url: 'foto',
+}
 const PESAN_TANPA_PERIODE = 'Belum ada periode aktif. Hubungi tim backend untuk menyiapkan periode.'
 
-// Form tambah pengurus (desain 05 sampai 11).
+// Form tambah dan ubah pengurus (desain 05 sampai 11; mode ubah memakai tata letak yang sama).
+// mode       : 'tambah' | 'ubah' ; id : id pengurus (mode ubah)
 // onNavigate : (path) => void
-// onSukses   : ({ id, nama }) => void
-function StrukturForm({ onNavigate, onSukses }) {
+// onSukses   : ({ id, nama, edit, tanpaPerubahan }) => void
+function StrukturForm({ mode = 'tambah', id, onNavigate, onSukses }) {
+  const edit = mode === 'ubah'
   const [nama, setNama] = useState('')
   const [jabatan, setJabatan] = useState('')
   const [departmentId, setDepartmentId] = useState('')
@@ -30,6 +48,11 @@ function StrukturForm({ onNavigate, onSukses }) {
   // foto: null | { file: File, nama, ukuran }; preview = blob URL
   const [foto, setFoto] = useState(null)
   const [preview, setPreview] = useState(null)
+
+  // Mode ubah: data pengurus saat dimuat. fotoLama = photo_url tersimpan; fotoDihapus = pengguna menekan Hapus.
+  const [awal, setAwal] = useState(null)
+  const [fotoDihapus, setFotoDihapus] = useState(false)
+  const [tidakAda, setTidakAda] = useState(false)
 
   const [errors, setErrors] = useState({})
   const [banner, setBanner] = useState(null)
@@ -54,31 +77,48 @@ function StrukturForm({ onNavigate, onSukses }) {
   const bannerRef = useRef(null)
   const abortRef = useRef(null)
 
-  // ── Ambil periode aktif dan daftar department-nya ───────────────────────
+  // ── Ambil periode dan daftar department-nya ────────────────────────────
+  // Tambah: periode aktif. Ubah: pengurus dimuat dulu, lalu department milik periodenya.
   useEffect(() => {
     const ac = new AbortController()
     ;(async () => {
       try {
-        const { active } = await getPeriods(ac.signal)
-        if (!active) {
+        let periodeTarget
+        if (edit) {
+          const data = await getAdminMember(id, ac.signal)
+          periodeTarget = data.period
+          setAwal(data)
+          // Slot posisi utama yang belum diisi bernama "(Belum diisi)": kolom nama dikosongkan agar mudah diisi
+          setNama(data.name === NAMA_BELUM_DIISI ? '' : (data.name ?? ''))
+          setJabatan(data.position ?? '')
+          setDepartmentId(data.department_id ? String(data.department_id) : '')
+        } else {
+          const { active } = await getPeriods(ac.signal)
+          periodeTarget = active
+        }
+        if (!periodeTarget) {
           setPeriode(null)
           setDaftarDepartment([])
           setPesanMuat(PESAN_TANPA_PERIODE)
           setMuat('gagal')
           return
         }
-        const dept = await getAdminDepartments(active, ac.signal)
-        setPeriode(active)
+        const dept = await getAdminDepartments(periodeTarget, ac.signal)
+        setPeriode(periodeTarget)
         setDaftarDepartment(dept)
         setMuat('siap')
       } catch (err) {
         if (err.name === 'AbortError') return
-        setPesanMuat(pesanGagal(err, PESAN_GAGAL_DEPARTMENT))
+        if (edit && err.status === 404) {
+          setTidakAda(true)
+          return
+        }
+        setPesanMuat(pesanGagal(err, edit ? 'Data pengurus belum dapat dimuat. Silakan coba lagi.' : PESAN_GAGAL_DEPARTMENT))
         setMuat('gagal')
       }
     })()
     return () => ac.abort()
-  }, [muatKe])
+  }, [edit, id, muatKe])
 
   // Bersihkan blob URL saat ganti foto atau unmount
   useEffect(() => {
@@ -106,6 +146,7 @@ function StrukturForm({ onNavigate, onSukses }) {
     }
     setPreview(URL.createObjectURL(file))
     setFoto({ file, nama: file.name, ukuran: file.size })
+    setFotoDihapus(false)
     bersihkan('foto')
   }
 
@@ -117,6 +158,7 @@ function StrukturForm({ onNavigate, onSukses }) {
   function hapusFoto() {
     setPreview(null)
     setFoto(null)
+    setFotoDihapus(true)
     bersihkan('foto')
   }
 
@@ -131,7 +173,8 @@ function StrukturForm({ onNavigate, onSukses }) {
     e.preventDefault()
     if (menyimpan) return
 
-    const masalah = validasiPengurus({ nama, jabatan, departmentId })
+    // Posisi utama BPH dan pengurus inti lama tidak punya department, jadi department tidak diwajibkan.
+    const masalah = validasiPengurus({ nama, jabatan, departmentId: perluDepartment ? departmentId : 'tidak-wajib', awal })
     if (Object.keys(masalah).length > 0) {
       setErrors((prev) => ({ foto: prev.foto, ...masalah }))
       setBanner(null)
@@ -152,6 +195,30 @@ function StrukturForm({ onNavigate, onSukses }) {
     abortRef.current = ac
 
     try {
+      if (edit) {
+        // Kontrak 5.2: PUT parsial, hanya field yang berubah yang dikirim. Posisi utama BPH hanya boleh
+        // mengubah nama, foto, dan status (selain itu server menjawab 409), jadi jabatan/department tidak dikirim.
+        const badan = {}
+        if (nama.trim() !== (awal.name === NAMA_BELUM_DIISI ? '' : awal.name)) badan.name = nama.trim()
+        if (!posisiUtama) {
+          if (jabatan.trim() !== awal.position) badan.position = jabatan.trim()
+          const deptBaru = departmentId ? Number(departmentId) : null
+          if (deptBaru !== (awal.department_id ?? null)) badan.department_id = deptBaru
+        }
+        if (foto?.file) badan.photo_url = await uploadImage(foto.file, ac.signal)
+        else if (fotoDihapus && awal.photo_url) badan.photo_url = null
+        // Slot posisi utama yang baru diisi diaktifkan agar tampil di website (kontrak 5.5)
+        if (posisiUtama && awal.is_active === 0) badan.is_active = 1
+
+        if (Object.keys(badan).length === 0) {
+          onSukses({ id: Number(id), nama: nama.trim(), edit: true, tanpaPerubahan: true })
+          return
+        }
+        await updateMember(id, badan, ac.signal)
+        onSukses({ id: Number(id), nama: nama.trim(), edit: true })
+        return
+      }
+
       // 1) Unggah foto bila ada. Tanpa foto, photo_url null dan website memakai foto bawaan.
       const urlFoto = foto?.file ? await uploadImage(foto.file, ac.signal) : null
 
@@ -170,7 +237,24 @@ function StrukturForm({ onNavigate, onSukses }) {
       onSukses({ id: hasil?.id ?? null, nama: nama.trim() })
     } catch (err) {
       if (err.name === 'AbortError') return
-      setBanner({ pesan: pesanGagal(err, PESAN_GAGAL_SIMPAN) })
+      // Kontrak 7.3: pesan validasi per field ditampilkan di dekat field-nya.
+      // Field yang tidak punya kolom di form (mis. period) tetap tampil di kotak pesan.
+      const perField = {}
+      const sisa = []
+      for (const e of err.errors ?? []) {
+        const kolom = KOLOM_ERROR[e.field]
+        if (kolom && !perField[kolom]) perField[kolom] = e.message
+        else if (!kolom) sisa.push(e.message)
+      }
+      if (Object.keys(perField).length > 0) {
+        setErrors((prev) => ({ ...prev, ...perField }))
+        if (perField.nama) namaRef.current?.focus()
+        else if (perField.jabatan) jabatanRef.current?.focus()
+        else if (perField.department) departmentRef.current?.focus()
+      }
+      if (Object.keys(perField).length === 0 || sisa.length > 0) {
+        setBanner({ pesan: sisa[0] ?? pesanGagal(err, PESAN_GAGAL_SIMPAN) })
+      }
     } finally {
       setMenyimpan(false)
     }
@@ -184,17 +268,56 @@ function StrukturForm({ onNavigate, onSukses }) {
   }
 
   const department = daftarDepartment.find((d) => String(d.id) === String(departmentId))
+  const posisiUtama = edit && awal?.is_core === 1
+  // Department wajib saat tambah; saat ubah hanya jika pengurus itu memang berada di sebuah department.
+  const perluDepartment = !edit || (!posisiUtama && Boolean(awal?.department_id))
+  const fotoTersimpan = edit && awal?.photo_url && !fotoDihapus ? awal.photo_url : null
+  const srcFoto = preview ?? (fotoTersimpan ? resolveImage(fotoTersimpan) : null)
+  const adaFoto = Boolean(foto || fotoTersimpan)
   const errNama = errors.nama
   const errJabatan = errors.jabatan
   const errDepartment = errors.department
   const errFoto = errors.foto
 
+  if (tidakAda) {
+    return (
+      <div className={base.page}>
+        <header className={base.head}>
+          <div>
+            <h1 className={base.title}>Ubah Pengurus</h1>
+            <p className={base.subtitle}>Data pengurus yang dicari tidak tersedia.</p>
+          </div>
+        </header>
+        <div className={base.panel} role="alert">
+          <span className={`${base.panelIcon} ${base.panelIconWarn}`}>
+            <CircleAlert size={28} strokeWidth={1.9} aria-hidden="true" />
+          </span>
+          <h2 className={base.panelTitle}>Pengurus tidak ditemukan</h2>
+          <p className={base.panelText}>Data ini mungkin sudah dihapus. Kembali ke daftar untuk melihat data terbaru.</p>
+          <a
+            href={PATH_STRUKTUR}
+            className={`${base.btn} ${base.primary}`}
+            onClick={(e) => {
+              if (!klikBiasa(e)) return
+              e.preventDefault()
+              onNavigate(PATH_STRUKTUR)
+            }}
+          >
+            Kembali ke Daftar
+          </a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <form className={base.page} onSubmit={simpan} noValidate>
       <header className={base.head}>
         <div>
-          <h1 className={base.title}>Tambah Pengurus</h1>
-          <p className={base.subtitle}>Isi data pengurus lalu tekan Simpan.</p>
+          <h1 className={base.title}>{edit ? 'Ubah Pengurus' : 'Tambah Pengurus'}</h1>
+          <p className={base.subtitle}>
+            {edit && muat === 'memuat' ? 'Memuat data pengurus...' : edit ? 'Ubah data pengurus lalu tekan Simpan.' : 'Isi data pengurus lalu tekan Simpan.'}
+          </p>
         </div>
         <div className={base.actions}>
           <button type="button" className={`${base.btn} ${base.outline} ${styles.batal}`} onClick={batal}>
@@ -203,7 +326,7 @@ function StrukturForm({ onNavigate, onSukses }) {
           <button
             type="submit"
             className={`${base.btn} ${base.primary} ${styles.simpan}`}
-            disabled={menyimpan}
+            disabled={menyimpan || (edit && muat !== 'siap')}
             aria-busy={menyimpan}
           >
             {menyimpan && <RefreshCw className={styles.putar} size={16} strokeWidth={2.2} aria-hidden="true" />}
@@ -250,7 +373,7 @@ function StrukturForm({ onNavigate, onSukses }) {
                   }}
                   placeholder="Masukkan nama lengkap"
                   autoComplete="off"
-                  disabled={menyimpan}
+                  disabled={menyimpan || (edit && muat !== 'siap')}
                   maxLength={MAKS_NAMA}
                   aria-invalid={errNama ? 'true' : 'false'}
                   aria-describedby={errNama ? `${namaId}-err` : undefined}
@@ -278,7 +401,7 @@ function StrukturForm({ onNavigate, onSukses }) {
                     }}
                     placeholder="Contoh: Ketua Divisi"
                     autoComplete="off"
-                    disabled={menyimpan}
+                    disabled={menyimpan || posisiUtama}
                     maxLength={MAKS_JABATAN}
                     aria-invalid={errJabatan ? 'true' : 'false'}
                     aria-describedby={errJabatan ? `${jabatanId}-err` : undefined}
@@ -302,11 +425,13 @@ function StrukturForm({ onNavigate, onSukses }) {
                       setDepartmentId(e.target.value)
                       bersihkan('department')
                     }}
-                    disabled={menyimpan || muat === 'memuat'}
+                    disabled={menyimpan || muat === 'memuat' || posisiUtama}
                     aria-invalid={errDepartment ? 'true' : 'false'}
                     aria-describedby={errDepartment ? `${departmentIdEl}-err` : undefined}
                   >
-                    <option value="">{muat === 'memuat' ? 'Memuat department...' : 'Pilih Department'}</option>
+                    <option value="">
+                      {muat === 'memuat' ? 'Memuat department...' : posisiUtama || (edit && !perluDepartment) ? 'Pengurus Inti' : 'Pilih Department'}
+                    </option>
                     {daftarDepartment.map((d) => (
                       <option key={d.id} value={d.id}>{d.name}</option>
                     ))}
@@ -319,7 +444,13 @@ function StrukturForm({ onNavigate, onSukses }) {
               </div>
             </div>
 
-            <p className={styles.hint}>Semua kolom wajib diisi, kecuali foto.</p>
+            <p className={styles.hint}>
+              {posisiUtama
+                ? 'Posisi utama BPH: hanya nama dan foto yang dapat diubah.'
+                : perluDepartment
+                  ? 'Semua kolom wajib diisi, kecuali foto.'
+                  : 'Nama dan jabatan wajib diisi, kecuali foto.'}
+            </p>
           </section>
 
           {/* ── Pratinjau di Website ───────────────────────── */}
@@ -335,7 +466,7 @@ function StrukturForm({ onNavigate, onSukses }) {
             </div>
 
             <div className={styles.kartu} aria-hidden="true">
-              <AvatarPengurus src={preview} ukuran={60} />
+              <AvatarPengurus src={srcFoto} ukuran={60} />
               <span className={styles.kartuNama}>{nama.trim() || 'Nama Lengkap'}</span>
               <span className={styles.kartuJabatan}>{jabatan.trim() || 'Jabatan'}</span>
               <span className={styles.kartuDept}>
@@ -353,13 +484,13 @@ function StrukturForm({ onNavigate, onSukses }) {
           </div>
 
           <div className={`${styles.fotoBulat} ${errFoto ? styles.fotoSalah : ''}`}>
-            <AvatarPengurus src={preview} nama="Pratinjau foto pengurus" ukuran={126} cincin={!errFoto} />
+            <AvatarPengurus src={srcFoto} nama="Pratinjau foto pengurus" ukuran={126} cincin={!errFoto} />
           </div>
 
           <div className={styles.fotoAksi}>
-            <label className={`${base.btn} ${base.outline} ${styles.tombolFoto} ${foto ? '' : styles.tombolUnggah}`}>
+            <label className={`${base.btn} ${base.outline} ${styles.tombolFoto} ${adaFoto ? '' : styles.tombolUnggah}`}>
               <Upload size={16} strokeWidth={2} aria-hidden="true" />
-              {foto ? 'Ganti' : 'Unggah Foto'}
+              {adaFoto ? 'Ganti' : 'Unggah Foto'}
               <input
                 ref={fotoInputRef}
                 id={fotoId}
@@ -372,7 +503,7 @@ function StrukturForm({ onNavigate, onSukses }) {
                 aria-describedby={`${fotoId}-info`}
               />
             </label>
-            {foto && (
+            {adaFoto && (
               <button
                 type="button"
                 className={`${base.btn} ${base.danger} ${styles.tombolFoto}`}
@@ -390,6 +521,10 @@ function StrukturForm({ onNavigate, onSukses }) {
           ) : foto ? (
             <p id={`${fotoId}-info`} className={styles.fotoInfo}>
               {foto.nama} · {formatUkuran(foto.ukuran)}
+            </p>
+          ) : fotoTersimpan ? (
+            <p id={`${fotoId}-info`} className={styles.fotoInfo}>
+              Foto saat ini. Tekan Ganti untuk memakai foto lain.
             </p>
           ) : (
             <p id={`${fotoId}-info`} className={styles.fotoInfo}>

@@ -39,6 +39,8 @@ async function request(method, path, { body, signal, admin = false, senyap = fal
   if (!res.ok) {
     const err = new Error(json.message || `Request gagal (${res.status})`)
     err.status = res.status
+    // Validasi per field (berita, anggota, departemen): [{ field, message }] — kontrak 1.2 dan 7.3
+    err.errors = Array.isArray(json.errors) ? json.errors : []
     throw err
   }
   return json
@@ -188,6 +190,24 @@ export async function getAdminDepartments(period, signal) {
 export async function createMember(body, signal) {
   const json = await request('POST', '/members', { body, signal, admin: true })
   return json.data
+}
+
+// GET /members/admin/:id -> satu pengurus lengkap untuk mengisi form ubah
+// { id, name, position, period, group_name, department_id, department_name, photo_url, sort_order, is_active, is_core }
+export async function getAdminMember(id, signal) {
+  const json = await request('GET', `/members/admin/${id}`, { signal, admin: true })
+  return json.data
+}
+
+// PUT /members/:id -> 200. Hanya field yang dikirim yang berubah.
+// Posisi utama BPH (is_core = 1) hanya boleh mengubah name, photo_url, is_active; selain itu 409.
+export async function updateMember(id, body, signal) {
+  await request('PUT', `/members/${id}`, { body, signal, admin: true })
+}
+
+// DELETE /members/:id -> 200 (404 bila sudah terhapus, 409 untuk posisi utama BPH)
+export async function deleteMember(id, signal) {
+  await request('DELETE', `/members/${id}`, { signal, admin: true })
 }
 
 // ── Endpoint publik ───────────────────────────────────────────────────────────
