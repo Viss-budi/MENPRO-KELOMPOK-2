@@ -1,5 +1,5 @@
 // Validasi eksplisit untuk anggota/pengurus. Mengembalikan [{ field, message }]
-const { isImageRef, isPeriod, isBit, isSmallInt, PERIOD_MSG } = require('./common');
+const { isImageRef, isBit, isSmallInt } = require('./common');
 
 module.exports = function validateMember(data) {
   const errors = [];
@@ -19,7 +19,6 @@ module.exports = function validateMember(data) {
     else if (data.photo_url.length > 500) add('photo_url', 'photo_url maksimal 500 karakter');
     else if (!isImageRef(data.photo_url)) add('photo_url', 'photo_url harus berupa nama file gambar, URL http(s), atau path berawalan "/"');
   }
-  if (has('period') && !isPeriod(data.period)) add('period', PERIOD_MSG);
   if (has('department_id') && data.department_id !== null && !(Number.isInteger(data.department_id) && data.department_id > 0)) {
     add('department_id', 'department_id harus berupa angka bulat positif atau null');
   }
