@@ -74,14 +74,12 @@ app.get('/api/v1/health', async (req, res) => {
 });
 
 app.use('/api/v1/auth', require('./routes/authRoutes'));
-app.use('/api/v1/hero-slides', require('./routes/heroRoutes'));
 app.use('/api/v1/events', require('./routes/eventRoutes'));
 app.use('/api/v1/calendar', require('./routes/calendarRoutes'));
 app.use('/api/v1/news', require('./routes/newsRoutes'));
 app.use('/api/v1/members', require('./routes/memberRoutes'));
 app.use('/api/v1/departments', require('./routes/departmentRoutes'));
 app.use('/api/v1/structure', require('./routes/structureRoutes'));
-app.use('/api/v1/periods', require('./routes/periodRoutes'));
 app.use('/api/v1/settings', require('./routes/settingRoutes'));
 app.use('/api/v1/upload', require('./routes/uploadRoutes'));
 app.use('/api/v1/admin', require('./routes/adminRoutes'));

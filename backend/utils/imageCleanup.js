@@ -13,7 +13,7 @@ function extractCloudUrls(text) {
   return [...new Set(text.match(/https:\/\/res\.cloudinary\.com\/[^\s)"'<>\]]+/g) || [])];
 }
 
-// Apakah gambar ini masih dipakai baris lain? (contoh: logo departemen yang disalin lewat POST /periods copy_from)
+// Apakah gambar ini masih dipakai baris lain? (contoh: gambar yang sama dipakai dua baris, atau tertulis di isi berita)
 async function stillUsed(url) {
   for (const [table, col] of IMAGE_COLUMNS) {
     try {
