@@ -345,7 +345,7 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
 
       {/* Tabel Department di bawah tabel pengurus (desain Kelola Struktur Organisasi) */}
       {!error && !loading && (
-        <DepartmentDaftar pengurus={semua} onSukses={onSukses} onBerubah={() => setMuatUlang((n) => n + 1)} />
+        <DepartmentDaftar pengurus={semua} onNavigate={onNavigate} onSukses={onSukses} onBerubah={() => setMuatUlang((n) => n + 1)} />
       )}
 
       {target && (

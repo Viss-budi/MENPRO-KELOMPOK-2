@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import Toast from '../../../components/admin/Toast/Toast'
 import StrukturDaftar from './StrukturDaftar'
+import DepartmentForm from './DepartmentForm'
 import StrukturForm from './StrukturForm'
 import { PATH_STRUKTUR, bacaRuteStruktur } from './rute'
 
@@ -9,6 +10,7 @@ import { PATH_STRUKTUR, bacaRuteStruktur } from './rute'
 //   /admin/struktur         -> daftar pengurus
 //   /admin/struktur/tambah  -> form tambah pengurus
 //   /admin/struktur/7/ubah  -> form ubah pengurus id 7
+//   /admin/struktur/department/tambah dan /department/3/ubah -> form department
 // pathname   : path halaman yang sedang tampil (dari App.jsx)
 // onNavigate : (path) => void
 function KelolaStruktur({ pathname, onNavigate }) {
@@ -63,6 +65,41 @@ function KelolaStruktur({ pathname, onNavigate }) {
     [onNavigate]
   )
 
+  // Form department (tambah/ubah) selesai: kembali ke daftar dan beri kabar.
+  const selesaiSimpanDept = useCallback(
+    ({ nama, edit, tanpaPerubahan }) => {
+      setBaruId(null)
+      setToast({
+        id: Date.now(),
+        judul: tanpaPerubahan ? 'Tidak ada perubahan' : edit ? 'Department berhasil diperbarui' : 'Department berhasil ditambahkan',
+        pesan: tanpaPerubahan
+          ? `Data "${nama}" tidak berubah.`
+          : edit
+            ? `Perubahan pada "${nama}" sudah tampil di daftar.`
+            : `"${nama}" sudah tampil di daftar.`,
+      })
+      onNavigate(PATH_STRUKTUR)
+    },
+    [onNavigate]
+  )
+
+  const selesaiHapusDept = useCallback(
+    ({ nama, sudahTerhapus, anggotaDihapus = 0 }) => {
+      setBaruId(null)
+      setToast({
+        id: Date.now(),
+        judul: sudahTerhapus ? 'Department sudah terhapus' : 'Department berhasil dihapus',
+        pesan: sudahTerhapus
+          ? `"${nama}" sudah dihapus sebelumnya. Daftar diperbarui.`
+          : anggotaDihapus > 0
+            ? `"${nama}" dan ${anggotaDihapus} anggotanya sudah dihapus.`
+            : `"${nama}" sudah dihapus dari daftar.`,
+      })
+      onNavigate(PATH_STRUKTUR)
+    },
+    [onNavigate]
+  )
+
   // Toast dari daftar sendiri (mis. berhasil dihapus)
   const tampilkanToast = useCallback((isi) => {
     setBaruId(null)
@@ -73,6 +110,15 @@ function KelolaStruktur({ pathname, onNavigate }) {
     <>
       {rute.mode === 'daftar' ? (
         <StrukturDaftar baruId={baruId} onNavigate={keluarDaftar} onSukses={tampilkanToast} />
+      ) : rute.mode === 'tambahDept' || rute.mode === 'ubahDept' ? (
+        <DepartmentForm
+          key={`${rute.mode}-${rute.id ?? ''}`}
+          mode={rute.mode === 'ubahDept' ? 'ubah' : 'tambah'}
+          id={rute.id}
+          onNavigate={onNavigate}
+          onSukses={selesaiSimpanDept}
+          onHapus={selesaiHapusDept}
+        />
       ) : (
         // key: pindah antara tambah dan ubah (atau antar id) selalu memulai form dari awal
         <StrukturForm

@@ -6,6 +6,8 @@ import Paginasi from '../../../components/admin/Paginasi/Paginasi'
 import { useApi } from '../../../hooks/useApi'
 import { deleteDepartment, getAdminDepartmentsAll } from '../../../services/api'
 import { pesanGagal } from '../../../utils/pesanGagal'
+import { klikBiasa } from '../../../utils/nav'
+import { PATH_TAMBAH_DEPARTMENT, pathUbahDepartment } from './rute'
 import { kepalaDepartment, normalisasiKata } from './strukturUtils'
 import base from '../Berita/Berita.module.css'
 import aksi from '../Berita/BeritaDaftar.module.css'
@@ -17,8 +19,9 @@ const namaTampil = (nama) => (/^department\b/i.test(nama || '') ? nama : `Depart
 
 // Tabel Department di bawah tabel pengurus.
 // pengurus  : daftar pengurus (dari tabel di atasnya) untuk mencari kepala department
+// onNavigate: (path) => void (ke form tambah/ubah department)
 // onSukses  : ({ judul, pesan }) => void (toast) ; onBerubah : () => void (muat ulang daftar pengurus)
-function DepartmentDaftar({ pengurus, onSukses, onBerubah }) {
+function DepartmentDaftar({ pengurus, onNavigate, onSukses, onBerubah }) {
   const [muatUlang, setMuatUlang] = useState(0)
   const [kata, setKata] = useState('')
   const [halaman, setHalaman] = useState(1)
@@ -98,17 +101,21 @@ function DepartmentDaftar({ pengurus, onSukses, onBerubah }) {
   const kosong = !loading && !error && semua.length === 0
   const alatSiap = !loading && !error && semua.length > 0
 
-  // Tambah dan Ubah Department belum punya halaman form (belum ada desainnya), jadi tombolnya dinonaktifkan
+  function ke(e, path) {
+    if (!klikBiasa(e)) return
+    e.preventDefault()
+    onNavigate?.(path)
+  }
+
   const tombolTambah = (
-    <button
-      type="button"
+    <a
+      href={PATH_TAMBAH_DEPARTMENT}
       className={`${base.btn} ${base.primary}`}
-      disabled
-      title="Form tambah department belum tersedia"
+      onClick={(e) => ke(e, PATH_TAMBAH_DEPARTMENT)}
     >
       <Plus size={16} strokeWidth={2.4} aria-hidden="true" />
       Tambah Department
-    </button>
+    </a>
   )
 
   return (
@@ -211,16 +218,15 @@ function DepartmentDaftar({ pengurus, onSukses, onBerubah }) {
                       </td>
                       <td className={tabel.selAksi}>
                         <div className={aksi.aksi}>
-                          <button
-                            type="button"
+                          <a
+                            href={pathUbahDepartment(d.id)}
                             className={`${base.btn} ${base.outline} ${base.sm} ${aksi.btnAksi} ${aksi.btnEdit}`}
                             aria-label={`Edit ${nama}`}
-                            disabled
-                            title="Form ubah department belum tersedia"
+                            onClick={(e) => ke(e, pathUbahDepartment(d.id))}
                           >
                             <Pencil size={15} strokeWidth={2} aria-hidden="true" />
                             <span className={aksi.labelAksi}>Edit</span>
-                          </button>
+                          </a>
                           <button
                             type="button"
                             className={`${base.btn} ${base.danger} ${base.sm} ${aksi.btnAksi} ${aksi.btnHapus}`}

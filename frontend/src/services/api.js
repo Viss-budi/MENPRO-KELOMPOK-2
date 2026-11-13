@@ -189,6 +189,24 @@ export async function getAdminDepartmentsAll(signal) {
   return json.data ?? []
 }
 
+// GET /departments/admin/:id -> { id, name, slug, description, logo_url, sort_order, is_active, member_count, updated_at }
+export async function getAdminDepartment(id, signal) {
+  const json = await request('GET', `/departments/admin/${id}`, { signal, admin: true })
+  return json.data
+}
+
+// POST /departments -> 201 { data: { id, slug } }
+// body: { name (maks 75), description (maks 500), logo_url, sort_order, is_active }. Slug dibuat server dari nama; nama kembar -> 409.
+export async function createDepartment(body, signal) {
+  const json = await request('POST', '/departments', { body, signal, admin: true })
+  return json.data
+}
+
+// PUT /departments/:id -> 200 (parsial: hanya field yang dikirim yang berubah)
+export async function updateDepartment(id, body, signal) {
+  await request('PUT', `/departments/${id}`, { body, signal, admin: true })
+}
+
 // DELETE /departments/:id -> 200 { data: { members_deleted } }
 // 409 bila departemen masih punya anggota, kecuali denganAnggota = true (?with_members=1: anggotanya ikut dihapus).
 export async function deleteDepartment(id, { denganAnggota = false } = {}, signal) {
