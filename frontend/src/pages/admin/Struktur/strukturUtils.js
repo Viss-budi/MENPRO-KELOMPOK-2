@@ -101,3 +101,18 @@ export function saringPengurus(items, { q = '', department = '' } = {}) {
     return kata.every((k) => bahan.includes(k))
   })
 }
+
+// Pengurus inti (BPH, is_core = 1) selalu paling atas; sisanya mengikuti urutan dari server. Tidak mengubah array asli.
+export function urutkanPengurus(items) {
+  return items
+    .map((item, i) => ({ item, i }))
+    .sort((a, b) => (b.item.is_core === 1) - (a.item.is_core === 1) || a.i - b.i)
+    .map((x) => x.item)
+}
+
+// Nama kepala department: pengurus department itu yang jabatannya diawali "Kepala" (yang aktif didahulukan). '' bila tidak ada.
+export function kepalaDepartment(pengurus, departmentId) {
+  const calon = pengurus.filter((p) => p.department_id === departmentId && /^\s*kepala\b/i.test(p.position || ''))
+  const kepala = calon.find((p) => p.is_active === 1) ?? calon[0]
+  return kepala ? kepala.name : ''
+}
