@@ -1,0 +1,64 @@
+/* Kaki tabel admin (desain Kelola Struktur Organisasi): info halaman kiri, nomor halaman kanan. */
+.kaki {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding: 14px 24px 16px 40px;
+  border-top: 1px solid var(--color-border);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+.kiri { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 24px; }
+.info b { color: var(--color-heading); font-weight: 700; }
+.baris { display: inline-flex; align-items: center; gap: 8px; }
+.pilih {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--color-deco);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-heading);
+  cursor: pointer;
+}
+.pilih:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
+.nomor { display: flex; align-items: center; gap: 8px; }
+.tombol {
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
+  border: 1px solid var(--color-deco);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-heading);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.tombol:hover:not(:disabled):not(.aktif) { background: var(--color-surface-panel); }
+.tombol:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.tombol:disabled { background: var(--color-surface-panel); border-color: var(--color-border); color: var(--color-text-disabled); cursor: not-allowed; }
+.aktif { border-color: var(--color-primary); background: var(--color-primary); color: #fff; cursor: default; }
+.titik { padding: 0 2px; color: var(--color-text-muted); }
+
+@media (max-width: 640px) {
+  .kaki {
+    margin-top: 12px;
+    padding: 14px 16px;
+    border: 0;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(var(--color-shadow), 0.06);
+    justify-content: center;
+  }
+  .kiri { justify-content: center; }
+}

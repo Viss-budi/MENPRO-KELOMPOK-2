@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { CircleAlert, Pencil, Plus, RefreshCw, SearchX, Trash2, Users } from 'lucide-react'
 import AlatTabel, { ChipFilterAktif } from '../../../components/admin/AlatTabel/AlatTabel'
 import ConfirmDialog from '../../../components/admin/ConfirmDialog/ConfirmDialog'
+import Paginasi from '../../../components/admin/Paginasi/Paginasi'
 import AvatarPengurus from '../../../components/common/AvatarPengurus/AvatarPengurus'
 import { useApi } from '../../../hooks/useApi'
 import { deleteMember, getAdminStruktur } from '../../../services/api'
@@ -9,7 +10,8 @@ import { resolveImage } from '../../../utils/image'
 import { klikBiasa } from '../../../utils/nav'
 import { pesanGagal } from '../../../utils/pesanGagal'
 import { PATH_TAMBAH_PENGURUS, pathUbahPengurus } from './rute'
-import { NAMA_BELUM_DIISI, labelDepartment, opsiDepartment, saringPengurus } from './strukturUtils'
+import { NAMA_BELUM_DIISI, labelDepartment, opsiDepartment, saringPengurus, urutkanPengurus } from './strukturUtils'
+import DepartmentDaftar from './DepartmentDaftar'
 import base from '../Berita/Berita.module.css'
 // Gaya tombol Edit/Hapus dan animasi hover-nya dipakai bersama tabel Berita (desain UI/UX: animasi_edithapus)
 import aksi from '../Berita/BeritaDaftar.module.css'
@@ -38,11 +40,19 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
   const [errorHapus, setErrorHapus] = useState('')
   const [kata, setKata] = useState('')
   const [department, setDepartment] = useState('')
+  const [halaman, setHalaman] = useState(1)
+  const [perHalaman, setPerHalaman] = useState(10)
 
   const { data, loading, error } = useApi((signal) => getAdminStruktur(signal), `struktur-${muatUlang}`)
 
   const semua = useMemo(() => data?.items ?? [], [data])
-  const items = useMemo(() => saringPengurus(semua, { q: kata, department }), [semua, kata, department])
+  // Pengurus inti (is_core) selalu paling atas, lalu dibagi per halaman
+  const items = useMemo(() => urutkanPengurus(saringPengurus(semua, { q: kata, department })), [semua, kata, department])
+  const halamanAktif = Math.min(halaman, Math.max(1, Math.ceil(items.length / perHalaman)))
+  const tampil = useMemo(
+    () => items.slice((halamanAktif - 1) * perHalaman, halamanAktif * perHalaman),
+    [items, halamanAktif, perHalaman]
+  )
   const grupFilter = useMemo(
     () => [{ key: 'department', label: 'Department', opsi: opsiDepartment(semua) }],
     [semua]
@@ -56,11 +66,15 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
   const alatSiap = !loading && !error && semua.length > 0
 
   function ubahFilter(key, nilai) {
-    if (key === 'department') setDepartment(nilai)
+    if (key === 'department') {
+      setDepartment(nilai)
+      setHalaman(1)
+    }
   }
   function resetSemua() {
     setKata('')
     setDepartment('')
+    setHalaman(1)
   }
 
   const alat = (variant) => (
@@ -69,11 +83,17 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
       label="pengurus"
       placeholder="Cari nama atau jabatan..."
       query={kata}
-      onQuery={setKata}
+      onQuery={(v) => {
+        setKata(v)
+        setHalaman(1)
+      }}
       grup={grupFilter}
       nilai={nilaiFilter}
       onUbah={ubahFilter}
-      onReset={() => setDepartment('')}
+      onReset={() => {
+        setDepartment('')
+        setHalaman(1)
+      }}
     />
   )
 
@@ -189,7 +209,10 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
           </div>
           {alatSiap && (
             <div className={styles.chipBaris}>
-              <ChipFilterAktif grup={grupFilter} nilai={nilaiFilter} onUbah={ubahFilter} onReset={() => setDepartment('')} />
+              <ChipFilterAktif grup={grupFilter} nilai={nilaiFilter} onUbah={ubahFilter} onReset={() => {
+                setDepartment('')
+                setHalaman(1)
+              }} />
             </div>
           )}
 
@@ -255,7 +278,7 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
                 )}
 
                 {adaData &&
-                  items.map((item) => (
+                  tampil.map((item) => (
                     <tr key={item.id} className={item.id === baruId ? styles.barisBaru : ''}>
                       <td>
                         <div className={styles.selPengurus}>
@@ -303,8 +326,26 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
                   ))}
               </tbody>
             </table>
+            {adaData && (
+              <Paginasi
+                total={items.length}
+                halaman={halamanAktif}
+                perHalaman={perHalaman}
+                onHalaman={setHalaman}
+                onPerHalaman={(n) => {
+                  setPerHalaman(n)
+                  setHalaman(1)
+                }}
+                label="pengurus"
+              />
+            )}
           </div>
         </>
+      )}
+
+      {/* Tabel Department di bawah tabel pengurus (desain Kelola Struktur Organisasi) */}
+      {!error && !loading && (
+        <DepartmentDaftar pengurus={semua} onSukses={onSukses} onBerubah={() => setMuatUlang((n) => n + 1)} />
       )}
 
       {target && (

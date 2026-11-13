@@ -150,50 +150,62 @@ export async function uploadImage(file, signal) {
 
 // ── Kelola struktur organisasi (anggota, departemen, periode) ───────────────
 // Khusus admin (403 jika editor).
+// DIHAPUS di backend (commit 0bec9ed): kolom periode dan endpoint /periods sudah tidak ada. Tidak dipakai lagi.
 // GET /periods -> { active, periods } (publik). active = periode yang tampil di website.
 export async function getPeriods(signal) {
   const json = await request('GET', '/periods', { signal })
   return { active: json.data?.active ?? null, periods: json.data?.periods ?? [] }
 }
 
-// Daftar pengurus periode aktif untuk halaman admin.
-// GET /members/admin/all?period=&per_page=100 -> { items, meta }
-// Mengembalikan { period, items }. period null = belum ada periode aktif.
+// Daftar pengurus untuk halaman admin (tanpa periode sejak backend 0bec9ed).
+// GET /members/admin/all?per_page=100 -> { items, meta }
+// Mengembalikan { period: null, items } (period dipertahankan null supaya pemakai lama tidak error).
 export async function getAdminStruktur(signal) {
-  const { active } = await getPeriods(signal)
-  if (!active) return { period: null, items: [] }
-  const q = new URLSearchParams({ period: active, per_page: '100' })
+  const q = new URLSearchParams({ per_page: '100' })
   const json = await request('GET', `/members/admin/all?${q}`, { signal, admin: true })
-  return { period: active, items: json.data ?? [] }
+  return { period: null, items: json.data ?? [] }
 }
 
 // Pencarian pengurus untuk kolom "Cari di admin" (kontrak 5.2.1: q dicari di nama, jabatan, nama departemen).
-// Khusus admin. Mengembalikan data[] (maks `batas` pengurus) pada periode aktif.
+// Khusus admin. Mengembalikan data[] (maks `batas` pengurus).
 export async function cariPengurus(q, batas = 5, signal) {
-  const { active } = await getPeriods(signal)
   const params = new URLSearchParams({ per_page: String(batas), q: String(q).trim().slice(0, 100) })
-  if (active) params.set('period', active)
   const json = await request('GET', `/members/admin/all?${params}`, { signal, admin: true })
   return json.data ?? []
 }
 
-// Departemen aktif pada satu periode, untuk pilihan dropdown di form.
-// GET /departments/admin/all?period=&is_active=1&per_page=100 -> data[]
-export async function getAdminDepartments(period, signal) {
-  const q = new URLSearchParams({ period, is_active: '1', per_page: '100' })
+// Departemen aktif, untuk pilihan dropdown di form (tanpa periode sejak backend 0bec9ed).
+// GET /departments/admin/all?is_active=1&per_page=100 -> data[]
+export async function getAdminDepartments(signal) {
+  const q = new URLSearchParams({ is_active: '1', per_page: '100' })
   const json = await request('GET', `/departments/admin/all?${q}`, { signal, admin: true })
   return json.data ?? []
 }
 
+// Semua departemen (aktif dan nonaktif) untuk tabel Department di halaman Kelola Struktur.
+// GET /departments/admin/all?per_page=100 -> data[]: { id, name, slug, description, logo_url, is_active, member_count, updated_at }
+export async function getAdminDepartmentsAll(signal) {
+  const json = await request('GET', '/departments/admin/all?per_page=100', { signal, admin: true })
+  return json.data ?? []
+}
+
+// DELETE /departments/:id -> 200 { data: { members_deleted } }
+// 409 bila departemen masih punya anggota, kecuali denganAnggota = true (?with_members=1: anggotanya ikut dihapus).
+export async function deleteDepartment(id, { denganAnggota = false } = {}, signal) {
+  const q = denganAnggota ? '?with_members=1' : ''
+  const json = await request('DELETE', `/departments/${id}${q}`, { signal, admin: true })
+  return json.data ?? {}
+}
+
 // POST /members -> 201 { data: { id } }
-// body: { name, position, department_id, photo_url, period, is_active }
+// body: { name, position, department_id, photo_url, is_active }
 export async function createMember(body, signal) {
   const json = await request('POST', '/members', { body, signal, admin: true })
   return json.data
 }
 
 // GET /members/admin/:id -> satu pengurus lengkap untuk mengisi form ubah
-// { id, name, position, period, group_name, department_id, department_name, photo_url, sort_order, is_active, is_core }
+// { id, name, position, group_name, department_id, department_name, photo_url, sort_order, is_active, is_core }
 export async function getAdminMember(id, signal) {
   const json = await request('GET', `/members/admin/${id}`, { signal, admin: true })
   return json.data
@@ -211,6 +223,7 @@ export async function deleteMember(id, signal) {
 }
 
 // ── Endpoint publik ───────────────────────────────────────────────────────────
+// DIHAPUS di backend (commit 0bec9ed): endpoint /hero-slides sudah tidak ada. Belum ada pemakai di frontend.
 export const getHeroSlides = (signal) => get('/hero-slides', signal)
 export const getEvents = (limit = 3, signal) => get(`/events?limit=${limit}&featured=1`, signal)
 export const getEventsByDate = (date, signal) => get(`/events?date=${date}`, signal)
@@ -234,13 +247,10 @@ export async function kirimPesan(body, signal) {
   const json = await request('POST', '/contact', { body, signal, senyap: true })
   return json.data
 }
-// GET /structure?period= -> { period, inti: [{ group, members }], departments }
-// Tanpa period = periode aktif. Hanya pengurus is_active=1 (publik).
-export const getStructure = (period, signal) =>
-  get(`/structure${period ? `?period=${encodeURIComponent(period)}` : ''}`, signal)
-// GET /members?period= -> data[] (publik, hanya is_active=1): { id, name, position, group_name, department_id, photo_url, period }
-export const getMembers = (period, signal) =>
-  get(`/members${period ? `?period=${encodeURIComponent(period)}` : ''}`, signal)
-// GET /departments/:slug?period= -> { department, members }
-export const getDepartment = (slug, period, signal) =>
-  get(`/departments/${encodeURIComponent(slug)}${period ? `?period=${encodeURIComponent(period)}` : ''}`, signal)
+// GET /structure -> { inti: [{ group, members }], departments }
+// Hanya pengurus is_active=1 (publik). Tanpa periode sejak backend 0bec9ed.
+export const getStructure = (signal) => get('/structure', signal)
+// GET /members -> data[] (publik, hanya is_active=1): { id, name, position, group_name, department_id, photo_url }
+export const getMembers = (signal) => get('/members', signal)
+// GET /departments/:slug -> { department, members }
+export const getDepartment = (slug, signal) => get(`/departments/${encodeURIComponent(slug)}`, signal)
