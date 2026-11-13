@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]   # ganti jika branch utama kamu master/develop
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+        env:
+          VITE_API_URL: /api/v1
+
+  backend:
+    name: Backend (API test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: himafor_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+
+    env:
+      PORT: 5000
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: root
+      DB_NAME: himafor_test
+      DB_SSL: 'false'
+      JWT_SECRET: ci-only-secret-0123456789abcdef0123456789abcdef
+      CORS_ORIGIN: http://localhost:5173
+      ADMIN_EMAIL: admin@himafor.id
+      ADMIN_PASSWORD: PasswordCI12345
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+
+      - name: Buat skema database
+        run: mysql -h 127.0.0.1 -uroot -proot himafor_test < database/schema_production.sql
+
+      - name: Buat akun admin untuk tes
+        run: npm run create-admin -- "Admin CI" "$ADMIN_EMAIL" "$ADMIN_PASSWORD"
+
+      - name: Jalankan server
+        run: |
+          nohup node index.js > server.log 2>&1 &
+          curl --retry 20 --retry-delay 1 --retry-connrefused -sf http://localhost:5000/api/v1/health
+
+      - name: Tes API (Postman/newman)
+        run: |
+          npx --yes newman run tests/Himafor-API-Sprint4_postman_collection.json \
+            --env-var "host=http://localhost:5000" \
+            --env-var "adminEmail=$ADMIN_EMAIL" \
+            --env-var "adminPassword=$ADMIN_PASSWORD" \
+            --folder "01 Publik (tanpa login)" \
+            --folder "02 Tanpa Login (harus ditolak)" \
+            --folder "03 Login dan Sesi" \
+            --folder "04 Dashboard - Ringkasan" \
+            --folder "05 Dashboard - Kegiatan (CRUD)" \
+            --folder "06 Dashboard - Berita (CRUD)" \
+            --folder "07 Dashboard - Anggota (CRUD, admin)" \
+            --folder "08 Pengaturan (admin)" \
+            --folder "09 Struktur Organisasi (departemen dan BPH)" \
+            --folder "10 Upload (tanpa file)" \
+            --folder "11 Akun dan Izin Editor" \
+            --folder "12 Sistem dan Error Global" \
+            --folder "13 Logout dan Sesi Dicabut" \
+            --bail
+
+      - name: Simpan log server jika gagal
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-log
+          path: backend/server.log
