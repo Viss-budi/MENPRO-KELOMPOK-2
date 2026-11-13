@@ -49,6 +49,20 @@ function KelolaStruktur({ pathname, onNavigate }) {
     [onNavigate]
   )
 
+  // Pengurus dihapus dari form ubah (Zona Berbahaya): kembali ke daftar dan beri kabar.
+  const selesaiHapus = useCallback(
+    ({ nama, sudahTerhapus }) => {
+      setBaruId(null)
+      setToast({
+        id: Date.now(),
+        judul: sudahTerhapus ? 'Pengurus sudah terhapus' : 'Pengurus berhasil dihapus',
+        pesan: sudahTerhapus ? `"${nama}" sudah dihapus sebelumnya. Daftar diperbarui.` : `"${nama}" sudah dihapus dari daftar.`,
+      })
+      onNavigate(PATH_STRUKTUR)
+    },
+    [onNavigate]
+  )
+
   // Toast dari daftar sendiri (mis. berhasil dihapus)
   const tampilkanToast = useCallback((isi) => {
     setBaruId(null)
@@ -67,6 +81,7 @@ function KelolaStruktur({ pathname, onNavigate }) {
           id={rute.id}
           onNavigate={onNavigate}
           onSukses={selesaiSimpan}
+          onHapus={selesaiHapus}
         />
       )}
       <Toast toast={toast} onClose={tutupToast} />

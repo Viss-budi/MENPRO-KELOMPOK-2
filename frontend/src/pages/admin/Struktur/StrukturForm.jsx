@@ -5,7 +5,6 @@ import {
   createMember,
   getAdminDepartments,
   getAdminMember,
-  getPeriods,
   updateMember,
   uploadImage,
 } from '../../../services/api'
@@ -33,7 +32,6 @@ const KOLOM_ERROR = {
   department_id: 'department',
   photo_url: 'foto',
 }
-const PESAN_TANPA_PERIODE = 'Belum ada periode aktif. Hubungi tim backend untuk menyiapkan periode.'
 
 // Form tambah dan ubah pengurus (desain 05 sampai 11; mode ubah memakai tata letak yang sama).
 // mode       : 'tambah' | 'ubah' ; id : id pengurus (mode ubah)
@@ -58,10 +56,9 @@ function StrukturForm({ mode = 'tambah', id, onNavigate, onSukses }) {
   const [banner, setBanner] = useState(null)
   const [menyimpan, setMenyimpan] = useState(false)
 
-  // Periode aktif + pilihan department. muat: 'memuat' | 'siap' | 'gagal'
+  // Pilihan department. muat: 'memuat' | 'siap' | 'gagal'
   const [muat, setMuat] = useState('memuat')
   const [muatKe, setMuatKe] = useState(0)
-  const [periode, setPeriode] = useState(null)
   const [daftarDepartment, setDaftarDepartment] = useState([])
   const [pesanMuat, setPesanMuat] = useState('')
 
@@ -77,34 +74,21 @@ function StrukturForm({ mode = 'tambah', id, onNavigate, onSukses }) {
   const bannerRef = useRef(null)
   const abortRef = useRef(null)
 
-  // ── Ambil periode dan daftar department-nya ────────────────────────────
-  // Tambah: periode aktif. Ubah: pengurus dimuat dulu, lalu department milik periodenya.
+  // ── Ambil daftar department (backend tidak lagi memakai periode) ───────
+  // Ubah: pengurus dimuat dulu agar form terisi, lalu daftar department diambil.
   useEffect(() => {
     const ac = new AbortController()
     ;(async () => {
       try {
-        let periodeTarget
         if (edit) {
           const data = await getAdminMember(id, ac.signal)
-          periodeTarget = data.period
           setAwal(data)
           // Slot posisi utama yang belum diisi bernama "(Belum diisi)": kolom nama dikosongkan agar mudah diisi
           setNama(data.name === NAMA_BELUM_DIISI ? '' : (data.name ?? ''))
           setJabatan(data.position ?? '')
           setDepartmentId(data.department_id ? String(data.department_id) : '')
-        } else {
-          const { active } = await getPeriods(ac.signal)
-          periodeTarget = active
         }
-        if (!periodeTarget) {
-          setPeriode(null)
-          setDaftarDepartment([])
-          setPesanMuat(PESAN_TANPA_PERIODE)
-          setMuat('gagal')
-          return
-        }
-        const dept = await getAdminDepartments(periodeTarget, ac.signal)
-        setPeriode(periodeTarget)
+        const dept = await getAdminDepartments(ac.signal)
         setDaftarDepartment(dept)
         setMuat('siap')
       } catch (err) {
@@ -183,10 +167,6 @@ function StrukturForm({ mode = 'tambah', id, onNavigate, onSukses }) {
       else departmentRef.current?.focus()
       return
     }
-    if (!periode) {
-      setBanner({ pesan: pesanMuat || PESAN_TANPA_PERIODE })
-      return
-    }
 
     setBanner(null)
     setMenyimpan(true)
@@ -229,7 +209,6 @@ function StrukturForm({ mode = 'tambah', id, onNavigate, onSukses }) {
           position: jabatan.trim(),
           department_id: Number(departmentId),
           photo_url: urlFoto,
-          period: periode,
           is_active: 1,
         },
         ac.signal
@@ -238,7 +217,7 @@ function StrukturForm({ mode = 'tambah', id, onNavigate, onSukses }) {
     } catch (err) {
       if (err.name === 'AbortError') return
       // Kontrak 7.3: pesan validasi per field ditampilkan di dekat field-nya.
-      // Field yang tidak punya kolom di form (mis. period) tetap tampil di kotak pesan.
+      // Field yang tidak punya kolom di form (mis. field tak dikenal) tetap tampil di kotak pesan.
       const perField = {}
       const sisa = []
       for (const e of err.errors ?? []) {
@@ -314,9 +293,9 @@ function StrukturForm({ mode = 'tambah', id, onNavigate, onSukses }) {
     <form className={base.page} onSubmit={simpan} noValidate>
       <header className={base.head}>
         <div>
-          <h1 className={base.title}>{edit ? 'Ubah Pengurus' : 'Tambah Pengurus'}</h1>
+          <h1 className={base.title}>{edit ? 'Edit Pengurus' : 'Tambah Pengurus'}</h1>
           <p className={base.subtitle}>
-            {edit && muat === 'memuat' ? 'Memuat data pengurus...' : edit ? 'Ubah data pengurus lalu tekan Simpan.' : 'Isi data pengurus lalu tekan Simpan.'}
+            {edit && muat === 'memuat' ? 'Memuat data pengurus...' : edit ? 'Ubah data pengurus lalu tekan Simpan Perubahan.' : 'Isi data pengurus lalu tekan Simpan.'}
           </p>
         </div>
         <div className={base.actions}>

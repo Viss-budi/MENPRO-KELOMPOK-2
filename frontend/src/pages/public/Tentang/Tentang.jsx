@@ -30,10 +30,10 @@ function KartuPengurus({ member }) {
 function Tentang() {
   const [muatUlang, setMuatUlang] = useState(0)
 
-  // Struktur periode aktif (pengurus inti + daftar department), lalu anggota per department
+  // Struktur organisasi (pengurus inti + daftar department), lalu anggota per department
   const { data, loading, error } = useApi(async (signal) => {
-    const struktur = await getStructure(null, signal)
-    const anggota = await getMembers(struktur.period, signal)
+    const struktur = await getStructure(signal)
+    const anggota = await getMembers(signal)
     return { struktur, anggota }
   }, `struktur-publik-${muatUlang}`)
 
