@@ -4,7 +4,8 @@ const { cleanBody, clamp, escapeLike } = require('../utils/crud');
 const validateDepartment = require('../utils/validators/department');
 const { scheduleCleanup } = require('../utils/imageCleanup');
 
-const FIELDS = ['name', 'description', 'logo_url', 'sort_order', 'is_active']; // slug tidak bisa dikirim: dibuat dari nama
+const FIELDS = ['name', 'alias', 'description', 'logo_url', 'sort_order', 'is_active'];
+const ALIAS_TAKEN = 'Alias sudah dipakai departemen lain';
 const HAS_MEMBERS = 'Departemen masih punya anggota. Pindahkan atau hapus anggotanya, atau nonaktifkan departemen.';
 
 const bad = (res, message) => res.status(400).json({ success: false, message });
@@ -13,15 +14,15 @@ const notFound = (res, message = 'Data tidak ditemukan') => res.status(404).json
 const conflict = (res, message) => res.status(409).json({ success: false, message });
 
 const normalize = (data) => {
-  for (const f of ['description', 'logo_url']) if (data[f] === '') data[f] = null;
+  for (const f of ['alias', 'description', 'logo_url']) if (data[f] === '') data[f] = null; // ALIAS
   for (const f of ['sort_order', 'is_active']) {
     if (typeof data[f] === 'string' && /^-?\d+$/.test(data[f])) data[f] = Number(data[f]);
   }
   return data;
 };
 
-const COLS = `d.id, d.name, d.slug, d.description, d.logo_url, d.sort_order, d.is_active,
-  (SELECT COUNT(*) FROM members m WHERE m.department_id = d.id) AS member_count, d.created_at, d.updated_at`;
+const COLS = `d.id, d.name, d.alias, d.slug, d.description, d.logo_url, d.sort_order, d.is_active,
+  (SELECT COUNT(*) FROM members m WHERE m.department_id = d.id) AS member_count, d.created_at, d.updated_at`; // ALIAS
 
 // ---------- publik ----------
 // GET /departments/:slug
@@ -47,7 +48,7 @@ const listAll = async (req, res) => {
   const where = [];
   const params = [];
   const q = String(req.query.q ?? '').trim().slice(0, 100);
-  if (q) { where.push('d.name LIKE ?'); params.push(`%${escapeLike(q)}%`); }
+  if (q) { where.push('(d.name LIKE ? OR d.alias LIKE ?)'); params.push(...Array(2).fill(`%${escapeLike(q)}%`)); } // ALIAS
   for (const f of ['is_active']) {
     const v = req.query[f];
     if (v !== undefined && v !== '') { where.push(`d.${f} = ?`); params.push(String(v)); }
@@ -82,6 +83,10 @@ const create = async (req, res) => {
   // LOWER(): perbandingan nama tidak boleh bergantung pada collation database (TiDB case-sensitive, MariaDB tidak)
   const [[dup]] = await db.query('SELECT id FROM departments WHERE slug = ? OR LOWER(name) = LOWER(?) LIMIT 1', [data.slug, data.name]);
   if (dup) return conflict(res, 'Departemen dengan nama itu sudah ada');
+  if (data.alias) { // ALIAS
+    const [[aliasDup]] = await db.query('SELECT id FROM departments WHERE LOWER(alias) = LOWER(?) LIMIT 1', [data.alias]);
+    if (aliasDup) return conflict(res, ALIAS_TAKEN);
+  }
 
   const [r] = await db.query('INSERT INTO departments SET ?', [data]);
   res.status(201).json({ success: true, message: 'Berhasil ditambahkan', data: { id: r.insertId, slug: data.slug } });
@@ -109,6 +114,10 @@ const update = async (req, res) => {
     );
     if (dup) return conflict(res, 'Departemen dengan nama itu sudah ada');
     data.slug = newSlug; // slug mengikuti nama; FE selalu mengambil slug dari GET /structure
+  }
+  if (data.alias) { // ALIAS
+    const [[aliasDup]] = await db.query('SELECT id FROM departments WHERE id <> ? AND LOWER(alias) = LOWER(?) LIMIT 1', [row.id, data.alias]);
+    if (aliasDup) return conflict(res, ALIAS_TAKEN);
   }
   await db.query('UPDATE departments SET ? WHERE id = ?', [data, req.params.id]);
   if ('logo_url' in data && row.logo_url && row.logo_url !== data.logo_url) scheduleCleanup([row.logo_url]); // logo lama
