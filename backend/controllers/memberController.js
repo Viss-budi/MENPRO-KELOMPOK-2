@@ -6,6 +6,7 @@ const { scheduleCleanup } = require('../utils/imageCleanup');
 
 const FIELDS = ['name', 'position', 'group_name', 'department_id', 'photo_url', 'sort_order', 'is_active'];
 const REQUIRED = ['name', 'position'];
+
 // Posisi utama BPH (is_core = 1): hanya ini yang boleh diubah
 const CORE_EDITABLE = ['name', 'photo_url', 'is_active'];
 
@@ -52,7 +53,8 @@ const getPublic = async (req, res) => {
 };
 
 const ADMIN_COLS = `m.id, m.name, m.position, m.group_name, m.department_id, d.name AS department_name,
-  m.photo_url, m.sort_order, m.is_active, m.is_core, m.created_at, m.updated_at`;
+  COALESCE(NULLIF(d.alias, ''), d.name) AS department_alias, m.photo_url, m.sort_order, m.is_active, m.is_core, m.created_at, m.updated_at`;
+
 const ADMIN_FROM = 'FROM members m LEFT JOIN departments d ON d.id = m.department_id';
 
 // GET /admin/all?page=&per_page=&q=&department_id=&is_active=&is_core=&group_name=
@@ -64,8 +66,8 @@ const listAll = async (req, res) => {
 
   const q = String(req.query.q ?? '').trim().slice(0, 100);
   if (q) {
-    where.push('(m.name LIKE ? OR m.position LIKE ? OR d.name LIKE ?)');
-    params.push(...Array(3).fill(`%${escapeLike(q)}%`));
+    where.push('(m.name LIKE ? OR m.position LIKE ? OR d.name LIKE ? OR d.alias LIKE ?)');
+    params.push(...Array(4).fill(`%${escapeLike(q)}%`));
   }
   for (const f of ['department_id', 'is_active', 'is_core', 'group_name']) {
     const v = req.query[f];
