@@ -10,6 +10,10 @@ module.exports = function validateDepartment(data) {
     if (typeof data.name !== 'string') add('name', 'Nama departemen harus berupa teks');
     else if (data.name.length > 75) add('name', 'Nama departemen maksimal 75 karakter');
   }
+  if (has('alias') && data.alias !== null) {
+    if (typeof data.alias !== 'string') add('alias', 'Alias harus berupa teks');
+    else if (data.alias.length > 10) add('alias', 'Alias maksimal 10 karakter');
+  }
   if (has('description') && data.description !== null) {
     if (typeof data.description !== 'string') add('description', 'Deskripsi harus berupa teks');
     else if (data.description.length > 500) add('description', 'Deskripsi maksimal 500 karakter');

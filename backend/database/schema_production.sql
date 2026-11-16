@@ -1,5 +1,7 @@
 -- Himafor: skema database PRODUCTION (API Contract v1.4, Sprint 4)
--- Jalankan pada database kosong. Tanpa data dummy.
+-- Jalankan SEKALI pada database kosong. Tidak berisi data dummy.
+-- Urutan: users -> settings -> departments -> members -> events -> news -> data awal.
+
 -- CREATE DATABASE himafor_prod CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- USE himafor_prod;
 
@@ -26,6 +28,7 @@ CREATE TABLE settings (
 CREATE TABLE departments (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(75) NOT NULL,
+  alias VARCHAR(10) NULL,
   slug VARCHAR(180) NOT NULL,
   description VARCHAR(500) NULL,
   logo_url VARCHAR(500) NULL,
@@ -34,10 +37,11 @@ CREATE TABLE departments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uq_departments_slug (slug),
+  UNIQUE KEY uq_departments_alias (alias),
   INDEX idx_departments_list (is_active, sort_order)
 );
 
--- department_id NULL = BPH. is_core = 1 = posisi utama BPH.
+-- department_id NULL = Badan Pengurus Harian (BPH). is_core = 1 = posisi utama BPH.
 CREATE TABLE members (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(75) NOT NULL,
@@ -52,15 +56,14 @@ CREATE TABLE members (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_members_active (is_active, sort_order),
   INDEX idx_members_department (department_id),
-  CONSTRAINT fk_members_department FOREIGN KEY (department_id)
-    REFERENCES departments(id) ON DELETE RESTRICT
+  CONSTRAINT fk_members_department FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE events (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200) NOT NULL,
   slug VARCHAR(255) NOT NULL,
-  category ENUM('Seminar','Event','Workshop','Lomba','Lainnya') NOT NULL DEFAULT 'Event',
+  category ENUM('Seminar','Event','Workshop','Lomba','Lainnya') NOT NULL DEFAULT 'Event',          -- Seminar, Event, Workshop, Lomba, Lainnya (dicek backend)
   description TEXT NULL,
   thumbnail_url VARCHAR(500) NULL,
   location VARCHAR(200) NULL,
@@ -80,9 +83,9 @@ CREATE TABLE news (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(100) NOT NULL,
   slug VARCHAR(100) NOT NULL,
-  category ENUM('Berita','Kegiatan','Prestasi','Pengumuman') NOT NULL DEFAULT 'Berita',
+  category ENUM('Berita','Kegiatan','Prestasi','Pengumuman') NOT NULL DEFAULT 'Berita',         -- Berita, Kegiatan, Prestasi, Pengumuman (dicek backend)
   excerpt VARCHAR(300) NULL,
-  content MEDIUMTEXT NULL,
+  content MEDIUMTEXT NULL,                                -- maks 50.000 karakter, dicek backend
   cover_url VARCHAR(500) NULL,
   published_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   is_published TINYINT(1) NOT NULL DEFAULT 1,
@@ -95,7 +98,7 @@ CREATE TABLE news (
   CONSTRAINT fk_news_user FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Data awal: 6 slot posisi utama BPH (nonaktif sampai diisi admin)
+-- Data awal (bukan data dummy): 6 slot posisi utama BPH, nonaktif sampai admin mengisinya
 INSERT INTO members (name, position, group_name, sort_order, is_active, is_core) VALUES
  ('(Belum diisi)', 'Ketua Umum',    NULL,         1, 0, 1),
  ('(Belum diisi)', 'Wakil Ketua',   NULL,         2, 0, 1),
@@ -107,3 +110,6 @@ INSERT INTO members (name, position, group_name, sort_order, is_active, is_core)
 INSERT INTO settings (setting_key, setting_value) VALUES
  ('stat_members','0'),('stat_events','0'),('stat_achievements','0'),('stat_years','0'),
  ('footer_tagline',''),('contact_email',''),('contact_phone',''),('contact_address','');
+
+-- Akun admin pertama TIDAK dibuat di sini (password harus di-hash bcrypt). Jalankan setelah skema:
+--   npm run create-admin -- "Nama Admin" email@domain.com PasswordMinimal10

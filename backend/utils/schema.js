@@ -6,7 +6,7 @@ const REQUIRED = {
   events: ['id', 'title', 'slug', 'category', 'description', 'thumbnail_url', 'location', 'start_at', 'end_at', 'is_featured', 'is_published'],
   news: ['id', 'title', 'slug', 'category', 'excerpt', 'content', 'cover_url', 'published_at', 'is_published'],
   members: ['id', 'name', 'position', 'group_name', 'department_id', 'photo_url', 'sort_order', 'is_active', 'is_core'],
-  departments: ['id', 'name', 'slug', 'description', 'logo_url', 'sort_order', 'is_active'],
+  departments: ['id', 'name', 'alias', 'slug', 'description', 'logo_url', 'sort_order', 'is_active'],
   settings: ['setting_key', 'setting_value'],
 };
 const OPTIONAL = { events: ['created_by'], news: ['author_id', 'views_count'] };

@@ -8460,6 +8460,538 @@
           ]
         },
         {
+          "name": "Alias: lebih dari 10 karakter (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{deptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{deptA}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"12345678901\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = false\", () => pm.expect(j.success).to.be.false);",
+                  "pm.test(\"errors memuat field alias\", () => pm.expect(j.errors.map(e => e.field)).to.include(\"alias\"));",
+                  "pm.test(\"message menyebut maksimal 10 karakter\", () => pm.expect(j.message).to.include(\"maksimal 10 karakter\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: berupa objek (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{deptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{deptA}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": {\n    \"x\": 1\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = false\", () => pm.expect(j.success).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias A: isi alias 9 karakter (200)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{deptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{deptA}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"Dept Alfa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias A: detail admin memuat alias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/departments/admin/{{deptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "admin",
+                "{{deptA}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.test(\"alias = Dept Alfa\", () => pm.expect(j.data.alias).to.eql(\"Dept Alfa\"));",
+                  "pm.test(\"name tetap panjang, tidak berubah\", () => pm.expect(j.data.name).to.include(\"Departemen Uji A\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias A: kirim ulang alias sendiri tidak bentrok (200)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{deptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{deptA}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"Dept Alfa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias B: sama dengan alias A (409)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{deptB}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{deptB}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"Dept Alfa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = false\", () => pm.expect(j.success).to.be.false);",
+                  "pm.test(\"message: Alias sudah dipakai departemen lain\", () => pm.expect(j.message).to.include(\"Alias sudah dipakai departemen lain\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias B: sama dengan alias A beda huruf besar (409)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{deptB}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{deptB}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"DEPT ALFA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = false\", () => pm.expect(j.success).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: tambah departemen dengan alias bentrok (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Departemen Uji Alias {{ts}}\",\n  \"alias\": \"dept alfa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.response.to.have.status(409));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = false\", () => pm.expect(j.success).to.be.false);",
+                  "pm.test(\"message: Alias sudah dipakai departemen lain\", () => pm.expect(j.message).to.include(\"Alias sudah dipakai departemen lain\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias B: tepat 10 karakter (200)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{deptB}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{deptB}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"1234567890\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: tambah departemen dengan alias (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Departemen Uji Alias {{ts}}\",\n  \"alias\": \"UjiBuat\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.collectionVariables.set(\"aliasDept\", j.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: detail departemen yang baru dibuat memuat alias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/departments/admin/{{aliasDept}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "admin",
+                "{{aliasDept}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.test(\"alias = UjiBuat\", () => pm.expect(j.data.alias).to.eql(\"UjiBuat\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: hapus departemen uji alias (200)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{aliasDept}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{aliasDept}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: pencarian departemen ?q= ikut mencari alias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/departments/admin/all?q=Dept%20Alfa",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "admin",
+                "all"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Dept%20Alfa"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.test(\"departemen A ditemukan lewat alias\", () => pm.expect(j.data.map(d => Number(d.id))).to.include(Number(pm.collectionVariables.get(\"deptA\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Anggota: department_id tidak ada (400)",
           "request": {
             "method": "POST",
@@ -8700,6 +9232,220 @@
                   "const j = pm.response.json();",
                   "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
                   "pm.test(\"2 anggota departemen A\", () => { pm.expect(j.data.length).to.eql(2); j.data.forEach(m => pm.expect(m.department_id).to.eql(pm.collectionVariables.get(\"deptA\"))); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: detail anggota memuat department_alias (alias terisi)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/admin/{{mA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "admin",
+                "{{mA}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.test(\"department_alias = alias, department_name tetap penuh\", () => { pm.expect(j.data.department_alias).to.eql(\"Dept Alfa\"); pm.expect(j.data.department_name).to.include(\"Departemen Uji A\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: pencarian anggota ?q= ikut mencari alias departemen",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/admin/all?q=Dept%20Alfa&per_page=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "admin",
+                "all"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Dept%20Alfa"
+                },
+                {
+                  "key": "per_page",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.test(\"anggota departemen A ditemukan lewat alias\", () => pm.expect(j.data.map(m => Number(m.id))).to.include(Number(pm.collectionVariables.get(\"mA\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: pengurus inti (BPH) department_alias = null",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/admin/{{ketuaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "admin",
+                "{{ketuaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.test(\"BPH tanpa departemen: alias dan nama null\", () => { pm.expect(j.data.department_alias).to.be.null; pm.expect(j.data.department_name).to.be.null; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias A: dikosongkan menjadi null (200)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/{{deptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "{{deptA}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alias\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias A: detail admin alias = null",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/departments/admin/{{deptA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "departments",
+                "admin",
+                "{{deptA}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.test(\"alias null\", () => pm.expect(j.data.alias).to.be.null);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Alias: tanpa alias, department_alias jatuh ke nama departemen",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/members/admin/{{mA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "members",
+                "admin",
+                "{{mA}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"success = true\", () => pm.expect(j.success).to.be.true);",
+                  "pm.test(\"department_alias = department_name\", () => { pm.expect(j.data.department_alias).to.eql(j.data.department_name); pm.expect(j.data.department_alias).to.include(\"Departemen Uji A\"); });"
                 ]
               }
             }
