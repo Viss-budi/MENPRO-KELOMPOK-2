@@ -5,12 +5,12 @@ import ConfirmDialog from '../../../components/admin/ConfirmDialog/ConfirmDialog
 import Paginasi from '../../../components/admin/Paginasi/Paginasi'
 import AvatarPengurus from '../../../components/common/AvatarPengurus/AvatarPengurus'
 import { useApi } from '../../../hooks/useApi'
-import { deleteMember, getAdminStruktur } from '../../../services/api'
+import { deleteMember, getAdminDepartmentsAll, getAdminStruktur } from '../../../services/api'
 import { resolveImage } from '../../../utils/image'
 import { klikBiasa } from '../../../utils/nav'
 import { pesanGagal } from '../../../utils/pesanGagal'
 import { PATH_TAMBAH_PENGURUS, pathUbahPengurus } from './rute'
-import { NAMA_BELUM_DIISI, labelDepartment, opsiDepartment, saringPengurus, urutkanPengurus } from './strukturUtils'
+import { NAMA_BELUM_DIISI, labelDepartment, opsiDepartmentDariDaftar, saringPengurus, urutkanPengurus } from './strukturUtils'
 import DepartmentDaftar from './DepartmentDaftar'
 import base from '../Berita/Berita.module.css'
 // Gaya tombol Edit/Hapus dan animasi hover-nya dipakai bersama tabel Berita (desain UI/UX: animasi_edithapus)
@@ -23,7 +23,7 @@ const BARIS_SKELETON = [0, 1, 2, 3, 4, 5]
 // pengurus departemen berlabel "Department <nama>".
 function LabelDepartment({ item }) {
   if (!item.department_id) return <span className={styles.badge}>Pengurus Inti</span>
-  const label = item.department_name ? labelDepartment(item) : 'Department —'
+  const label = item.department_alias || item.department_name ? labelDepartment(item) : 'Department —'
   return (
     <span className={styles.badge} title={label}>
       <span className={styles.badgeTeks}>{label}</span>
@@ -46,6 +46,8 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
   const { data, loading, error } = useApi((signal) => getAdminStruktur(signal), `struktur-${muatUlang}`)
 
   const semua = useMemo(() => data?.items ?? [], [data])
+  // Daftar department (sama dengan tabel Department) untuk pilihan filter
+  const { data: dataDept } = useApi((signal) => getAdminDepartmentsAll(signal), `struktur-filter-dept-${muatUlang}`)
   // Pengurus inti (is_core) selalu paling atas, lalu dibagi per halaman
   const items = useMemo(() => urutkanPengurus(saringPengurus(semua, { q: kata, department })), [semua, kata, department])
   const halamanAktif = Math.min(halaman, Math.max(1, Math.ceil(items.length / perHalaman)))
@@ -54,8 +56,8 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
     [items, halamanAktif, perHalaman]
   )
   const grupFilter = useMemo(
-    () => [{ key: 'department', label: 'Department', opsi: opsiDepartment(semua) }],
-    [semua]
+    () => [{ key: 'department', label: 'Department', opsi: opsiDepartmentDariDaftar(dataDept, semua) }],
+    [semua, dataDept]
   )
   const nilaiFilter = { department }
   const disaring = kata.trim() !== '' || department !== ''
@@ -200,9 +202,9 @@ function StrukturDaftar({ baruId, onNavigate, onSukses }) {
               {loading ? (
                 <span className={`${base.skel} ${styles.skelMeta}`} aria-label="Memuat data" />
               ) : disaring ? (
-                `Menampilkan ${items.length} dari ${semua.length} pengurus`
+                `Menampilkan ${items.length} dari ${semua.length} Pengurus`
               ) : (
-                `Menampilkan ${semua.length} pengurus`
+                `Menampilkan ${semua.length} Pengurus`
               )}
             </p>
             {alatSiap && <div className={styles.alatHp}>{alat('bar')}</div>}

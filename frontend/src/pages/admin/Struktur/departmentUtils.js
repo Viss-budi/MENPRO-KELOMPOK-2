@@ -1,6 +1,7 @@
 // Aturan validasi form tambah/ubah department (batas mengikuti backend: utils/validators/department.js).
 
 export const MAKS_NAMA_DEPARTMENT = 75
+export const MAKS_ALIAS = 10
 export const MAKS_DESKRIPSI = 500
 export const MAKS_URUTAN = 1000000
 export const MAKS_UKURAN_LOGO = 2 * 1024 * 1024
@@ -10,6 +11,7 @@ export const TIPE_LOGO = ['image/jpeg', 'image/png', 'image/webp']
 export const PESAN_DEPT = {
   namaKosong: 'Nama department wajib diisi',
   namaPanjang: `Nama maksimal ${MAKS_NAMA_DEPARTMENT} karakter`,
+  aliasPanjang: `Alias maksimal ${MAKS_ALIAS} karakter`,
   deskripsiPanjang: `Deskripsi maksimal ${MAKS_DESKRIPSI} karakter`,
   urutanKosong: 'Urutan tampil wajib diisi',
   urutanSalah: 'Urutan tampil harus berupa bilangan bulat',
@@ -26,8 +28,9 @@ export function validasiFileLogo(file) {
 
 // Mengembalikan { nama?, deskripsi?, urutan? } (objek kosong = valid).
 // `awal` (mode ubah): nilai lama; data lama yang melebihi batas tidak dipersoalkan selama tidak diubah.
-export function validasiDepartment({ nama, deskripsi, urutan, awal }) {
+export function validasiDepartment({ nama, alias = '', deskripsi, urutan, awal }) {
   const errors = {}
+  if (alias.trim().length > MAKS_ALIAS) errors.alias = PESAN_DEPT.aliasPanjang
   const n = nama.trim()
   if (!n) errors.nama = PESAN_DEPT.namaKosong
   else if (n.length > MAKS_NAMA_DEPARTMENT && n !== awal?.name) errors.nama = PESAN_DEPT.namaPanjang
