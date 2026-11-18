@@ -1,6 +1,6 @@
 /* Tabel Department (desain Kelola Struktur Organisasi). Gaya tabel dipakai bersama StrukturDaftar.module.css. */
-.bagian { margin-top: 56px; }
-.judul { font-size: 26px; line-height: 34px; }
+.bagian { margin-top: 35px; }
+.judul { font-size: 24px; line-height: 32px; }
 .ikon {
   display: grid;
   flex: none;
@@ -14,5 +14,5 @@
 @media (max-width: 640px) {
   .bagian { margin-top: 36px; }
 }
-.bagian > header { margin-bottom: 26px; }
+.bagian > header { margin-bottom: 32px; }
 @media (max-width: 640px) { .bagian > header { margin-bottom: 16px; } }

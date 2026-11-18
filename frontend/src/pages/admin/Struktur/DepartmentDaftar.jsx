@@ -37,7 +37,7 @@ function DepartmentDaftar({ pengurus, onNavigate, onSukses, onBerubah }) {
     const kataKunci = normalisasiKata(kata).split(' ').filter(Boolean)
     return semua.filter((d) => {
       if (kataKunci.length === 0) return true
-      const bahan = normalisasiKata(`${namaTampil(d.name)} ${kepalaDepartment(pengurus, d.id)}`)
+      const bahan = normalisasiKata(`${namaTampil(d.alias || d.name)} ${d.name} ${kepalaDepartment(pengurus, d.id)}`)
       return kataKunci.every((k) => bahan.includes(k))
     })
   }, [semua, kata, pengurus])
@@ -56,7 +56,7 @@ function DepartmentDaftar({ pengurus, onNavigate, onSukses, onBerubah }) {
 
   async function konfirmasiHapus() {
     if (!target || menghapus) return
-    const nama = namaTampil(target.name)
+    const nama = namaTampil(target.alias || target.name)
     setMenghapus(true)
     setErrorHapus('')
     try {
@@ -201,7 +201,7 @@ function DepartmentDaftar({ pengurus, onNavigate, onSukses, onBerubah }) {
               {adaData &&
                 tampil.map((d) => {
                   const kepala = kepalaDepartment(pengurus, d.id)
-                  const nama = namaTampil(d.name)
+                  const nama = namaTampil(d.alias || d.name)
                   return (
                     <tr key={d.id}>
                       <td>
@@ -264,8 +264,8 @@ function DepartmentDaftar({ pengurus, onNavigate, onSukses, onBerubah }) {
           judul="Hapus department ini?"
           pesan={
             Number(target.member_count) > 0
-              ? `"${namaTampil(target.name)}" masih punya ${target.member_count} anggota. Menghapusnya juga akan menghapus semua anggotanya secara permanen.`
-              : `"${namaTampil(target.name)}" akan dihapus permanen dan tidak dapat dikembalikan.`
+              ? `"${namaTampil(target.alias || target.name)}" masih punya ${target.member_count} anggota. Menghapusnya juga akan menghapus semua anggotanya secara permanen.`
+              : `"${namaTampil(target.alias || target.name)}" akan dihapus permanen dan tidak dapat dikembalikan.`
           }
           error={errorHapus}
           loading={menghapus}

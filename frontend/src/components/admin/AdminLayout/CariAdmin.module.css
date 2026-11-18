@@ -208,3 +208,6 @@
   .panel, .putar { animation: none; }
   .kolom { transition: none; }
 }
+
+/* Hint "/" disembunyikan sesuai desain; pintasan tetap berfungsi */
+.kbd { display: none; }

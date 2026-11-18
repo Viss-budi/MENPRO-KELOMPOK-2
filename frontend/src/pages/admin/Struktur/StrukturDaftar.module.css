@@ -6,7 +6,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px 12px;
-  margin: 26px 0 24px;
+  margin: 17px 0 12px;
 }
 .metaBar:has(+ .chipBaris:not(:empty)) { margin-bottom: 12px; }
 .chipBaris { margin: 0 0 20px; }
@@ -42,9 +42,9 @@
 /* Lebar kolom mengikuti desain 01 (kartu 1100px: pengurus ± 440, jabatan ± 240, department 200, aksi 216).
    Pengurus menyerap sisa lebar; kartu bisa digeser mendatar bila layar terlalu sempit. */
 .table { min-width: 760px; }
-.colJabatan { width: 22%; }
-.colDept { width: 200px; }
-.colAksi { width: 216px; }
+.colJabatan { width: 23.6%; }
+.colDept { width: 170px; }
+.colAksi { width: 210px; }
 
 .table th {
   height: 48px;
@@ -110,8 +110,8 @@
 }
 
 /* ── Kolom Aksi (Edit / Hapus) ──────────────────────────── */
-.selAksi { padding-right: 20px; }
-.selAksi > div { gap: 8px; justify-content: flex-end; }
+.selAksi { padding-right: 18px; }
+.selAksi > div { gap: 8px; justify-content: center; }
 @media (min-width: 721px) {
   .selAksi > div > * { min-width: 92px; justify-content: center; padding: 0 14px; }
 }

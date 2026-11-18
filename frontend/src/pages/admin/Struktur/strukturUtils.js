@@ -74,7 +74,7 @@ export function nilaiDepartment(item) {
 // Nama yang sudah diawali "Department" (mis. "Department of Information and Communications") dipakai apa adanya.
 export function labelDepartment(item) {
   if (!item.department_id) return 'Pengurus Inti'
-  const nama = (item.department_name || '').trim()
+  const nama = (item.department_alias || item.department_name || '').trim()
   return /^department\b/i.test(nama) ? nama : `Department ${nama}`.trim()
 }
 
@@ -86,7 +86,20 @@ export function opsiDepartment(items) {
   for (const i of items) {
     if (!i.department_id || lihat.has(i.department_id)) continue
     lihat.add(i.department_id)
-    opsi.push({ value: String(i.department_id), label: i.department_name || `Department ${i.department_id}` })
+    opsi.push({ value: String(i.department_id), label: i.department_alias || i.department_name || `Department ${i.department_id}` })
+  }
+  return opsi
+}
+
+// Pilihan filter yang mengikuti tabel Department (termasuk department yang belum punya anggota):
+// Semua, Pengurus Inti, lalu tiap department (alias, atau nama tanpa awalan "Department").
+// Bila daftar department belum ada/gagal dimuat, dipakai pilihan dari data pengurus (opsiDepartment).
+export function opsiDepartmentDariDaftar(departments, items) {
+  if (!Array.isArray(departments) || departments.length === 0) return opsiDepartment(items)
+  const opsi = [{ value: '', label: 'Semua' }, { value: FILTER_INTI, label: 'Pengurus Inti' }]
+  for (const d of departments) {
+    const label = (d.alias || String(d.name || '').replace(/^department\s+/i, '') || `Department ${d.id}`).trim()
+    opsi.push({ value: String(d.id), label })
   }
   return opsi
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
-import { ArrowLeft, ChevronDown, CircleAlert, LayoutGrid, RefreshCw, Trash2, Upload } from 'lucide-react'
+import { ArrowLeft, ChevronDown, CircleAlert, LayoutGrid, RefreshCw, Trash2, ArrowUp } from 'lucide-react'
 import ConfirmDialog from '../../../components/admin/ConfirmDialog/ConfirmDialog'
 import {
   createDepartment,
@@ -13,6 +13,7 @@ import { resolveImage } from '../../../utils/image'
 import { klikBiasa } from '../../../utils/nav'
 import { pesanGagal } from '../../../utils/pesanGagal'
 import {
+  MAKS_ALIAS,
   MAKS_DESKRIPSI,
   MAKS_NAMA_DEPARTMENT,
   namaFileDariUrl,
@@ -27,7 +28,7 @@ import styles from './DepartmentForm.module.css'
 
 const PESAN_GAGAL_SIMPAN = 'Data department gagal disimpan, silakan coba lagi'
 // Nama field di respons error backend -> kolom di form ini
-const KOLOM_ERROR = { name: 'nama', description: 'deskripsi', logo_url: 'foto', sort_order: 'urutan' }
+const KOLOM_ERROR = { name: 'nama', alias: 'alias', description: 'deskripsi', logo_url: 'foto', sort_order: 'urutan' }
 
 // Form tambah dan ubah department (desain 02-tambah-department dan 03-edit-department).
 // mode       : 'tambah' | 'ubah' ; id : id department (mode ubah)
@@ -36,6 +37,7 @@ const KOLOM_ERROR = { name: 'nama', description: 'deskripsi', logo_url: 'foto', 
 function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) {
   const edit = mode === 'ubah'
   const [nama, setNama] = useState('')
+  const [alias, setAlias] = useState('')
   const [deskripsi, setDeskripsi] = useState('')
   const [urutan, setUrutan] = useState('')
   const [aktif, setAktif] = useState(true)
@@ -62,6 +64,7 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
   const [errorHapus, setErrorHapus] = useState('')
 
   const namaId = useId()
+  const aliasId = useId()
   const kepalaId = useId()
   const deskripsiId = useId()
   const urutanId = useId()
@@ -70,6 +73,7 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
   const aktifId = useId()
 
   const namaRef = useRef(null)
+  const aliasRef = useRef(null)
   const deskripsiRef = useRef(null)
   const urutanRef = useRef(null)
   const bannerRef = useRef(null)
@@ -85,6 +89,7 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
         const data = await getAdminDepartment(id, ac.signal)
         setAwal(data)
         setNama(data.name ?? '')
+        setAlias(data.alias ?? '')
         setDeskripsi(data.description ?? '')
         setUrutan(data.sort_order === null || data.sort_order === undefined ? '' : String(data.sort_order))
         setAktif(data.is_active === 1)
@@ -161,11 +166,12 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
   async function simpan(e) {
     e.preventDefault()
     if (menyimpan) return
-    const masalah = validasiDepartment({ nama, deskripsi, urutan, awal })
+    const masalah = validasiDepartment({ nama, alias, deskripsi, urutan, awal })
     if (Object.keys(masalah).length > 0) {
       setErrors((prev) => ({ foto: prev.foto, ...masalah }))
       setBanner(null)
       if (masalah.nama) namaRef.current?.focus()
+      else if (masalah.alias) aliasRef.current?.focus()
       else if (masalah.deskripsi) deskripsiRef.current?.focus()
       else urutanRef.current?.focus()
       return
@@ -182,6 +188,7 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
         // PUT parsial: hanya field yang berubah yang dikirim
         const badan = {}
         if (nama.trim() !== awal.name) badan.name = nama.trim()
+        if (alias.trim() !== (awal.alias ?? '')) badan.alias = alias.trim() || null
         if (deskripsi.trim() !== (awal.description ?? '')) badan.description = deskripsi.trim() || null
         if (Number(urutan) !== awal.sort_order) badan.sort_order = Number(urutan)
         if (aktif !== (awal.is_active === 1)) badan.is_active = aktif ? 1 : 0
@@ -199,6 +206,7 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
 
       const urlLogo = logo?.file ? await uploadImage(logo.file, ac.signal) : null
       const badan = { name: nama.trim(), sort_order: Number(urutan), is_active: aktif ? 1 : 0 }
+      if (alias.trim()) badan.alias = alias.trim()
       if (deskripsi.trim()) badan.description = deskripsi.trim()
       if (urlLogo) badan.logo_url = urlLogo
       const hasil = await createDepartment(badan, ac.signal)
@@ -213,10 +221,15 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
         else if (!kolom) sisa.push(e2.message)
       }
       // 409: nama (atau slug-nya) sudah dipakai department lain -> tampil di kolom nama
-      if (err.status === 409 && err.message && !perField.nama) perField.nama = err.message
+      // 409 alias: pesan menyebut "Alias" -> tampil di kolom alias
+      if (err.status === 409 && err.message && !perField.nama && !perField.alias) {
+        if (/alias/i.test(err.message)) perField.alias = err.message
+        else perField.nama = err.message
+      }
       if (Object.keys(perField).length > 0) {
         setErrors((prev) => ({ ...prev, ...perField }))
         if (perField.nama) namaRef.current?.focus()
+        else if (perField.alias) aliasRef.current?.focus()
         else if (perField.deskripsi) deskripsiRef.current?.focus()
         else if (perField.urutan) urutanRef.current?.focus()
       }
@@ -261,6 +274,7 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
   const namaFile = logo ? logo.nama : namaFileDariUrl(logoTersimpan || '') || 'Logo department'
   const ukuranFile = logo ? formatUkuran(logo.ukuran) : ''
   const errNama = errors.nama
+  const errAlias = errors.alias
   const errDeskripsi = errors.deskripsi
   const errUrutan = errors.urutan
   const errFoto = errors.foto
@@ -356,6 +370,33 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
                 {errNama && <CircleAlert className={fs.inputIcon} size={18} strokeWidth={2} aria-hidden="true" />}
               </div>
               <p id={`${namaId}-err`} className={`${fs.fieldError} ${styles.galat}`} role={errNama ? 'alert' : undefined}>{errNama}</p>
+            </div>
+
+            <div className={fs.field}>
+              <label htmlFor={aliasId} className={fs.label}>
+                Alias <span className={fs.opsional}>Opsional</span>
+              </label>
+              <div className={fs.inputWrap}>
+                <input
+                  ref={aliasRef}
+                  id={aliasId}
+                  type="text"
+                  className={`${fs.input} ${errAlias ? fs.inputError : ''}`}
+                  value={alias}
+                  onChange={(e) => {
+                    setAlias(e.target.value)
+                    bersihkan('alias')
+                  }}
+                  placeholder="Contoh: LEADE"
+                  autoComplete="off"
+                  disabled={terkunci}
+                  maxLength={MAKS_ALIAS}
+                  aria-invalid={errAlias ? 'true' : 'false'}
+                  aria-describedby={errAlias ? `${aliasId}-err` : undefined}
+                />
+                {errAlias && <CircleAlert className={fs.inputIcon} size={18} strokeWidth={2} aria-hidden="true" />}
+              </div>
+              <p id={`${aliasId}-err`} className={`${fs.fieldError} ${styles.galat}`} role={errAlias ? 'alert' : undefined}>{errAlias}</p>
             </div>
 
             {/* Backend belum punya field kepala department. Kepala = pengurus department itu yang jabatannya
@@ -475,7 +516,7 @@ function DepartmentForm({ mode = 'tambah', id, onNavigate, onSukses, onHapus }) 
                 onDragLeave={() => setSeret(false)}
                 onDrop={lepas}
               >
-                <span className={styles.zonaIkon} aria-hidden="true"><Upload size={22} strokeWidth={2} /></span>
+                <span className={styles.zonaIkon} aria-hidden="true"><ArrowUp size={22} strokeWidth={2} /></span>
                 <span className={styles.zonaTeks}><b>Klik untuk unggah</b> atau seret file</span>
                 <span className={styles.zonaCatatan}>PNG, JPG, atau WEBP (maks. 2 MB)</span>
                 <input
